@@ -324,8 +324,10 @@ localStorage.removeItem(SAVE_KEY);
 load();
 const simResult = {};
 for (const dgId of DUNGEON_ORDER) {
+  // d3は呪具なしAIで数〜10ラン想定(開発計画の基準値)。運の下振れでのフレークを避けるため上限に余裕を持たせる
+  const maxTries = dgId === 'd3' ? 25 : 15;
   let clears = 0, tries = 0;
-  while (clears < 1 && tries < 15) {
+  while (clears < 1 && tries < maxTries) {
     tries++;
     if (!dungeonUnlocked(dgId)) break;
     startRun(dgId);
