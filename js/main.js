@@ -12,6 +12,7 @@ let nodeOpts = null;        // 現在のノード2択
 let E = null;               // イベント画面データ
 let importText = '';        // 引継ぎコード入力
 let itemSel = null;         // 呪具画面で選択中の呪具id
+let detailUid = null;       // 拡大表示中の手持ち妖怪uid
 
 const NODE_INFO = {
   battle:   { emoji: '⚔️', name: '戦闘',   desc: '妖怪と戦う。弱らせて調伏の好機' },
@@ -77,6 +78,13 @@ function chooseNode(i) {
 // ===== アクション =====
 function handleAction(action, arg) {
   switch (action) {
+    case 'unit-detail': {
+      const uid = Number(arg);
+      if (getUnit(uid)) detailUid = uid;
+      break;
+    }
+    case 'unit-detail-close': detailUid = null; break;
+
     case 'nav-home': screen = 'home'; setToast(''); break;
     case 'nav-deck': screen = 'deck'; setToast(''); break;
     case 'nav-fusion': screen = 'fusion'; fusionSel = []; fusionResult = null; setToast(''); break;
@@ -234,6 +242,10 @@ function handleAction(action, arg) {
 }
 
 app.addEventListener('click', (ev) => {
+  if (ev.target.matches && ev.target.matches('[data-detail-backdrop]')) {
+    handleAction('unit-detail-close');
+    return;
+  }
   const t = ev.target.closest('[data-action]');
   if (!t) return;
   handleAction(t.dataset.action, t.dataset.arg);
@@ -259,11 +271,35 @@ function unitCard(u, opts) {
   const action = o.action ? `data-action="${o.action}" data-arg="${u.uid}"` : '';
   const itemMark = u.item && ITEMS[u.item] ? ` ${ITEMS[u.item].emoji}` : '';
   return `<div class="${cls.join(' ')}" ${action}>
-    <div class="unit-top"><span class="unit-emoji">${artHtml(s.id, s.emoji)}</span>${elemChip(s.element)}<span class="cost">◆${effCost(u)}</span></div>
+    <div class="unit-top"><button class="unit-art-btn" type="button" data-action="unit-detail" data-arg="${u.uid}" aria-label="${esc(s.name)}のイラストを拡大"><span class="unit-emoji">${artHtml(s.id, s.emoji)}</span><span class="zoom-mark" aria-hidden="true">＋</span></button>${elemChip(s.element)}<span class="cost">◆${effCost(u)}</span></div>
     <div class="unit-name">${esc(s.name)}${starText(u)}</div>
     <div class="unit-lv">Lv${unitLevel(u)} ${s.role}${itemMark}</div>
     <div class="unit-effect">${effectText(u)}</div>
     ${o.badge ? `<div class="unit-badge">${o.badge}</div>` : ''}
+  </div>`;
+}
+
+function unitDetailHtml() {
+  const u = getUnit(detailUid);
+  if (!u) { detailUid = null; return ''; }
+  const s = SPECIES[u.sp];
+  const item = u.item && ITEMS[u.item];
+  return `<div class="unit-detail-overlay" data-detail-backdrop role="presentation">
+    <section class="unit-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="unit-detail-title">
+      <button class="unit-detail-close" type="button" data-action="unit-detail-close" aria-label="閉じる">×</button>
+      <div class="unit-detail-art">${artHtml(s.id, s.emoji)}</div>
+      <h2 id="unit-detail-title">${esc(s.name)}${starText(u)}</h2>
+      <div class="unit-detail-meta">
+        ${elemChip(s.element)}
+        <span>Lv${unitLevel(u)}</span>
+        <span>${esc(s.role)}の札</span>
+        <span class="cost">◆${effCost(u)}</span>
+      </div>
+      <p class="unit-detail-effect">${effectText(u)}</p>
+      <p class="unit-detail-desc">${esc(s.desc)}</p>
+      <p class="unit-detail-item">${item ? `呪具 ${item.emoji} ${esc(item.name)}` : '呪具 なし'}</p>
+      <button class="btn btn-primary" type="button" data-action="unit-detail-close">閉じる</button>
+    </section>
   </div>`;
 }
 
@@ -621,6 +657,7 @@ function render() {
     case 'runend': renderRunEnd(); break;
     case 'resume': renderResume(); break;
   }
+  if (detailUid !== null) app.innerHTML += unitDetailHtml();
 }
 
 load();

@@ -76,6 +76,17 @@ body {
 .unit.indeck { border-color: #7a68c9; }
 .unit-top { display: flex; justify-content: space-between; align-items: center; }
 .unit-emoji { font-size: 1.6rem; }
+.unit-art-btn {
+  appearance: none; border: 0; background: transparent; color: inherit; padding: 2px;
+  border-radius: 8px; cursor: zoom-in; position: relative; line-height: 1;
+}
+.unit-art-btn:active { transform: scale(.94); }
+.unit-art-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.zoom-mark {
+  position: absolute; right: -3px; bottom: -3px; width: 13px; height: 13px;
+  display: grid; place-items: center; border-radius: 50%; background: var(--gold); color: #201a10;
+  border: 1px solid var(--panel); font-size: 10px; font-weight: bold; line-height: 1;
+}
 .unit-name { font-size: .8rem; margin-top: 2px; }
 .unit-lv { color: var(--dim); font-size: .7rem; }
 .unit-effect { font-size: .68rem; color: var(--text); margin-top: 2px; min-height: 1.6em; }
@@ -157,6 +168,36 @@ body {
 
 /* イラスト(絵文字と同じ大きさ感で置き換わる) */
 .sprite { width: 1.2em; height: 1.2em; vertical-align: -0.2em; }
+
+/* 手持ち妖怪のイラスト拡大 */
+.unit-detail-overlay {
+  position: fixed; inset: 0; z-index: 200; padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+  display: flex; align-items: center; justify-content: center; background: rgba(10, 8, 20, .88);
+  overscroll-behavior: contain;
+}
+.unit-detail-dialog {
+  width: min(92vw, 420px); max-height: 90vh; max-height: 90dvh; overflow-y: auto;
+  position: relative; padding: 18px 20px 20px; text-align: center;
+  background: linear-gradient(180deg, var(--panel2), var(--panel));
+  border: 1px solid var(--gold); border-radius: 18px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, .55);
+}
+.unit-detail-close {
+  appearance: none; position: absolute; top: 8px; right: 8px; z-index: 1;
+  width: 44px; height: 44px; border: 0; border-radius: 50%; cursor: pointer;
+  background: rgba(10, 8, 20, .65); color: var(--text); font-size: 1.7rem; line-height: 1;
+}
+.unit-detail-art {
+  min-height: 220px; display: grid; place-items: center; margin: 2px 0 6px;
+  background: radial-gradient(circle, rgba(122, 104, 201, .24), transparent 66%);
+}
+.unit-detail-art .sprite { display: block; width: min(68vw, 280px); height: min(68vw, 280px); }
+.unit-detail-dialog h2 { color: var(--gold); font-size: 1.45rem; margin: 2px 0 8px; }
+.unit-detail-meta { display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap; font-size: .82rem; }
+.unit-detail-effect { margin-top: 10px; font-size: .95rem; font-weight: bold; }
+.unit-detail-desc { margin: 10px auto; max-width: 32em; color: var(--dim); font-size: .84rem; line-height: 1.55; }
+.unit-detail-item { margin-bottom: 2px; color: var(--gold); font-size: .8rem; }
+.unit-detail-dialog > .btn { margin-top: 12px; }
 
 /* 呪具 */
 .item-card.item-empty { opacity: .4; cursor: default; }

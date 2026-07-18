@@ -32,6 +32,10 @@ check('home(イラスト差し替え)', () => {
   render();
   if (!appStub.innerHTML.includes('assets/art/onibi.svg')) throw new Error('imgタグに切り替わっていない');
 });
+check('home(イラスト拡大ボタン)', () => {
+  screen = 'home'; render();
+  if (!appStub.innerHTML.includes('data-action="unit-detail"')) throw new Error('拡大ボタンがない');
+});
 check('deck', () => { screen = 'deck'; render(); });
 check('dungeon(d2ロック中)', () => { screen = 'dungeon'; render(); });
 check('dungeon(全解放)', () => { G.dungeonClears.d1 = 1; G.dungeonClears.d2 = 1; render(); G.dungeonClears.d1 = 0; G.dungeonClears.d2 = 0; });
@@ -83,6 +87,16 @@ check('runend(踏破)', () => { R.clear = true; render(); });
 // アクションを一通り叩く
 check('action: nav遷移', () => {
   ['nav-deck','nav-fusion','nav-items','nav-dex','nav-save','nav-home'].forEach(a => handleAction(a));
+});
+check('action: 妖怪イラスト拡大/閉じる', () => {
+  screen = 'home';
+  const u = G.roster[0];
+  handleAction('unit-detail', String(u.uid));
+  if (detailUid !== u.uid) throw new Error('拡大対象が選択されていない');
+  if (!appStub.innerHTML.includes('unit-detail-dialog')) throw new Error('詳細モーダルがない');
+  if (!appStub.innerHTML.includes(SPECIES[u.sp].desc)) throw new Error('妖怪説明がない');
+  handleAction('unit-detail-close');
+  if (detailUid !== null || appStub.innerHTML.includes('unit-detail-dialog')) throw new Error('詳細モーダルが閉じていない');
 });
 check('action: 呪具の装備/解除', () => {
   screen = 'items';
