@@ -55,7 +55,7 @@ function makeEnemy(spId, hpScale, atkScale) {
   const s = SPECIES[spId];
   const hp = Math.round(s.enemy.hp * hpScale);
   return {
-    sp: spId, boss: false, name: s.name, emoji: s.emoji, element: s.element, tier: s.tier,
+    sp: spId, art: spId, boss: false, name: s.name, emoji: s.emoji, element: s.element, tier: s.tier,
     maxHp: hp, hp, atk: Math.round(s.enemy.atk * atkScale),
     rage: 0, poison: 0, weak: 0, advTag: false, snareTag: false, state: 'alive',
   };
@@ -68,7 +68,7 @@ function makeGroup(kind) {
   if (kind === 'boss') {
     const b = dg.boss;
     return [{
-      sp: null, boss: true, name: b.name, emoji: b.emoji, element: null, tier: 0,
+      sp: null, art: b.id, boss: true, name: b.name, emoji: b.emoji, element: null, tier: 0,
       maxHp: b.hp, hp: b.hp, atk: b.atk, bigAtk: b.bigAtk, expValue: b.expValue,
       rage: 0, poison: 0, weak: 0, advTag: false, snareTag: false, state: 'alive',
     }];

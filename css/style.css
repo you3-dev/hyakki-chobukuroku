@@ -155,6 +155,9 @@ body {
 .hand-card.disabled { opacity: .45; }
 .battle-actions { margin-top: 4px; }
 
+/* イラスト(絵文字と同じ大きさ感で置き換わる) */
+.sprite { width: 1.2em; height: 1.2em; vertical-align: -0.2em; }
+
 /* 呪具 */
 .item-card.item-empty { opacity: .4; cursor: default; }
 .drop-line { color: var(--gold); font-weight: bold; margin: 6px 0; }

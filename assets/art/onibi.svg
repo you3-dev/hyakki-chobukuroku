@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="onibi-core" cx="50%" cy="62%" r="58%">
+      <stop offset="0%" stop-color="#fff6cf"/>
+      <stop offset="45%" stop-color="#ffc25e"/>
+      <stop offset="100%" stop-color="#e2574c"/>
+    </radialGradient>
+  </defs>
+  <!-- 尾を引く小さな火 -->
+  <path d="M22 84 C 18 70, 28 62, 30 52 C 38 62, 40 74, 34 84 A 8 8 0 1 1 22 84 Z" fill="#e2574c" stroke="#5a2030" stroke-width="3.5" opacity="0.9"/>
+  <path d="M100 90 C 96 78, 104 70, 105 62 C 112 72, 113 82, 108 90 A 7 7 0 1 1 100 90 Z" fill="#ffb347" stroke="#5a2030" stroke-width="3.5" opacity="0.9"/>
+  <!-- 本体の炎 -->
+  <path d="M64 12 C 70 30, 92 42, 94 68 C 96 90, 82 106, 64 106 C 46 106, 30 90, 34 68 C 38 44, 58 30, 64 12 Z"
+        fill="url(#onibi-core)" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 内炎 -->
+  <path d="M64 44 C 68 54, 78 60, 78 74 C 78 86, 72 92, 64 92 C 56 92, 50 86, 50 74 C 50 60, 60 54, 64 44 Z"
+        fill="#fff6cf" opacity="0.85"/>
+  <!-- 顔: にんまり閉じ目 -->
+  <path d="M50 72 q 5 -6 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M68 72 q 5 -6 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M58 82 q 6 6 12 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+</svg>

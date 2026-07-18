@@ -252,7 +252,7 @@ function unitCard(u, opts) {
   const action = o.action ? `data-action="${o.action}" data-arg="${u.uid}"` : '';
   const itemMark = u.item && ITEMS[u.item] ? ` ${ITEMS[u.item].emoji}` : '';
   return `<div class="${cls.join(' ')}" ${action}>
-    <div class="unit-top"><span class="unit-emoji">${s.emoji}</span>${elemChip(s.element)}<span class="cost">◆${effCost(u)}</span></div>
+    <div class="unit-top"><span class="unit-emoji">${artHtml(s.id, s.emoji)}</span>${elemChip(s.element)}<span class="cost">◆${effCost(u)}</span></div>
     <div class="unit-name">${esc(s.name)}${starText(u)}</div>
     <div class="unit-lv">Lv${unitLevel(u)} ${s.role}${itemMark}</div>
     <div class="unit-effect">${effectText(u)}</div>
@@ -332,7 +332,7 @@ function renderFusion() {
   if (fusionResult) {
     const s = SPECIES[fusionResult.sp];
     preview = `<div class="fusion-preview ok">
-      <div class="big-emoji">${s.emoji}</div>
+      <div class="big-emoji">${artHtml(s.id, s.emoji)}</div>
       <div><b>${s.name}</b>${starText(fusionResult)} が生まれた!(Lv${unitLevel(fusionResult)})</div>
       <div class="hint">${s.desc}</div>
     </div>`;
@@ -414,7 +414,7 @@ function renderDex() {
     const habitat = s.tier === 0 ? '憑合のみ' : places;
     if (state === 2) {
       return `<div class="unit dex-item">
-        <div class="unit-top"><span class="unit-emoji">${s.emoji}</span>${elemChip(s.element)}<span class="cost">◆${s.cost}</span></div>
+        <div class="unit-top"><span class="unit-emoji">${artHtml(s.id, s.emoji)}</span>${elemChip(s.element)}<span class="cost">◆${s.cost}</span></div>
         <div class="unit-name">${s.name}</div>
         <div class="unit-lv">${s.role} | ${habitat}</div>
         <div class="unit-effect">${s.desc}</div>
@@ -422,7 +422,7 @@ function renderDex() {
     }
     if (state === 1) {
       return `<div class="unit dex-item dex-seen">
-        <div class="unit-emoji">${s.emoji}</div>
+        <div class="unit-emoji">${artHtml(s.id, s.emoji)}</div>
         <div class="unit-name">${s.name}</div>
         <div class="unit-lv">目撃のみ | ${habitat}</div>
       </div>`;
@@ -508,7 +508,7 @@ function enemyHtml(e, idx) {
     e.rage > 0 ? `<span class="rage">怒×${e.rage}</span>` : '',
   ].filter(Boolean).join(' ');
   return `<div class="${cls.join(' ')}" data-action="target-enemy" data-arg="${idx}">
-    <div class="enemy-emoji">${e.emoji}</div>
+    <div class="enemy-emoji">${artHtml(e.art, e.emoji)}</div>
     <div class="enemy-name">${esc(e.name)} ${elemChip(e.element)}</div>
     ${dead
       ? `<div class="enemy-state">${e.state === 'captured' ? '調伏!' : '討伐'}</div>`
@@ -530,7 +530,7 @@ function renderBattle() {
     return `<div class="hand-card ${selCard === uid ? 'selected' : ''} ${playable ? '' : 'disabled'}"
       data-action="play-card" data-arg="${uid}">
       <div class="unit-top"><span class="cost">◆${effCost(u)}</span>${elemChip(s.element)}</div>
-      <div class="unit-emoji">${s.emoji}</div>
+      <div class="unit-emoji">${artHtml(s.id, s.emoji)}</div>
       <div class="unit-name">${esc(s.name)}${starText(u)}</div>
       <div class="unit-effect">${effectText(u)}</div>
       <div class="unit-lv">Lv${unitLevel(u)} ${itemMark}</div>
