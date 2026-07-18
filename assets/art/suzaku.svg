@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="suzaku-hi" cx="50%" cy="55%" r="58%">
+      <stop offset="0%" stop-color="#fff6cf"/>
+      <stop offset="55%" stop-color="#ffc25e"/>
+      <stop offset="100%" stop-color="#e2574c"/>
+    </radialGradient>
+    <radialGradient id="suzaku-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffc25e" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#ffc25e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 焔の霊気 -->
+  <circle cx="64" cy="60" r="54" fill="url(#suzaku-aura)"/>
+  <!-- 飛び火 -->
+  <path d="M16 62 C 13 54, 18 49, 19 43 C 24 50, 25 57, 21 62 A 4.5 4.5 0 1 1 16 62 Z" fill="#e2574c" stroke="#5a2030" stroke-width="3.5" opacity="0.9"/>
+  <path d="M107 62 C 104 54, 109 49, 110 43 C 115 50, 116 57, 112 62 A 4.5 4.5 0 1 1 107 62 Z" fill="#ffb347" stroke="#5a2030" stroke-width="3.5" opacity="0.9"/>
+  <!-- 長い尾羽 -->
+  <g stroke="#5a2030" stroke-width="4" stroke-linejoin="round">
+    <path d="M56 78 C 44 86, 34 96, 32 108 C 32 114, 40 116, 44 110 C 50 100, 54 88, 56 78 Z" fill="#e2574c"/>
+    <path d="M72 78 C 84 86, 94 96, 96 108 C 96 114, 88 116, 84 110 C 78 100, 74 88, 72 78 Z" fill="#e2574c"/>
+    <path d="M64 80 C 58 90, 56 102, 62 112 C 65 116, 71 114, 71 107 C 71 97, 68 88, 64 80 Z" fill="#ffb347"/>
+  </g>
+  <circle cx="39" cy="106" r="4" fill="#ffc25e" stroke="#5a2030" stroke-width="2.5"/>
+  <circle cx="89" cy="106" r="4" fill="#ffc25e" stroke="#5a2030" stroke-width="2.5"/>
+  <circle cx="66" cy="107" r="4" fill="#fff6cf" stroke="#5a2030" stroke-width="2.5"/>
+  <!-- 焔の翼(立ちのぼる炎) -->
+  <path d="M17 64 C 12 52, 19 43, 21 31 C 28 43, 30 55, 25 65 A 5.5 5.5 0 1 1 17 64 Z" fill="#e2574c" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M32 70 C 28 60, 34 52, 36 42 C 43 52, 44 62, 40 70 A 5 5 0 1 1 32 70 Z" fill="#ffb347" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M111 64 C 116 52, 109 43, 107 31 C 100 43, 98 55, 103 65 A 5.5 5.5 0 1 0 111 64 Z" fill="#e2574c" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M96 70 C 100 60, 94 52, 92 42 C 85 52, 84 62, 88 70 A 5 5 0 1 0 96 70 Z" fill="#ffb347" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- 冠羽 -->
+  <path d="M56 30 C 51 23, 52 13, 58 8 C 58 16, 60 22, 62 27 Z" fill="#e2574c" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M62 27 C 62 17, 66 9, 73 6 C 69 14, 70 21, 69 28 Z" fill="#ffb347" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M70 30 C 74 24, 80 21, 85 23 C 80 27, 77 31, 75 35 Z" fill="#e2574c" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 体 -->
+  <path d="M46 56 C 46 39, 53 29, 64 29 C 75 29, 82 39, 82 56 C 82 70, 74 79, 64 79 C 54 79, 46 70, 46 56 Z" fill="url(#suzaku-hi)" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 胸の羽毛 -->
+  <ellipse cx="64" cy="64" rx="10" ry="11" fill="#fff6cf" opacity="0.9"/>
+  <path d="M64 58 C 66.5 61, 66.5 65, 64 68 C 61.5 65, 61.5 61, 64 58 Z" fill="#ffb347"/>
+  <!-- 目 -->
+  <circle cx="55" cy="45" r="4.6" fill="#fff6cf" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="73" cy="45" r="4.6" fill="#fff6cf" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="55" cy="45.5" r="2.1" fill="#5a2030"/>
+  <circle cx="73" cy="45.5" r="2.1" fill="#5a2030"/>
+  <path d="M49 38.5 q 5 -3 10 -1.5" fill="none" stroke="#5a2030" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M79 38.5 q -5 -3 -10 -1.5" fill="none" stroke="#5a2030" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- くちばし -->
+  <path d="M59 50 L 69 50 L 64 57 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="49" cy="52" r="3.5" fill="#e2574c" opacity="0.45"/>
+  <circle cx="79" cy="52" r="3.5" fill="#e2574c" opacity="0.45"/>
+</svg>

@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="genbu-aqua" cx="50%" cy="52%" r="50%">
+      <stop offset="0%" stop-color="#5b8dd9" stop-opacity="0.4"/>
+      <stop offset="70%" stop-color="#5b8dd9" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="#5b8dd9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 水気の霊気 -->
+  <circle cx="64" cy="62" r="53" fill="url(#genbu-aqua)"/>
+  <g fill="none" stroke="#5b8dd9" stroke-width="2.5">
+    <circle cx="18" cy="38" r="4"/>
+    <circle cx="112" cy="46" r="3"/>
+    <circle cx="110" cy="84" r="4.5"/>
+  </g>
+  <circle cx="24" cy="86" r="2.5" fill="#fff6cf"/>
+  <circle cx="106" cy="28" r="2.5" fill="#fff6cf"/>
+  <!-- 蛇の首(甲羅の陰から) -->
+  <path d="M84 14 C 80 22, 80 30, 82 38 L 96 38 C 92 28, 92 20, 96 14 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- 脚 -->
+  <path d="M30 76 C 24 82, 23 92, 29 97 C 35 100, 41 96, 41 89 L 39 78 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M98 76 C 104 82, 105 92, 99 97 C 93 100, 87 96, 87 89 L 89 78 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- 甲羅 -->
+  <path d="M30 60 C 30 36, 45 24, 64 24 C 83 24, 98 36, 98 60 C 98 76, 84 87, 64 87 C 44 87, 30 76, 30 60 Z" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 甲羅の亀甲紋 -->
+  <path d="M52 42 L 64 36 L 76 42 L 76 55 L 64 61 L 52 55 Z" fill="#3d2f5e" opacity="0.55"/>
+  <g fill="none" stroke="#2a1f3d" stroke-width="3" stroke-linecap="round" opacity="0.85">
+    <path d="M52 42 L 64 36 L 76 42 L 76 55 L 64 61 L 52 55 Z"/>
+    <path d="M52 42 L 40 37"/>
+    <path d="M76 42 L 88 37"/>
+    <path d="M52 55 L 41 63"/>
+    <path d="M76 55 L 87 63"/>
+    <path d="M64 36 L 64 27"/>
+  </g>
+  <!-- 甲羅の縁 -->
+  <path d="M30 60 C 30 76, 44 87, 64 87 C 84 87, 98 76, 98 60 C 95 70, 84 79, 64 79 C 44 79, 33 70, 30 60 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- 絡みつく蛇 -->
+  <path d="M28 54 C 44 65, 86 65, 100 49 C 103 52, 103 57, 101 60 C 87 75, 43 75, 26 64 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M28 54 C 19 51, 12 56, 13 65 C 17 60, 22 62, 26 66 C 25 62, 25 58, 28 54 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M33 60 C 47 69, 83 69, 96 56" fill="none" stroke="#fff6cf" stroke-width="3" stroke-linecap="round" opacity="0.85"/>
+  <!-- 亀の頭 -->
+  <path d="M50 92 C 50 82, 56 76, 64 76 C 72 76, 78 82, 78 92 C 78 100, 72 105, 64 105 C 56 105, 50 100, 50 92 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M54 91 q 4.5 -5 9 0" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M65 91 q 4.5 -5 9 0" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M60 98 q 4 3.5 8 0" fill="none" stroke="#2a1f3d" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="53" cy="97" r="3.2" fill="#e2574c" opacity="0.4"/>
+  <circle cx="75" cy="97" r="3.2" fill="#e2574c" opacity="0.4"/>
+  <!-- 蛇の頭 -->
+  <path d="M86 18 C 85 9, 93 3, 101 6 C 108 9, 110 17, 103 22 C 96 26, 88 25, 86 18 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <circle cx="95" cy="13" r="3.4" fill="#fff6cf" stroke="#2a1f3d" stroke-width="2.5"/>
+  <circle cx="94.5" cy="13.5" r="1.6" fill="#2a1f3d"/>
+  <g fill="none" stroke="#e2574c" stroke-width="2.5" stroke-linecap="round">
+    <path d="M86 20 C 80 22, 77 26, 78 30"/>
+    <path d="M78 30 l -4 -1"/>
+    <path d="M78 30 l -1 4"/>
+  </g>
+</svg>

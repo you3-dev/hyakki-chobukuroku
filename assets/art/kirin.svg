@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="kirin-holy" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff6cf" stop-opacity="0.5"/>
+      <stop offset="65%" stop-color="#fff6cf" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#fff6cf" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 聖なる光 -->
+  <circle cx="64" cy="60" r="53" fill="url(#kirin-holy)"/>
+  <!-- 光の粒 -->
+  <g fill="#fff6cf">
+    <path d="M22 38 L23.8 42.2 L28 44 L23.8 45.8 L22 50 L20.2 45.8 L16 44 L20.2 42.2 Z"/>
+    <path d="M106 38 L107.8 42.2 L112 44 L107.8 45.8 L106 50 L104.2 45.8 L100 44 L104.2 42.2 Z"/>
+    <path d="M97 12 L98.5 15.5 L102 17 L98.5 18.5 L97 22 L95.5 18.5 L92 17 L95.5 15.5 Z"/>
+  </g>
+  <!-- たてがみ(緑の焔) -->
+  <path d="M44 60 C 34 62, 28 72, 33 80 C 37 77, 42 72, 45 66 Z" fill="#5eb87a" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M84 60 C 94 62, 100 72, 95 80 C 91 77, 86 72, 83 66 Z" fill="#5eb87a" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 尾の焔 -->
+  <path d="M82 90 C 92 86, 96 78, 92 70 C 99 74, 102 84, 94 91 C 89 95, 83 94, 82 90 Z" fill="#5eb87a" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 座った体 -->
+  <path d="M46 100 C 44 84, 50 76, 64 76 C 78 76, 84 84, 82 100 C 82 104, 78 106, 74 106 L 54 106 C 50 106, 46 104, 46 100 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 胸の鱗 -->
+  <g fill="none" stroke="#5eb87a" stroke-width="3" stroke-linecap="round">
+    <path d="M56 84 q 4 -5 8 0"/>
+    <path d="M64 90 q 4 -5 8 0"/>
+    <path d="M55 94 q 4 -5 8 0"/>
+  </g>
+  <!-- 蹄 -->
+  <rect x="51" y="98" width="10" height="8" rx="3" fill="#c9a24b" stroke="#5a2030" stroke-width="4"/>
+  <rect x="67" y="98" width="10" height="8" rx="3" fill="#c9a24b" stroke="#5a2030" stroke-width="4"/>
+  <!-- 耳 -->
+  <path d="M44 34 C 36 24, 26 22, 22 28 C 28 34, 38 38, 46 40 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M84 34 C 92 24, 102 22, 106 28 C 100 34, 90 38, 82 40 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M40 33 C 35 28, 30 27, 28 29 C 32 32, 37 34, 41 36 Z" fill="#5eb87a"/>
+  <path d="M88 33 C 93 28, 98 27, 100 29 C 96 32, 91 34, 87 36 Z" fill="#5eb87a"/>
+  <!-- 一角 -->
+  <path d="M60 28 C 58 18, 60 8, 68 5 C 66 12, 66 19, 68 27 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M63 16 C 67 11, 72 9, 75 12 C 71 14, 68 17, 66 21 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- 頭 -->
+  <circle cx="64" cy="50" r="24" fill="#fff6cf" stroke="#5a2030" stroke-width="5"/>
+  <!-- 額の鱗 -->
+  <path d="M64 33 L 68.5 38 L 64 43 L 59.5 38 Z" fill="#5eb87a" stroke="#5a2030" stroke-width="3"/>
+  <!-- 顔 -->
+  <path d="M45 53 q 5 -5 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M73 53 q 5 -5 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M61 59 L 67 59 L 64 63 Z" fill="#5a2030"/>
+  <path d="M59 66 q 5 4 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="44" cy="60" r="4.5" fill="#e2574c" opacity="0.4"/>
+  <circle cx="84" cy="60" r="4.5" fill="#e2574c" opacity="0.4"/>
+</svg>

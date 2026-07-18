@@ -16,6 +16,8 @@ const ART = [
   // 憑合限定
   'daitengu', 'kyubi', 'yoroi', 'ryujin', 'omukade',
   'yatagarasu', 'muramasa', 'tsukumogami', 'tamamo',
+  'kirin', 'hakutaku', 'tatarigami', 'genbu',
+  'byakko', 'seiryu', 'suzaku', 'nurarihyon',
 ];
 
 function artHtml(id, emoji) {

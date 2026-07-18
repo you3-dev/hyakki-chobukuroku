@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 黒い瘴気 -->
+  <path d="M92 72 C 102 70, 106 60, 99 52 C 110 56, 112 70, 102 76 C 97 79, 92 77, 92 72 Z" fill="#3d2f5e" stroke="#2a1f3d" stroke-width="3.5" opacity="0.95"/>
+  <path d="M30 50 C 20 48, 16 40, 22 32 C 20 40, 26 44, 33 44 C 35 48, 33 51, 30 50 Z" fill="#3d2f5e" stroke="#2a1f3d" stroke-width="3.5" opacity="0.95"/>
+  <circle cx="104" cy="38" r="3" fill="#3d2f5e"/>
+  <circle cx="22" cy="66" r="2.5" fill="#3d2f5e"/>
+  <circle cx="98" cy="90" r="2.5" fill="#3d2f5e"/>
+  <!-- 欠けた後光 -->
+  <g fill="none" stroke="#c9a24b" stroke-width="4.5" stroke-linecap="round">
+    <path d="M41 26 A 25 25 0 0 1 84 24"/>
+    <path d="M39 36 A 25 25 0 0 0 42 50"/>
+    <path d="M93 40 q 4 6 -1 11"/>
+  </g>
+  <!-- 体(朽ちた神霊) -->
+  <path d="M42 44 C 42 28, 52 20, 64 20 C 76 20, 86 28, 86 44 C 86 52, 85 60, 86 68 C 87 77, 85 86, 78 84 C 74 83, 74 77, 70 78 C 66 79, 68 88, 61 89 C 55 90, 56 82, 52 81 C 48 80, 48 87, 43 85 C 37 83, 40 74, 41 66 C 42 58, 42 52, 42 44 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- ひび -->
+  <path d="M63 23 l 3 5 -2 4" fill="none" stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  <path d="M80 56 l -3 4 2 4" fill="none" stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  <!-- 朽ちた注連縄 -->
+  <path d="M40 63 C 50 57, 78 57, 88 64 L 86 71 C 76 64, 52 64, 42 70 Z" fill="#c9a24b" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <g stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round" opacity="0.7">
+    <path d="M51 60 l -2 7"/>
+    <path d="M61 58 l -2 8"/>
+    <path d="M71 58 l -2 8"/>
+  </g>
+  <!-- ほつれた縄の端 -->
+  <g fill="none" stroke="#c9a24b" stroke-width="3.5" stroke-linecap="round">
+    <path d="M87 67 q 7 3 6 12"/>
+    <path d="M89 65 q 9 1 10 8"/>
+  </g>
+  <!-- 紙垂 -->
+  <path d="M46 69 l 8 0 l 0 6 l -6 2 l 0 6 l -6 2 l 0 -6 l 6 -2 l 0 -6 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M72 69 l 8 0 l 0 6 l -6 2 l 0 6 l -6 2 l 0 -6 l 6 -2 l 0 -6 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3" stroke-linejoin="round"/>
+  <!-- 呪いの相 -->
+  <path d="M47 30 l 11 4" fill="none" stroke="#2a1f3d" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M81 30 l -11 4" fill="none" stroke="#2a1f3d" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="55" cy="40" r="6.5" fill="#e2574c" opacity="0.3"/>
+  <circle cx="73" cy="40" r="6.5" fill="#e2574c" opacity="0.3"/>
+  <circle cx="55" cy="40" r="4.2" fill="#3d2f5e" stroke="#2a1f3d" stroke-width="3"/>
+  <circle cx="73" cy="40" r="4.2" fill="#3d2f5e" stroke="#2a1f3d" stroke-width="3"/>
+  <circle cx="55" cy="40" r="1.7" fill="#e2574c"/>
+  <circle cx="73" cy="40" r="1.7" fill="#e2574c"/>
+  <path d="M56 49 l 4 3 4 -3 4 3" fill="none" stroke="#2a1f3d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 壊れた祠 -->
+  <g transform="rotate(-7 37 100)">
+    <rect x="27" y="96" width="21" height="13" rx="1.5" fill="#c9a24b" stroke="#2a1f3d" stroke-width="4"/>
+    <path d="M19 97 L 37.5 84 L 56 97 Z" fill="#aab2c0" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+    <rect x="33" y="100" width="8" height="9" fill="#2a1f3d"/>
+    <path d="M45 97 l -3 7" fill="none" stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>
