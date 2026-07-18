@@ -2,7 +2,7 @@
 
 const app = document.getElementById('app');
 
-let screen = 'home';        // home | deck | fusion | dex | save | dungeon | node | battle | event | runend | resume
+let screen = 'title';       // title | home | deck | fusion | dex | save | dungeon | node | battle | event | runend | resume
 let selCard = null;         // 選択中の手札uid
 let captureMode = false;
 let toast = '';
@@ -84,6 +84,11 @@ function handleAction(action, arg) {
       break;
     }
     case 'unit-detail-close': detailUid = null; break;
+
+    case 'title-enter':
+      screen = peekRun() ? 'resume' : 'home';
+      setToast('');
+      break;
 
     case 'nav-home': screen = 'home'; setToast(''); break;
     case 'nav-deck': screen = 'deck'; setToast(''); break;
@@ -306,6 +311,40 @@ function unitDetailHtml() {
 function toastHtml() { return toast ? `<div class="toast">${esc(toast)}</div>` : ''; }
 
 // ===== 各画面 =====
+function renderTitle() {
+  const pendingRun = peekRun();
+  const st = G.stats;
+  const hasProgress = st.runs > 0 || st.clears > 0 || st.captures > 0 || st.fusions > 0;
+  const buttonText = pendingRun ? '🌙 夜行を再開' : (hasProgress ? '記録から続ける' : '調伏の夜をはじめる');
+  const buttonSub = pendingRun
+    ? `${DUNGEONS[pendingRun.r.dungeon].name} ${pendingRun.r.depth}/${DUNGEONS[pendingRun.r.dungeon].length}歩`
+    : (hasProgress ? `図鑑 ${dexOwnedCount()}/${Object.keys(SPECIES).length}　踏破 ${st.clears}` : '最初の夜行は「宵の小径」から');
+  app.innerHTML = `<main class="title-screen">
+    <div class="title-moon" aria-hidden="true"></div>
+    <div class="title-art" aria-hidden="true">
+      <span class="title-art-side">${artHtml('karakasa', '☂️')}</span>
+      <span class="title-art-main">${artHtml('onibi', '🔥')}</span>
+      <span class="title-art-side">${artHtml('tanuki', '🦝')}</span>
+    </div>
+    <section class="title-copy" aria-labelledby="game-title">
+      <p class="title-kicker">妖怪デッキ構築ローグライト</p>
+      <h1 id="game-title">百鬼調伏録</h1>
+      <p class="title-reading">ひゃっきちょうぶくろく</p>
+      <p class="title-tagline">倒すか、従えるか。百鬼を率いて夜を往け。</p>
+    </section>
+    <div class="title-guide" aria-label="遊び方の要点">
+      <div><span>🧧</span><strong>弱らせて調伏</strong><small>敵の体力30%以下が好機</small></div>
+      <div><span>🔮</span><strong>集めて憑合</strong><small>組み合わせから新たな妖怪へ</small></div>
+    </div>
+    <div class="title-actions">
+      <button class="title-enter-btn" type="button" data-action="title-enter">
+        <span>${buttonText}</span><small>${buttonSub}</small>
+      </button>
+      <p>自動保存・完全オフライン対応予定</p>
+    </div>
+  </main>`;
+}
+
 function renderHome() {
   const st = G.stats;
   const rosterHtml = G.roster.map(u => unitCard(u, { inDeck: G.deck.includes(u.uid) })).join('');
@@ -344,7 +383,7 @@ function renderDungeon() {
   }).join('');
   app.innerHTML = `<div class="screen">
     <h2 class="h2">夜行 — 行き先を選ぶ</h2>
-    <p class="hint">術士の最大HP: ${runMaxHp()}(ダンジョン踏破ごとに+10)</p>
+    <p class="hint">術士の最大HP: ${runMaxHp()}(ダンジョン踏破ごとに+15)</p>
     <div class="node-row dungeon-row">${cards}</div>
     <div class="btn-row"><button class="btn" data-action="nav-home">拠点へ戻る</button></div>
     ${toastHtml()}
@@ -644,6 +683,7 @@ function renderRunEnd() {
 
 function render() {
   switch (screen) {
+    case 'title': renderTitle(); break;
     case 'home': renderHome(); break;
     case 'dungeon': renderDungeon(); break;
     case 'deck': renderDeck(); break;
@@ -661,5 +701,5 @@ function render() {
 }
 
 load();
-if (peekRun()) screen = 'resume';
+screen = 'title';
 render();

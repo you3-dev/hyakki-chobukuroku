@@ -26,6 +26,12 @@ function check(name, fn) {
   catch (e) { fails++; console.log('FAIL:', name, '-', e.message); }
 }
 
+check('boot: title', () => {
+  if (screen !== 'title') throw new Error('起動時にタイトルではない: ' + screen);
+  render();
+  if (!appStub.innerHTML.includes('百鬼調伏録')) throw new Error('タイトル名がない');
+  if (!appStub.innerHTML.includes('調伏の夜をはじめる')) throw new Error('新規開始ボタンがない');
+});
 check('home', () => { screen = 'home'; render(); });
 check('home(イラスト差し替え)', () => {
   if (!ART.includes('onibi')) throw new Error('サンプルアートが未登録');
@@ -37,7 +43,10 @@ check('home(イラスト拡大ボタン)', () => {
   if (!appStub.innerHTML.includes('data-action="unit-detail"')) throw new Error('拡大ボタンがない');
 });
 check('deck', () => { screen = 'deck'; render(); });
-check('dungeon(d2ロック中)', () => { screen = 'dungeon'; render(); });
+check('dungeon(d2ロック中)', () => {
+  screen = 'dungeon'; render();
+  if (!appStub.innerHTML.includes('踏破ごとに+15')) throw new Error('最大HP成長の表示が仕様と違う');
+});
 check('dungeon(全解放)', () => { G.dungeonClears.d1 = 1; G.dungeonClears.d2 = 1; render(); G.dungeonClears.d1 = 0; G.dungeonClears.d2 = 0; });
 check('dex', () => { screen = 'dex'; render(); });
 check('items(空)', () => { screen = 'items'; render(); });
@@ -87,6 +96,11 @@ check('runend(踏破)', () => { R.clear = true; render(); });
 // アクションを一通り叩く
 check('action: nav遷移', () => {
   ['nav-deck','nav-fusion','nav-items','nav-dex','nav-save','nav-home'].forEach(a => handleAction(a));
+});
+check('action: タイトルから拠点へ', () => {
+  clearRun(); R = null; B = null; screen = 'title';
+  handleAction('title-enter');
+  if (screen !== 'home') throw new Error('拠点へ進んでいない: ' + screen);
 });
 check('action: 妖怪イラスト拡大/閉じる', () => {
   screen = 'home';
@@ -148,8 +162,11 @@ check('resume(進行中ランあり)', () => {
   startBattle(makeGroup('battle'), { expMult: 1 });
   R = null; B = null; // リロードを模擬
   if (!peekRun()) throw new Error('ランが保存されていない');
-  screen = 'resume'; render();
-  if (!appStub.innerHTML.includes('夜行を再開する')) throw new Error('再開ボタンがない');
+  screen = 'title'; render();
+  if (!appStub.innerHTML.includes('夜行を再開')) throw new Error('タイトルに再開ボタンがない');
+  handleAction('title-enter');
+  if (screen !== 'resume') throw new Error('再開確認画面へ進んでいない: ' + screen);
+  if (!appStub.innerHTML.includes('夜行を再開する')) throw new Error('再開確認ボタンがない');
 });
 check('action: 夜行を再開(戦闘へ復帰)', () => {
   handleAction('resume-run');
