@@ -1,0 +1,9 @@
+{
+  "name": "百鬼調伏録(検証版)",
+  "short_name": "百鬼調伏録",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#151226",
+  "theme_color": "#151226"
+}
