@@ -13,6 +13,7 @@ let E = null;               // イベント画面データ
 let importText = '';        // 引継ぎコード入力
 let itemSel = null;         // 呪具画面で選択中の呪具id
 let detailUid = null;       // 拡大表示中の手持ち妖怪uid
+let gameTimeProvider = currentGameTime; // テストでは固定日時のコンテキストへ差し替え可能
 
 const NODE_INFO = {
   battle:   { emoji: '⚔️', name: '戦闘',   desc: '妖怪と戦う。弱らせて調伏の好機' },
@@ -310,8 +311,16 @@ function unitDetailHtml() {
 
 function toastHtml() { return toast ? `<div class="toast">${esc(toast)}</div>` : ''; }
 
+function timeContextHtml(context) {
+  return `<aside class="time-context" aria-label="現在の時間帯と月相">
+    <span class="time-moon" aria-hidden="true">${context.moonPhase.icon}</span>
+    <span><strong>${esc(context.timeBand.name)}・${esc(context.moonPhase.name)}</strong><small>${esc(context.timeBand.text)}</small></span>
+  </aside>`;
+}
+
 // ===== 各画面 =====
 function renderTitle() {
+  const time = gameTimeProvider();
   const pendingRun = peekRun();
   const st = G.stats;
   const hasProgress = st.runs > 0 || st.clears > 0 || st.captures > 0 || st.fusions > 0;
@@ -319,7 +328,7 @@ function renderTitle() {
   const buttonSub = pendingRun
     ? `${DUNGEONS[pendingRun.r.dungeon].name} ${pendingRun.r.depth}/${DUNGEONS[pendingRun.r.dungeon].length}歩`
     : (hasProgress ? `図鑑 ${dexOwnedCount()}/${Object.keys(SPECIES).length}　踏破 ${st.clears}` : '最初の夜行は「宵の小径」から');
-  app.innerHTML = `<main class="title-screen">
+  app.innerHTML = `<main class="title-screen time-${time.timeBand.id}" data-time-band="${time.timeBand.id}">
     <div class="title-moon" aria-hidden="true"></div>
     <div class="title-art" aria-hidden="true">
       <span class="title-art-side">${artHtml('karakasa', '☂️')}</span>
@@ -332,6 +341,7 @@ function renderTitle() {
       <p class="title-reading">ひゃっきちょうぶくろく</p>
       <p class="title-tagline">倒すか、従えるか。百鬼を率いて夜を往け。</p>
     </section>
+    ${timeContextHtml(time)}
     <div class="title-guide" aria-label="遊び方の要点">
       <div><span>🧧</span><strong>弱らせて調伏</strong><small>敵の体力30%以下が好機</small></div>
       <div><span>🔮</span><strong>集めて憑合</strong><small>組み合わせから新たな妖怪へ</small></div>
@@ -346,11 +356,13 @@ function renderTitle() {
 }
 
 function renderHome() {
+  const time = gameTimeProvider();
   const st = G.stats;
   const rosterHtml = G.roster.map(u => unitCard(u, { inDeck: G.deck.includes(u.uid) })).join('');
-  app.innerHTML = `<div class="screen home">
+  app.innerHTML = `<main class="home-time-shell time-${time.timeBand.id}" data-time-band="${time.timeBand.id}"><div class="screen home">
     <h1 class="title">百鬼調伏録</h1>
     <p class="subtitle">妖怪を調伏し、百鬼の図鑑を埋めよ</p>
+    ${timeContextHtml(time)}
     <div class="stats-line">図鑑 ${dexOwnedCount()}/${Object.keys(SPECIES).length} | 出撃${st.runs} / 踏破${st.clears} / 調伏${st.captures} / 憑合${st.fusions}</div>
     <div class="btn-row">
       <button class="btn btn-primary btn-big" data-action="start-run">🌙 夜行に出る</button>
@@ -365,7 +377,7 @@ function renderHome() {
     <h2 class="h2">手持ち妖怪 (${G.roster.length})</h2>
     <div class="grid">${rosterHtml}</div>
     ${toastHtml()}
-  </div>`;
+  </div></main>`;
 }
 
 function renderDungeon() {
@@ -494,12 +506,14 @@ function renderDex() {
     const places = DUNGEON_ORDER.filter(d => DUNGEONS[d].pools.t1.includes(s.id) || DUNGEONS[d].pools.t2.includes(s.id))
       .map(d => DUNGEONS[d].emoji).join('');
     const habitat = s.tier === 0 ? '憑合のみ' : places;
+    const conditionHint = s.encounter ? `<div class="dex-hint">🌙 ${esc(s.encounter.hint)}</div>` : '';
     if (state === 2) {
       return `<div class="unit dex-item">
         <div class="unit-top"><span class="unit-emoji">${artHtml(s.id, s.emoji)}</span>${elemChip(s.element)}<span class="cost">◆${s.cost}</span></div>
         <div class="unit-name">${s.name}</div>
         <div class="unit-lv">${s.role} | ${habitat}</div>
         <div class="unit-effect">${s.desc}</div>
+        ${conditionHint}
       </div>`;
     }
     if (state === 1) {
@@ -507,12 +521,14 @@ function renderDex() {
         <div class="unit-emoji">${artHtml(s.id, s.emoji)}</div>
         <div class="unit-name">${s.name}</div>
         <div class="unit-lv">目撃のみ | ${habitat}</div>
+        ${conditionHint}
       </div>`;
     }
-    return `<div class="unit dex-item dex-unknown">
+    return `<div class="unit dex-item dex-unknown${s.encounter ? ' dex-conditioned' : ''}">
       <div class="unit-emoji">❓</div>
       <div class="unit-name">???</div>
       <div class="unit-lv">${s.tier === 0 ? '憑合のみ' : '未発見'}</div>
+      ${conditionHint}
     </div>`;
   }).join('');
   app.innerHTML = `<div class="screen">

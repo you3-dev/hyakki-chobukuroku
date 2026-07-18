@@ -15,8 +15,9 @@ globalThis.appStub = { innerHTML: '', addEventListener() {} };
 globalThis.taStub = { value: '', focus() {}, select() {} };
 globalThis.document = { getElementById(id) { return id === 'app' ? globalThis.appStub : globalThis.taStub; } };
 globalThis.confirm = () => true;
+globalThis.styleCss = fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8');
 
-const code = ['js/data.js', 'js/art.js', 'js/state.js', 'js/run.js', 'js/battle.js', 'js/main.js']
+const code = ['js/time.js', 'js/data.js', 'js/art.js', 'js/state.js', 'js/run.js', 'js/battle.js', 'js/main.js']
   .map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
 
 const testBody = `
@@ -42,6 +43,27 @@ check('home(イラスト拡大ボタン)', () => {
   screen = 'home'; render();
   if (!appStub.innerHTML.includes('data-action="unit-detail"')) throw new Error('拡大ボタンがない');
 });
+check('title/home(全時間帯テーマ)', () => {
+  const cases = [
+    [new Date(2026, 6, 18, 7, 0), 'morning'],
+    [new Date(2026, 6, 18, 12, 0), 'day'],
+    [new Date(2026, 6, 18, 18, 0), 'evening'],
+    [new Date(2026, 6, 18, 22, 0), 'night'],
+    [new Date(2026, 6, 18, 2, 0), 'witching'],
+  ];
+  for (const [date, id] of cases) {
+    gameTimeProvider = () => gameTimeAt(date);
+    screen = 'title'; render();
+    if (!appStub.innerHTML.includes('time-' + id) || !appStub.innerHTML.includes('time-context')) throw new Error('title ' + id + 'のテーマ/時刻表示がない');
+    screen = 'home'; render();
+    if (!appStub.innerHTML.includes('time-' + id) || !appStub.innerHTML.includes('time-context')) throw new Error('home ' + id + 'のテーマ/時刻表示がない');
+  }
+  gameTimeProvider = currentGameTime;
+});
+check('reduced-motion対応CSS', () => {
+  if (!styleCss.includes('@media (prefers-reduced-motion: reduce)') || !styleCss.includes('.title-moon { animation: none; }')) throw new Error('reduced-motion指定がない');
+  appStub.innerHTML = '<span>CSS検査済み</span>';
+});
 check('deck', () => { screen = 'deck'; render(); });
 check('dungeon(d2ロック中)', () => {
   screen = 'dungeon'; render();
@@ -49,6 +71,15 @@ check('dungeon(d2ロック中)', () => {
 });
 check('dungeon(全解放)', () => { G.dungeonClears.d1 = 1; G.dungeonClears.d2 = 1; render(); G.dungeonClears.d1 = 0; G.dungeonClears.d2 = 0; });
 check('dex', () => { screen = 'dex'; render(); });
+check('dex(未発見・目撃の出現条件ヒント)', () => {
+  const oldYuki = G.dex.yukionna;
+  delete G.dex.chochin;
+  G.dex.yukionna = 1;
+  screen = 'dex'; render();
+  if (!appStub.innerHTML.includes(SPECIES.chochin.encounter.hint)) throw new Error('未発見の条件ヒントがない');
+  if (!appStub.innerHTML.includes(SPECIES.yukionna.encounter.hint)) throw new Error('目撃済みの条件ヒントがない');
+  if (oldYuki == null) delete G.dex.yukionna; else G.dex.yukionna = oldYuki;
+});
 check('items(空)', () => { screen = 'items'; render(); });
 check('items(所持・装備あり)', () => {
   gainItem('oniudewa'); gainItem('tengugeta');

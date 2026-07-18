@@ -41,15 +41,49 @@ body {
 .hint { color: var(--dim); font-size: .8rem; margin-bottom: 8px; }
 .footer { margin-top: 28px; text-align: center; }
 
-/* タイトル画面(M2.5先行版) */
+/* 現実時間テーマ(M3-B) */
+.time-morning { --sky-top: #2b2347; --sky-bottom: #775044; --sky-glow: rgba(244, 181, 105, .27); --time-line: #d99b70; }
+.time-day { --sky-top: #17364c; --sky-bottom: #4d5868; --sky-glow: rgba(195, 225, 232, .22); --time-line: #9fcbd2; }
+.time-evening { --sky-top: #28172f; --sky-bottom: #74362f; --sky-glow: rgba(238, 117, 76, .25); --time-line: #df7c62; }
+.time-night { --sky-top: #100d20; --sky-bottom: #211936; --sky-glow: rgba(224, 182, 78, .13); --time-line: #9079df; }
+.time-witching { --sky-top: #070918; --sky-bottom: #251442; --sky-glow: rgba(120, 91, 210, .25); --time-line: #7655c7; }
+
+.time-context {
+  position: relative; z-index: 2; width: fit-content; max-width: min(100%, 360px); margin: 0 auto;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 6px 12px; border: 1px solid var(--time-line); border-radius: 999px;
+  background: rgba(10, 8, 20, .72); color: #f3edf9; text-align: left;
+  box-shadow: 0 7px 20px rgba(8, 6, 18, .24); backdrop-filter: blur(4px);
+}
+.time-context > span:last-child { display: flex; flex-direction: column; min-width: 0; }
+.time-context strong { color: #f2d685; font-size: .72rem; line-height: 1.25; }
+.time-context small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #c8bddc; font-size: .58rem; line-height: 1.35; }
+.time-moon { flex: none; font-size: 1.28rem; filter: drop-shadow(0 0 7px var(--sky-glow)); }
+
+.home-time-shell {
+  position: relative; min-height: 100vh; min-height: 100svh; overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 8%, var(--sky-glow), transparent 34%),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--bg1) 48%, var(--sky-bottom) 130%);
+}
+.home-time-shell::before {
+  content: ''; position: absolute; top: -130px; right: -105px; width: 250px; height: 250px;
+  border: 1px solid var(--time-line); border-radius: 50%; opacity: .36;
+  box-shadow: 0 0 70px var(--sky-glow); pointer-events: none;
+}
+.home-time-shell .screen { position: relative; z-index: 1; }
+.home-time-shell .title { margin-top: 5vh; }
+.home-time-shell .time-context { margin-bottom: 11px; }
+
+/* タイトル画面(M2.5 + M3-B時間テーマ) */
 .title-screen {
   position: relative; min-height: 100vh; min-height: 100svh; overflow: hidden;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   gap: 12px; padding: max(22px, env(safe-area-inset-top)) 18px max(22px, env(safe-area-inset-bottom));
   text-align: center;
   background:
-    radial-gradient(circle at 50% 28%, rgba(224, 182, 78, .13), transparent 28%),
-    linear-gradient(180deg, #100d20 0%, var(--bg1) 52%, #211936 100%);
+    radial-gradient(circle at 50% 28%, var(--sky-glow), transparent 28%),
+    linear-gradient(180deg, var(--sky-top) 0%, var(--bg1) 52%, var(--sky-bottom) 115%);
 }
 .title-screen::before,
 .title-screen::after {
@@ -62,6 +96,7 @@ body {
   position: absolute; top: max(26px, env(safe-area-inset-top)); left: 50%; width: 190px; height: 190px;
   transform: translateX(-50%); border-radius: 50%; pointer-events: none;
   background: radial-gradient(circle, rgba(246, 223, 158, .18), rgba(224, 182, 78, .05) 58%, transparent 70%);
+  animation: moon-breathe 8s ease-in-out infinite;
 }
 .title-art { z-index: 1; display: flex; align-items: flex-end; justify-content: center; gap: 2px; height: 156px; }
 .title-art span { display: block; }
@@ -102,6 +137,16 @@ body {
 .title-enter-btn small { color: #d5cdef; font-size: .68rem; }
 .title-actions > p { margin-top: 7px; color: var(--dim); font-size: .63rem; }
 
+@keyframes moon-breathe {
+  0%, 100% { opacity: .72; transform: translateX(-50%) scale(.97); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.03); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .title-moon { animation: none; }
+  .btn:active, .title-enter-btn:active, .unit-art-btn:active, .node-card:active { transform: none; }
+}
+
 @media (max-height: 680px) {
   .title-screen { gap: 7px; padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: max(10px, env(safe-area-inset-bottom)); }
   .title-art { height: 102px; }
@@ -109,6 +154,24 @@ body {
   .title-art-side .sprite { width: 54px; height: 54px; }
   .title-copy h1 { font-size: 2rem; }
   .title-tagline { margin-top: 4px; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  .title-screen { gap: 4px; padding: max(4px, env(safe-area-inset-top)) 14px max(4px, env(safe-area-inset-bottom)); }
+  .title-art { height: 72px; }
+  .title-art-main .sprite { width: 72px; height: 72px; }
+  .title-art-side { transform: translateY(7px); }
+  .title-art-side .sprite { width: 42px; height: 42px; }
+  .title-kicker { font-size: .58rem; }
+  .title-copy h1 { margin-top: 0; font-size: 1.65rem; }
+  .title-reading { font-size: .58rem; }
+  .title-tagline { margin-top: 2px; font-size: .72rem; }
+  .title-screen .time-context { padding: 3px 10px; }
+  .title-guide > div { padding: 5px 8px; }
+  .title-guide > div > span { font-size: 1.1rem; }
+  .title-guide small { font-size: .55rem; }
+  .title-enter-btn { min-height: 48px; }
+  .title-actions > p { margin-top: 3px; }
 }
 
 /* ボタン */
@@ -283,6 +346,8 @@ body {
 .dex-seen { opacity: .75; }
 .dex-seen .unit-emoji { filter: grayscale(1) brightness(.7); }
 .dex-unknown { opacity: .45; }
+.dex-hint { margin-top: 5px; color: #d6bf79; font-size: .62rem; line-height: 1.35; }
+.dex-unknown.dex-conditioned { opacity: .68; }
 
 /* ダンジョン選択 */
 .dungeon-row { flex-direction: column; align-items: center; }

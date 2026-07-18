@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<base href="../">
+<title>M3 時間テーマ確認</title>
+<link rel="stylesheet" href="css/style.css?preview=m3c">
+</head>
+<body>
+<div id="app"></div>
+<script src="js/time.js?preview=m3c"></script>
+<script src="js/data.js?preview=m3c"></script>
+<script src="js/art.js?preview=m3c"></script>
+<script src="js/state.js?preview=m3c"></script>
+<script src="js/run.js?preview=m3c"></script>
+<script src="js/battle.js?preview=m3c"></script>
+<script src="js/main.js?preview=m3c"></script>
+<script>
+(() => {
+  const params = new URLSearchParams(location.search);
+  const hours = { morning: 7, day: 12, evening: 18, night: 22, witching: 2 };
+  const band = Object.hasOwn(hours, params.get('band')) ? params.get('band') : 'night';
+  const requestedScreen = params.get('screen');
+  const previewScreen = ['title', 'home', 'dex'].includes(requestedScreen) ? requestedScreen : 'title';
+  gameTimeProvider = () => gameTimeAt(new Date(2026, 6, 18, hours[band], 0));
+  screen = previewScreen;
+  render();
+})();
+</script>
+</body>
+</html>

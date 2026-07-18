@@ -1,6 +1,7 @@
 'use strict';
 
 let R = null; // 進行中のラン(RUN_KEYへ随時保存。リロード後に再開可)
+let runTimeProvider = currentGameTime; // 出撃時だけ実時計を読み、ラン中はR.timeへ固定
 
 function rand(n) { return Math.floor(Math.random() * n); }
 function pick(arr) { return arr[rand(arr.length)]; }
@@ -15,9 +16,17 @@ function dungeonUnlocked(id) {
   return !dg.unlock || G.dungeonClears[dg.unlock] > 0;
 }
 
+function runTimeSnapshot(context) {
+  return { timeBand: context.timeBand.id, moonPhase: context.moonPhase.id, label: context.label };
+}
+
+function validRunTime(time) {
+  return time && TIME_BANDS.some(x => x.id === time.timeBand) && MOON_PHASES.some(x => x.id === time.moonPhase);
+}
+
 function startRun(dungeonId) {
   const hp = runMaxHp();
-  R = { dungeon: dungeonId, depth: 0, hp, maxHp: hp, fuda: 3, captured: [], clear: false };
+  R = { dungeon: dungeonId, depth: 0, hp, maxHp: hp, fuda: 3, captured: [], clear: false, time: runTimeSnapshot(runTimeProvider()) };
   B = null;
   G.stats.runs++;
   save();
@@ -56,11 +65,14 @@ function loadRun() {
   if (!d) return false;
   const toUnits = uids => (uids || []).map(uid => getUnit(uid)).filter(Boolean);
   R = Object.assign({}, d.r, { captured: toUnits(d.r.captured) });
+  const timeMigrated = !validRunTime(R.time);
+  if (timeMigrated) R.time = runTimeSnapshot(runTimeProvider());
   if (d.b) {
     B = Object.assign({}, d.b, { captured: toUnits(d.b.captured) });
     const uids = new Set(G.roster.map(u => u.uid));
     ['draw', 'discard', 'hand', 'deckAtStart'].forEach(k => { B[k] = (B[k] || []).filter(id => uids.has(id)); });
   } else B = null;
+  if (timeMigrated) saveRun();
   return true;
 }
 
@@ -103,6 +115,27 @@ function makeEnemy(spId, hpScale, atkScale) {
   };
 }
 
+function encounterMatches(spId, time) {
+  const rule = SPECIES[spId] && SPECIES[spId].encounter;
+  if (!rule) return true;
+  if (rule.timeBands && !rule.timeBands.includes(time.timeBand)) return false;
+  if (rule.moonPhases && !rule.moonPhases.includes(time.moonPhase)) return false;
+  return true;
+}
+
+// 条件一致種はweight分だけ候補へ入れる。候補0件なら元テーブルへ戻し、進行不能を防ぐ。
+function encounterPool(ids, time) {
+  const eligible = [];
+  for (const id of ids) {
+    const rule = SPECIES[id].encounter;
+    const matches = encounterMatches(id, time);
+    const rawWeight = rule ? (matches ? rule.weight : rule.offWeight) : 1;
+    const weight = Math.max(0, Math.floor(rawWeight || 0));
+    for (let i = 0; i < weight; i++) eligible.push(id);
+  }
+  return eligible.length ? eligible : ids.slice();
+}
+
 function makeGroup(kind) {
   const dg = currentDungeon();
   const seg = depthSegment(R.depth);
@@ -115,7 +148,8 @@ function makeGroup(kind) {
       rage: 0, poison: 0, weak: 0, advTag: false, snareTag: false, state: 'alive',
     }];
   }
-  const { t1, t2 } = dg.pools;
+  const t1 = encounterPool(dg.pools.t1, R.time);
+  const t2 = encounterPool(dg.pools.t2, R.time);
   if (kind === 'elite') {
     const ids = [pick(t2), pick(t1), Math.random() < 0.5 ? pick(t2) : pick(t1)];
     return ids.map(id => makeEnemy(id, hpSc, atkSc));

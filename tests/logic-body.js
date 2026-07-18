@@ -1,6 +1,37 @@
 let fails = 0;
 function ok(cond, msg) { if (!cond) { fails++; console.log('FAIL:', msg); } else console.log('ok  :', msg); }
 
+// --- 時間帯・月相(M3-A: まだゲーム挙動には影響させない) ---
+{
+  const bandCases = [
+    [0, 59, 'night'], [1, 0, 'witching'], [4, 59, 'witching'], [5, 0, 'morning'],
+    [10, 59, 'morning'], [11, 0, 'day'], [16, 59, 'day'], [17, 0, 'evening'],
+    [19, 59, 'evening'], [20, 0, 'night'],
+  ];
+  for (const [hour, minute, expected] of bandCases) {
+    const actual = timeBandAt(new Date(2026, 6, 18, hour, minute)).id;
+    ok(actual === expected, `時間帯境界 ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}=${expected}`);
+  }
+
+  const newMoon = new Date(MOON_REFERENCE_UTC_MS);
+  const afterDays = days => new Date(MOON_REFERENCE_UTC_MS + days * DAY_MS);
+  ok(moonPhaseAt(newMoon).id === 'new' && moonAgeDaysAt(newMoon) < 1e-9, '月相基準日時=新月/月齢0');
+  ok(moonPhaseAt(afterDays(SYNODIC_MONTH_DAYS / 4)).id === 'first-quarter', '代表月齢=上弦');
+  ok(moonPhaseAt(afterDays(SYNODIC_MONTH_DAYS / 2)).id === 'full', '代表月齢=満月');
+  ok(moonPhaseAt(afterDays(SYNODIC_MONTH_DAYS * 3 / 4)).id === 'last-quarter', '代表月齢=下弦');
+  ok(moonPhaseAt(afterDays(SYNODIC_MONTH_DAYS)).id === 'new', '1朔望月後=新月');
+
+  const beforeMonthEnd = new Date(Date.UTC(2026, 0, 31, 23, 59));
+  const afterMonthStart = new Date(Date.UTC(2026, 1, 1, 0, 1));
+  const ageDelta = moonAgeDaysAt(afterMonthStart) - moonAgeDaysAt(beforeMonthEnd);
+  ok(Math.abs(ageDelta - 2 / (24 * 60)) < 1e-9, '月またぎでも月齢が連続');
+  const context = gameTimeAt(newMoon);
+  ok(context.label.includes(context.timeBand.name) && context.label.includes(context.moonPhase.name), '表示文言に時間帯・月相を含む');
+  let invalidRejected = false;
+  try { gameTimeAt(new Date('invalid')); } catch (e) { invalidRejected = e instanceof TypeError; }
+  ok(invalidRejected, '不正な日時を拒否');
+}
+
 // --- 初期化 ---
 load();
 ok(G.roster.length === 6, '初期手持ち6体');
@@ -25,6 +56,29 @@ ok(DUNGEON_ORDER.every(d => {
 ok(Object.values(SPECIES).filter(s => s.tier === 0).length === 17, '憑合限定17種');
 ok(Object.values(SPECIES).every(s => s.tier === 0 || (s.enemy && s.enemy.hp > 0)), '野生種は敵ステータスを持つ');
 ok(Object.keys(ITEMS).length === 8, '呪具8種');
+const conditionedSpecies = Object.values(SPECIES).filter(s => s.encounter);
+ok(conditionedSpecies.length === 5, '時間/月相条件付き妖怪5種');
+ok(conditionedSpecies.every(s => s.encounter.hint && s.encounter.weight >= 1), '条件付き妖怪にヒント・重みあり');
+ok(conditionedSpecies.every(s =>
+  (!s.encounter.timeBands || s.encounter.timeBands.every(id => TIME_BANDS.some(x => x.id === id))) &&
+  (!s.encounter.moonPhases || s.encounter.moonPhases.every(id => MOON_PHASES.some(x => x.id === id)))
+), '出現条件IDの整合');
+{
+  const dayNew = { timeBand: 'day', moonPhase: 'new' };
+  const nightNew = { timeBand: 'night', moonPhase: 'new' };
+  const dayFull = { timeBand: 'day', moonPhase: 'full' };
+  ok(encounterPool(['onibi', 'chochin'], dayNew).join(',') === 'onibi', '昼は提灯お化けを通常候補から除外');
+  ok(encounterPool(['onibi', 'chochin'], nightNew).filter(id => id === 'chochin').length === 2, '夜は提灯お化けの重み2');
+  const fullPool = encounterPool(['gaikotsu', 'hyakume', 'satori'], dayFull);
+  ok(fullPool.filter(id => id === 'hyakume').length === 4 && fullPool.filter(id => id === 'satori').length === 4, '満月レア2種の重み4');
+  const offMoonPool = encounterPool(['gaikotsu', 'hyakume', 'satori'], dayNew);
+  ok(offMoonPool.filter(id => id === 'hyakume').length === 1 && offMoonPool.filter(id => id === 'satori').length === 1, '満月外もレア2種へ低確率で到達可能');
+  ok(encounterPool(['chochin'], dayNew)[0] === 'chochin', '条件で候補0件なら元テーブルへフォールバック');
+  const contexts = TIME_BANDS.flatMap(band => MOON_PHASES.map(moon => ({ timeBand: band.id, moonPhase: moon.id })));
+  ok(contexts.every(time => DUNGEON_ORDER.every(id =>
+    encounterPool(DUNGEONS[id].pools.t1, time).length > 0 && encounterPool(DUNGEONS[id].pools.t2, time).length > 0
+  )), '全時間帯×月相で全ダンジョンの出現候補あり');
+}
 // 憑合限定種はすべてレシピの結果に登場する(作れない種がいない)
 {
   const results = new Set(RECIPES.map(r => r.result));
@@ -40,8 +94,13 @@ ok(dungeonUnlocked('d2') && runMaxHp() === 45, 'd1踏破でd2解放+HP45');
 G.dungeonClears.d1 = 0;
 
 // --- ラン開始・戦闘 ---
+runTimeProvider = () => gameTimeAt(new Date(2026, 6, 18, 22, 0));
 startRun('d1');
 ok(R.hp === 30 && R.fuda === 3 && R.dungeon === 'd1', 'ラン初期値');
+ok(R.time.timeBand === 'night' && validRunTime(R.time), '出撃開始時の時間帯・月相をランへ固定');
+runTimeProvider = () => gameTimeAt(new Date(2026, 6, 19, 12, 0));
+ok(encounterPool(['onibi', 'chochin'], R.time).includes('chochin'), '端末時刻が変わってもランの出現条件は固定');
+runTimeProvider = currentGameTime;
 R.depth = 1;
 const group = makeGroup('battle');
 ok(group.length >= 1 && group.length <= 2 && group.every(e => e.tier === 1), 'd1序盤: tier1のみ1-2体');
@@ -276,8 +335,19 @@ ok(dungeonUnlocked('d2'), 'd2解放');
   // 戦闘外: ラン開始時点で保存され、分かれ道から再開できる
   startRun('d1');
   ok(peekRun() && peekRun().b === null, 'ラン開始で保存(戦闘なし)');
+
+  // M3-C以前のランは、復元時の日時を一度だけ補完して以後固定する
+  const legacyRun = peekRun();
+  delete legacyRun.r.time;
+  localStorage.setItem(RUN_KEY, JSON.stringify(legacyRun));
+  runTimeProvider = () => gameTimeAt(new Date(2026, 6, 18, 2, 0));
   R = null; B = null;
   ok(loadRun() && R.depth === 0 && B === null, '戦闘外の復元');
+  ok(R.time.timeBand === 'witching' && validRunTime(R.time), '旧ランへ復元時の時間コンテキストを補完');
+  runTimeProvider = () => gameTimeAt(new Date(2026, 6, 18, 12, 0));
+  R = null; B = null;
+  ok(loadRun() && R.time.timeBand === 'witching', '旧ラン補完は一度だけで以後固定');
+  runTimeProvider = currentGameTime;
 
   // 戦闘中: ターン頭の状態が保存され、ターン途中の変化は巻き戻る
   R.depth = 1;
@@ -317,6 +387,78 @@ ok(dungeonUnlocked('d2'), 'd2解放');
 
   clearRun();
   ok(!peekRun() && !loadRun(), 'clearRunで保存が消える');
+}
+
+// --- M3-D: 全時間帯×代表月相の敵編成・全50種到達性 ---
+{
+  const representativePhases = ['new', 'first-quarter', 'full', 'last-quarter'];
+  const contexts = TIME_BANDS.flatMap(band => representativePhases.map(moonPhase => ({ timeBand: band.id, moonPhase })));
+  const previousR = R;
+  const originalRandom = Math.random;
+  let seed = 0x3d2026;
+  Math.random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 0x100000000);
+
+  let groupsGenerated = 0;
+  let enemiesGenerated = 0;
+  let conditionLeaks = 0;
+  let missingBossGroups = 0;
+  const conditionalCounts = Object.fromEntries(conditionedSpecies.map(s => [s.id, 0]));
+  try {
+    for (const time of contexts) {
+      for (const dungeon of DUNGEON_ORDER) {
+        const dg = DUNGEONS[dungeon];
+        const depths = [1, Math.ceil(dg.length / 2), dg.length - 1];
+        for (const depth of depths) {
+          R = { dungeon, depth, time };
+          for (let i = 0; i < 80; i++) {
+            const kind = i % 4 === 0 ? 'elite' : 'battle';
+            const group = makeGroup(kind);
+            groupsGenerated++;
+            enemiesGenerated += group.length;
+            for (const enemy of group) {
+              if (SPECIES[enemy.sp].encounter) {
+                conditionalCounts[enemy.sp]++;
+                const rule = SPECIES[enemy.sp].encounter;
+                if (!encounterMatches(enemy.sp, time) && !(rule.offWeight > 0)) conditionLeaks++;
+              }
+            }
+          }
+        }
+        R = { dungeon, depth: dg.length, time };
+        const boss = makeGroup('boss');
+        groupsGenerated++;
+        if (boss.length !== 1 || !boss[0].boss) missingBossGroups++;
+      }
+    }
+  } finally {
+    Math.random = originalRandom;
+    R = previousR;
+  }
+  console.log('時間連動編成シミュ:', JSON.stringify({ contexts: contexts.length, groupsGenerated, enemiesGenerated, conditionalCounts }));
+  ok(conditionLeaks === 0, '条件外の妖怪が敵編成へ混入しない');
+  ok(missingBossGroups === 0, '全時間帯×代表月相×全ダンジョンでボス編成あり');
+  ok(Object.values(conditionalCounts).every(count => count > 0), '条件付き5種が対応する時間/月相で出現');
+
+  // 野生種を起点に、材料2種が到達済みの憑合結果を反復追加する。
+  const reachable = new Set(Object.values(SPECIES).filter(s => s.tier > 0 &&
+    DUNGEON_ORDER.some(d => DUNGEONS[d].pools.t1.includes(s.id) || DUNGEONS[d].pools.t2.includes(s.id)) &&
+    contexts.some(time => encounterMatches(s.id, time))).map(s => s.id));
+  let expanded = true;
+  while (expanded) {
+    expanded = false;
+    for (const recipe of RECIPES) {
+      if (!reachable.has(recipe.result) && recipe.pair.every(id => reachable.has(id))) {
+        reachable.add(recipe.result);
+        expanded = true;
+      }
+    }
+  }
+  const unreachable = Object.keys(SPECIES).filter(id => !reachable.has(id));
+  ok(reachable.size === 50 && unreachable.length === 0, `妖怪50種すべてに到達経路あり ${unreachable.join(',')}`);
+
+  const allowedConditionKeys = new Set(['timeBands', 'moonPhases', 'weight', 'offWeight', 'hint']);
+  ok(conditionedSpecies.every(s => Object.keys(s.encounter).every(key => allowedConditionKeys.has(key))), '長期固定の暦日・季節条件なし');
+  ok(['hyakume', 'satori'].every(id => SPECIES[id].encounter.offWeight > 0), '満月レアも全月相で低確率出現し取得不能期間なし');
 }
 
 // --- 自動プレイ: d1→d2→d3を成長込みで通しシミュレーション ---

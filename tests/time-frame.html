@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>M3 時間テーマ実寸フレーム</title>
+<style>
+html, body { margin: 0; min-height: 100%; background: #080611; }
+iframe { display: block; border: 0; background: #151226; }
+</style>
+</head>
+<body>
+<script>
+(() => {
+  const params = new URLSearchParams(location.search);
+  const width = params.get('layout') === 'landscape' ? 844 : 390;
+  const height = params.get('layout') === 'landscape' ? 390 : 844;
+  const band = params.get('band') || 'night';
+  const requestedScreen = params.get('screen');
+  const previewScreen = ['title', 'home', 'dex'].includes(requestedScreen) ? requestedScreen : 'title';
+  const frame = document.createElement('iframe');
+  frame.width = width;
+  frame.height = height;
+  frame.title = `${band} ${previewScreen} ${width}x${height}`;
+  frame.src = `time-preview.html?band=${encodeURIComponent(band)}&screen=${previewScreen}`;
+  document.body.append(frame);
+})();
+</script>
+</body>
+</html>

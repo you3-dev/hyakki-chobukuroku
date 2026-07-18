@@ -25,7 +25,7 @@ function elementMult(atk, def) {
 const SPECIES = {
   // --- 宵の小径(d1)の野生種 ---
   onibi:      { id: 'onibi', name: '鬼火', emoji: '🔥', element: 'fire', cost: 1, role: '攻', effect: { dmg: 4 }, tier: 1, enemy: { hp: 12, atk: 4 }, desc: '夜道に漂う火の玉。従えれば夜が明るい。' },
-  chochin:    { id: 'chochin', name: '提灯お化け', emoji: '🏮', element: 'fire', cost: 1, role: '守', effect: { block: 4 }, tier: 1, enemy: { hp: 14, atk: 3 }, desc: '破れ提灯の付喪神。身を挺して主を守る。' },
+  chochin:    { id: 'chochin', name: '提灯お化け', emoji: '🏮', element: 'fire', cost: 1, role: '守', effect: { block: 4 }, tier: 1, enemy: { hp: 14, atk: 3 }, encounter: { timeBands: ['evening', 'night', 'witching'], weight: 2, hint: '夕暮れから夜の灯りに寄るらしい' }, desc: '破れ提灯の付喪神。身を挺して主を守る。' },
   karakasa:   { id: 'karakasa', name: '唐傘お化け', emoji: '☂️', element: 'water', cost: 1, role: '守', effect: { block: 5 }, tier: 1, enemy: { hp: 15, atk: 3 }, desc: '一本足で跳ねる古傘。雨も刃も弾き返す。' },
   tanuki:     { id: 'tanuki', name: '化け狸', emoji: '🦝', element: 'earth', cost: 1, role: '妙', effect: { draw: 2 }, tier: 1, enemy: { hp: 13, atk: 4 }, desc: '化かし上手。懐から次の一手を出してくれる。' },
   kamaitachi: { id: 'kamaitachi', name: '鎌鼬', emoji: '🌪️', element: 'metal', cost: 1, role: '攻', effect: { dmg: 5 }, tier: 1, enemy: { hp: 12, atk: 5 }, desc: 'つむじ風に乗る三兄弟の末弟。手数が早い。' },
@@ -42,7 +42,7 @@ const SPECIES = {
   dorotabo:   { id: 'dorotabo', name: '泥田坊', emoji: '🌾', element: 'earth', cost: 1, role: '攻', effect: { dmg: 3, block: 2 }, tier: 1, enemy: { hp: 14, atk: 4 }, desc: '「田を返せ」と呻く泥の腕。粘り強い。' },
   kudagitsune: { id: 'kudagitsune', name: '管狐', emoji: '🐁', element: 'metal', cost: 1, role: '攻', effect: { dmg: 3, poison: 1 }, tier: 1, enemy: { hp: 12, atk: 4 }, desc: '竹筒に棲む小さな妖狐。噛み跡が疼く。' },
   amefuri:    { id: 'amefuri', name: '雨降小僧', emoji: '☔', element: 'water', cost: 1, role: '守', effect: { block: 3, heal: 2 }, tier: 1, enemy: { hp: 14, atk: 3 }, desc: '雨を呼ぶ小僧。恵みの雨が傷を洗う。' },
-  yukionna:   { id: 'yukionna', name: '雪女', emoji: '❄️', element: 'water', cost: 2, role: '攻', effect: { dmg: 5, weaken: 2 }, tier: 2, enemy: { hp: 20, atk: 6 }, desc: '吹雪の化身。冷気が敵の腕を凍えさせる。' },
+  yukionna:   { id: 'yukionna', name: '雪女', emoji: '❄️', element: 'water', cost: 2, role: '攻', effect: { dmg: 5, weaken: 2 }, tier: 2, enemy: { hp: 20, atk: 6 }, encounter: { timeBands: ['witching'], weight: 2, hint: '夜の底、最も冷える刻に現れるらしい' }, desc: '吹雪の化身。冷気が敵の腕を凍えさせる。' },
   karasutengu: { id: 'karasutengu', name: 'からす天狗', emoji: '🪶', element: 'wood', cost: 2, role: '攻', effect: { dmgAll: 4 }, tier: 2, enemy: { hp: 19, atk: 5 }, desc: '黒翼の剣士。旋風が敵陣を切り裂く。' },
   ogama:      { id: 'ogama', name: '大蝦蟇', emoji: '🐸', element: 'water', cost: 2, role: '守', effect: { block: 5, poison: 3 }, tier: 2, enemy: { hp: 24, atk: 5 }, desc: '岩ほどの蟇。毒の息を吐き、腹で受け止める。' },
   nue:        { id: 'nue', name: '鵺', emoji: '⛈️', element: 'metal', cost: 2, role: '攻', effect: { dmg: 6, weaken: 1 }, tier: 2, enemy: { hp: 21, atk: 6 }, desc: '猿頭虎脚蛇尾の合成獣。黒雲とともに現れる。' },
@@ -50,13 +50,13 @@ const SPECIES = {
   // --- 百鬼の御堂(d3)の野生種 ---
   gaikotsu:   { id: 'gaikotsu', name: '骸骨武者', emoji: '☠️', element: 'metal', cost: 2, role: '攻', effect: { dmg: 8 }, tier: 2, enemy: { hp: 22, atk: 7 }, desc: '戦場に果てた武者の亡骸。太刀筋は今も鋭い。' },
   kasha:      { id: 'kasha', name: '火車', emoji: '😼', element: 'fire', cost: 2, role: '攻', effect: { dmg: 6, poison: 2 }, tier: 2, enemy: { hp: 20, atk: 6 }, desc: '亡者を攫う怪猫。爪の火傷は膿んで痛む。' },
-  hyakume:    { id: 'hyakume', name: '百目', emoji: '👀', element: 'earth', cost: 2, role: '妙', effect: { draw: 2, block: 3 }, tier: 2, enemy: { hp: 22, atk: 5 }, desc: '百の目が盤面のすべてを見通す。' },
+  hyakume:    { id: 'hyakume', name: '百目', emoji: '👀', element: 'earth', cost: 2, role: '妙', effect: { draw: 2, block: 3 }, tier: 2, enemy: { hp: 22, atk: 5 }, encounter: { moonPhases: ['full'], weight: 4, offWeight: 1, hint: '満月には百の目がいっせいに開くという' }, desc: '百の目が盤面のすべてを見通す。' },
   yamanba:    { id: 'yamanba', name: '山姥', emoji: '🧌', element: 'wood', cost: 2, role: '攻', effect: { dmg: 5, heal: 3 }, tier: 2, enemy: { hp: 21, atk: 6 }, desc: '山に棲む老婆。喰らった分だけ主に返す。' },
   onyudo:     { id: 'onyudo', name: '大入道', emoji: '🗿', element: 'earth', cost: 3, role: '攻', effect: { dmg: 9, block: 4 }, tier: 2, enemy: { hp: 28, atk: 7 }, desc: '見上げるほどの巨僧。一歩ごとに地が揺れる。' },
-  shiranui:   { id: 'shiranui', name: '不知火', emoji: '🎆', element: 'fire', cost: 2, role: '攻', effect: { dmgAll: 5 }, tier: 2, enemy: { hp: 18, atk: 6 }, desc: '海上に連なる怪火。夜を焦がして燃え広がる。' },
+  shiranui:   { id: 'shiranui', name: '不知火', emoji: '🎆', element: 'fire', cost: 2, role: '攻', effect: { dmgAll: 5 }, tier: 2, enemy: { hp: 18, atk: 6 }, encounter: { timeBands: ['night', 'witching'], weight: 2, hint: '夜の水辺に怪火が連なるらしい' }, desc: '海上に連なる怪火。夜を焦がして燃え広がる。' },
   itsumade:   { id: 'itsumade', name: '以津真天', emoji: '🦅', element: 'metal', cost: 2, role: '攻', effect: { dmgAll: 4, block: 2 }, tier: 2, enemy: { hp: 20, atk: 6 }, desc: '「いつまで」と鳴く怪鳥。翼が刃となり雨と降る。' },
   nureonna:   { id: 'nureonna', name: '濡女', emoji: '🧜‍♀️', element: 'water', cost: 2, role: '攻', effect: { dmg: 7, poison: 2 }, tier: 2, enemy: { hp: 23, atk: 6 }, desc: '濡れ髪の蛇女。絡みつかれたら逃げられない。' },
-  satori:     { id: 'satori', name: '覚', emoji: '🧠', element: 'earth', cost: 2, role: '妙', effect: { draw: 2, weaken: 1 }, tier: 2, enemy: { hp: 20, atk: 5 }, desc: '心を読む山の怪。敵の手の内はすべてお見通し。' },
+  satori:     { id: 'satori', name: '覚', emoji: '🧠', element: 'earth', cost: 2, role: '妙', effect: { draw: 2, weaken: 1 }, tier: 2, enemy: { hp: 20, atk: 5 }, encounter: { moonPhases: ['full'], weight: 4, offWeight: 1, hint: '満月の光の下では心の声を隠せないらしい' }, desc: '心を読む山の怪。敵の手の内はすべてお見通し。' },
   umibozu:    { id: 'umibozu', name: '海坊主', emoji: '🌊', element: 'water', cost: 3, role: '攻', effect: { dmgAll: 6 }, tier: 2, enemy: { hp: 26, atk: 6 }, desc: '夜の海に立つ巨影。大波が全てを呑み込む。' },
   oboroguruma: { id: 'oboroguruma', name: '朧車', emoji: '🛞', element: 'earth', cost: 2, role: '攻', effect: { dmg: 6, block: 3 }, tier: 2, enemy: { hp: 24, atk: 6 }, desc: '恨みを乗せた牛車。轢かれても轢いても堅い。' },
   // --- 憑合限定(17種) ---
