@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 座敷童子: おかっぱ・赤い着物・調伏札を差し出す -->
+  <!-- 足袋 -->
+  <ellipse cx="55" cy="110" rx="7" ry="4" fill="#f5f0e6" stroke="#5a2030" stroke-width="3.5"/>
+  <ellipse cx="73" cy="110" rx="7" ry="4" fill="#f5f0e6" stroke="#5a2030" stroke-width="3.5"/>
+  <!-- 着物 -->
+  <path d="M49 78 C 43 86, 40 98, 41 109 L 87 109 C 88 98, 85 86, 79 78 Z"
+        fill="#e2574c" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 帯(木属性の緑) -->
+  <path d="M43 96 C 56 100, 72 100, 85 96" fill="none" stroke="#5eb87a" stroke-width="6" stroke-linecap="round"/>
+  <!-- 衿 -->
+  <path d="M55 80 L 64 92 L 73 80" fill="none" stroke="#fff6cf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 着物の柄 -->
+  <circle cx="50" cy="88" r="2" fill="#fff6cf" opacity="0.8"/>
+  <circle cx="80" cy="90" r="2" fill="#fff6cf" opacity="0.8"/>
+  <!-- 両腕(札を差し出す) -->
+  <path d="M50 82 C 46 88, 46 94, 50 98" fill="none" stroke="#5a2030" stroke-width="9.5" stroke-linecap="round"/>
+  <path d="M50 82 C 46 88, 46 94, 50 98" fill="none" stroke="#e2574c" stroke-width="5" stroke-linecap="round"/>
+  <path d="M78 82 C 82 88, 82 94, 78 98" fill="none" stroke="#5a2030" stroke-width="9.5" stroke-linecap="round"/>
+  <path d="M78 82 C 82 88, 82 94, 78 98" fill="none" stroke="#e2574c" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="52" cy="99" r="4.5" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5"/>
+  <circle cx="76" cy="99" r="4.5" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5"/>
+  <!-- 調伏札 -->
+  <path d="M56 90 L 72 90 L 72 114 L 64 111 L 56 114 Z"
+        fill="#fff6cf" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M60 95 h 8 M64 95 v 12 M60.5 102 h 7" stroke="#e2574c" stroke-width="2.6" stroke-linecap="round"/>
+  <!-- 顔 -->
+  <path d="M42 52 C 42 38, 51 30, 64 30 C 77 30, 86 38, 86 52 C 86 65, 77 74, 64 74 C 51 74, 42 65, 42 52 Z"
+        fill="#fff6cf" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- おかっぱ頭(前髪ぱっつん+横髪) -->
+  <path d="M43 50 C 42 33, 51 25, 64 25 C 77 25, 86 33, 85 50 C 85 55, 84 59, 82 62 L 78 60 C 79 54, 79 48, 78 43 L 73 45.5 L 68.5 42.5 L 64 45.5 L 59.5 42.5 L 55 45.5 L 50 43 C 49 48, 49 54, 50 60 L 46 62 C 44 59, 43 55, 43 50 Z"
+        fill="#5a2030" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- にこにこ閉じ目 -->
+  <path d="M50 54 q 5 -6 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M68 54 q 5 -6 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <!-- にっこり口 -->
+  <path d="M58 63 q 6 6 12 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <!-- 頬 -->
+  <circle cx="47" cy="60" r="4.5" fill="#e2574c" opacity="0.45"/>
+  <circle cx="81" cy="60" r="4.5" fill="#e2574c" opacity="0.45"/>
+</svg>

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 体 -->
+  <path d="M40 80 C 40 68, 50 62, 64 62 C 78 62, 88 68, 88 80 C 88 91, 80 98, 64 98 C 48 98, 40 91, 40 80 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 脚と蹄 -->
+  <rect x="43" y="90" width="11" height="14" rx="4" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="4"/>
+  <rect x="74" y="90" width="11" height="14" rx="4" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="4"/>
+  <rect x="43" y="99" width="11" height="6" rx="2.5" fill="#c9a24b" stroke="#2a1f3d" stroke-width="3.5"/>
+  <rect x="74" y="99" width="11" height="6" rx="2.5" fill="#c9a24b" stroke="#2a1f3d" stroke-width="3.5"/>
+  <!-- 体側の目 -->
+  <g>
+    <ellipse cx="46" cy="78" rx="4.6" ry="5.6" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3"/>
+    <circle cx="46" cy="78.5" r="2.1" fill="#2a1f3d"/>
+    <ellipse cx="82" cy="78" rx="4.6" ry="5.6" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3"/>
+    <circle cx="82" cy="78.5" r="2.1" fill="#2a1f3d"/>
+  </g>
+  <!-- 巻物 -->
+  <rect x="48" y="88" width="32" height="14" rx="2" fill="#fff6cf" stroke="#2a1f3d" stroke-width="4"/>
+  <g stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round" opacity="0.55">
+    <path d="M57 92 v 7"/>
+    <path d="M64 92 v 7"/>
+    <path d="M71 92 v 7"/>
+  </g>
+  <rect x="41" y="85" width="8" height="21" rx="4" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="4"/>
+  <rect x="79" y="85" width="8" height="21" rx="4" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="4"/>
+  <circle cx="45" cy="85" r="3.2" fill="#5eb87a" stroke="#2a1f3d" stroke-width="3"/>
+  <!-- 角 -->
+  <path d="M36 28 C 27 24, 22 15, 27 9 C 34 12, 40 19, 42 26 Z" fill="#c9a24b" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M92 28 C 101 24, 106 15, 101 9 C 94 12, 88 19, 86 26 Z" fill="#c9a24b" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- 前髪の房 -->
+  <path d="M55 24 C 55 15, 60 12, 64 7 C 68 12, 73 15, 73 24 C 69 20, 59 20, 55 24 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 耳 -->
+  <path d="M32 46 C 24 43, 18 46, 20 52 C 25 55, 32 53, 35 49 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M96 46 C 104 43, 110 46, 108 52 C 103 55, 96 53, 93 49 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 頭 -->
+  <path d="M32 46 C 32 30, 44 22, 64 22 C 84 22, 96 30, 96 46 C 96 60, 84 68, 64 68 C 44 68, 32 60, 32 46 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 第三の目 -->
+  <ellipse cx="64" cy="35" rx="6.5" ry="5.5" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5"/>
+  <circle cx="64" cy="35.5" r="2.4" fill="#2a1f3d"/>
+  <!-- 穏やかな閉じ目 -->
+  <path d="M41 50 q 5 -6 10 0" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M77 50 q 5 -6 10 0" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <!-- 鼻口 -->
+  <ellipse cx="64" cy="59" rx="13" ry="8" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5"/>
+  <circle cx="58.5" cy="58.5" r="1.6" fill="#2a1f3d"/>
+  <circle cx="69.5" cy="58.5" r="1.6" fill="#2a1f3d"/>
+  <path d="M60 62.5 q 4 3.5 8 0" fill="none" stroke="#2a1f3d" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="38" cy="56" r="4" fill="#e2574c" opacity="0.4"/>
+  <circle cx="90" cy="56" r="4" fill="#e2574c" opacity="0.4"/>
+</svg>

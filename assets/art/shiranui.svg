@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="shiranui-core" cx="50%" cy="62%" r="58%">
+      <stop offset="0%" stop-color="#fff6cf"/>
+      <stop offset="45%" stop-color="#ffc25e"/>
+      <stop offset="100%" stop-color="#e2574c"/>
+    </radialGradient>
+  </defs>
+  <!-- 遠くの怪火 -->
+  <path d="M22 96 C 19 86 25 80 26 72 C 32 80 33 89 29 96 A 5.5 5.5 0 1 1 22 96 Z" fill="#ffb347" stroke="#5a2030" stroke-width="3.5" opacity="0.95"/>
+  <path d="M104 96 C 101 86 107 80 108 72 C 114 80 115 89 111 96 A 5.5 5.5 0 1 1 104 96 Z" fill="#ffb347" stroke="#5a2030" stroke-width="3.5" opacity="0.95"/>
+  <!-- 両脇の火 -->
+  <path d="M36 94 C 31 82 39 74 41 62 C 49 74 51 86 45 95 A 6.5 6.5 0 1 1 36 94 Z" fill="#e2574c" stroke="#5a2030" stroke-width="4"/>
+  <path d="M84 94 C 79 82 87 74 89 62 C 97 74 99 86 93 95 A 6.5 6.5 0 1 1 84 94 Z" fill="#e2574c" stroke="#5a2030" stroke-width="4"/>
+  <!-- 主火 -->
+  <path d="M64 20 C 68 36 84 46 86 66 C 88 84 76 96 64 96 C 52 96 40 84 42 66 C 44 46 60 36 64 20 Z" fill="url(#shiranui-core)" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M64 46 C 67 54 74 59 74 70 C 74 80 69 85 64 85 C 59 85 54 80 54 70 C 54 59 61 54 64 46 Z" fill="#fff6cf" opacity="0.85"/>
+  <!-- 顔(にたり) -->
+  <path d="M52 66 q 5 -3 9 3 M 76 66 q -5 -3 -9 3" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M55 78 L 59 81 L 63 77 L 67 81 L 71 77 L 74 80" fill="none" stroke="#5a2030" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="50" cy="74" r="3.5" fill="#e2574c" opacity="0.45"/>
+  <circle cx="78" cy="74" r="3.5" fill="#e2574c" opacity="0.45"/>
+  <!-- 夜の海 -->
+  <path d="M10 104 Q 19 96 28 104 T 46 104 T 64 104 T 82 104 T 100 104 T 118 104 L 118 116 L 10 116 Z" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M22 108 q 5 -4 10 0 M 58 109 q 5 -4 10 0 M 92 108 q 5 -4 10 0" stroke="#fff6cf" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.8"/>
+</svg>

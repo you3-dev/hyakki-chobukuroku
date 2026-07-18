@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 上座の座布団 -->
+  <rect x="28" y="97" width="72" height="14" rx="7" fill="#e2574c" stroke="#5a2030" stroke-width="4"/>
+  <circle cx="34" cy="104" r="1.8" fill="#fff6cf"/>
+  <circle cx="94" cy="104" r="1.8" fill="#fff6cf"/>
+  <!-- 上等な羽織 -->
+  <path d="M40 74 C 42 63, 50 58, 64 58 C 78 58, 86 63, 88 74 C 90 84, 91 94, 89 100 L 39 100 C 37 94, 38 84, 40 74 Z" fill="#3d2f5e" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 襟元 -->
+  <path d="M54 60 L 64 74 L 60 77 L 50 64 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M74 60 L 64 74 L 68 77 L 78 64 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M60 70 L 64 74 L 68 70 L 64 79 Z" fill="#c9a24b"/>
+  <!-- 羽織紐 -->
+  <path d="M58 80 C 62 78, 66 78, 70 80" fill="none" stroke="#c9a24b" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="64" cy="80" r="2.5" fill="#c9a24b"/>
+  <!-- 家紋風の柄 -->
+  <g fill="none" stroke="#c9a24b" stroke-width="2.5" stroke-linejoin="round">
+    <path d="M46 86 l 4 4 -4 4 -4 -4 Z"/>
+    <path d="M82 86 l 4 4 -4 4 -4 -4 Z"/>
+    <path d="M64 90 l 4 4 -4 4 -4 -4 Z"/>
+  </g>
+  <!-- 袖 -->
+  <path d="M42 70 C 33 72, 28 80, 31 89 C 34 95, 43 95, 48 89 L 48 76 Z" fill="#3d2f5e" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M86 70 C 95 72, 100 80, 97 89 C 94 95, 85 95, 80 89 L 80 76 Z" fill="#3d2f5e" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- 手と湯呑み -->
+  <circle cx="47" cy="83" r="4.5" fill="#fff6cf" stroke="#5a2030" stroke-width="3"/>
+  <path d="M39 74 C 39 72, 53 72, 53 74 L 52 83 C 52 85.5, 40 85.5, 40 83 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <ellipse cx="46" cy="74" rx="6" ry="2" fill="#5eb87a"/>
+  <path d="M46 68 q 3 -3.5 0 -7 q -3 -3.5 0 -7" fill="none" stroke="#f5f0e6" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+  <!-- 後頭部の長い頭 -->
+  <path d="M34 42 C 33 29, 42 20, 54 20 C 60 11, 74 5, 88 9 C 102 13, 109 27, 103 39 C 99 48, 90 51, 83 51 C 77 54, 71 56, 64 57 C 51 58, 35 55, 34 42 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 頭のしわ -->
+  <g fill="none" stroke="#5a2030" stroke-width="2.5" stroke-linecap="round" opacity="0.35">
+    <path d="M66 19 C 74 15, 84 15, 91 19"/>
+    <path d="M70 27 C 77 23, 86 23, 92 27"/>
+  </g>
+  <!-- 耳 -->
+  <path d="M33 43 C 27 41, 24 46, 28 51 C 31 53, 35 51, 35 47 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- 白眉 -->
+  <path d="M38 34 q 5 -3.5 10 -1.5" fill="none" stroke="#f5f0e6" stroke-width="4" stroke-linecap="round"/>
+  <path d="M54 33 q 5 -2.5 10 -0.5" fill="none" stroke="#f5f0e6" stroke-width="4" stroke-linecap="round"/>
+  <!-- したり顔の目と口 -->
+  <path d="M39 40 q 5 3.5 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M55 40 q 5 3.5 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M51 42 C 53 45, 53 48, 50 50" fill="none" stroke="#5a2030" stroke-width="3" stroke-linecap="round"/>
+  <path d="M45 53 q 4 3 8 0" fill="none" stroke="#5a2030" stroke-width="3.5" stroke-linecap="round"/>
+  <circle cx="40" cy="48" r="3.5" fill="#e2574c" opacity="0.35"/>
+  <!-- あごひげ -->
+  <path d="M46 56 C 45 61, 47 64, 50 63 C 52 61, 51 58, 50 55 Z" fill="#f5f0e6" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+</svg>

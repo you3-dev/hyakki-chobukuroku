@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 足 -->
+  <path d="M46 102 q -2 8 3 10 l 10 0 q 3 -5 1 -10 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M68 102 q -2 8 3 10 l 10 0 q 3 -5 1 -10 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 本体(でこぼこの土塊) -->
+  <path d="M64 14 C 75 12 85 18 90 27 C 99 32 104 44 101 55 C 107 64 105 80 96 89 C 92 100 78 107 64 106 C 50 107 36 100 32 89 C 23 80 21 64 27 55 C 24 44 29 32 38 27 C 43 18 53 12 64 14 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 中央の大目 -->
+  <ellipse cx="64" cy="56" rx="14" ry="16" fill="#f5f0e6" stroke="#5a2030" stroke-width="4"/>
+  <circle cx="64" cy="58" r="6.5" fill="#5a2030"/>
+  <circle cx="66.5" cy="55.5" r="2" fill="#fff6cf"/>
+  <!-- まわりの目(視線ばらばら) -->
+  <circle cx="44" cy="32" r="6" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="42" cy="33" r="2.6" fill="#5a2030"/>
+  <circle cx="66" cy="26" r="5" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="67" cy="24.5" r="2.2" fill="#5a2030"/>
+  <circle cx="85" cy="34" r="6.5" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="87" cy="35" r="2.8" fill="#5a2030"/>
+  <circle cx="34" cy="52" r="5.5" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="32" cy="53" r="2.4" fill="#5a2030"/>
+  <circle cx="95" cy="55" r="5.5" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="97" cy="54" r="2.4" fill="#5a2030"/>
+  <circle cx="37" cy="74" r="6" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="36" cy="76" r="2.6" fill="#5a2030"/>
+  <circle cx="91" cy="75" r="6" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="93" cy="77" r="2.6" fill="#5a2030"/>
+  <circle cx="52" cy="88" r="5" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="51" cy="90" r="2.2" fill="#5a2030"/>
+  <circle cx="76" cy="88" r="5" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="77" cy="90" r="2.2" fill="#5a2030"/>
+  <!-- 閉じ目もまぜる -->
+  <path d="M50 40 q 4 -5 8 0" fill="none" stroke="#5a2030" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M74 44 q 4 -5 8 0" fill="none" stroke="#5a2030" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M60 96 q 4 -5 8 0" fill="none" stroke="#5a2030" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M42 62 q 3 -4 6 0" fill="none" stroke="#5a2030" stroke-width="3" stroke-linecap="round"/>
+  <path d="M82 64 q 3 -4 6 0" fill="none" stroke="#5a2030" stroke-width="3" stroke-linecap="round"/>
+  <!-- 口 -->
+  <path d="M58 78 q 6 5 12 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="46" cy="80" r="4" fill="#e2574c" opacity="0.4"/>
+  <circle cx="82" cy="80" r="4" fill="#e2574c" opacity="0.4"/>
+</svg>

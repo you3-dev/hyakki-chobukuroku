@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="juzu-aura" cx="50%" cy="48%" r="52%">
+      <stop offset="0%" stop-color="#5eb87a" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#5eb87a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="62" r="52" fill="url(#juzu-aura)"/>
+  <!-- 紐 -->
+  <ellipse cx="64" cy="55" rx="27.5" ry="25.5" fill="none" stroke="#5a2030" stroke-width="3"/>
+  <!-- 大玉 -->
+  <g fill="#c9a24b" stroke="#5a2030" stroke-width="3.5">
+    <circle cx="64" cy="30" r="7.5"/>
+    <circle cx="80" cy="34" r="7.5"/>
+    <circle cx="90" cy="46" r="7.5"/>
+    <circle cx="91" cy="60" r="7.5"/>
+    <circle cx="82" cy="72" r="7.5"/>
+    <circle cx="48" cy="34" r="7.5"/>
+    <circle cx="38" cy="46" r="7.5"/>
+    <circle cx="37" cy="60" r="7.5"/>
+    <circle cx="46" cy="72" r="7.5"/>
+  </g>
+  <g fill="#fff6cf" opacity="0.85">
+    <circle cx="61.5" cy="27.5" r="2.2"/>
+    <circle cx="77.5" cy="31.5" r="2.2"/>
+    <circle cx="87.5" cy="43.5" r="2.2"/>
+    <circle cx="88.5" cy="57.5" r="2.2"/>
+    <circle cx="79.5" cy="69.5" r="2.2"/>
+    <circle cx="45.5" cy="31.5" r="2.2"/>
+    <circle cx="35.5" cy="43.5" r="2.2"/>
+    <circle cx="34.5" cy="57.5" r="2.2"/>
+    <circle cx="43.5" cy="69.5" r="2.2"/>
+  </g>
+  <!-- 親玉 -->
+  <circle cx="64" cy="82" r="10.5" fill="#fff6cf" stroke="#5a2030" stroke-width="4"/>
+  <circle cx="60" cy="78" r="3" fill="#f5f0e6"/>
+  <!-- 結び玉と房 -->
+  <circle cx="64" cy="95" r="3.5" fill="#e2574c" stroke="#5a2030" stroke-width="3"/>
+  <path d="M56 100 C 55 106 55 113 57 118 C 61 120 67 120 71 118 C 73 113 73 106 72 100 C 68 98 60 98 56 100 Z"
+        fill="#e2574c" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M55 102 C 60 104 68 104 73 102" fill="none" stroke="#ffb347" stroke-width="3" stroke-linecap="round"/>
+  <path d="M60 106 V 115 M64 107 V 116 M68 106 V 115" stroke="#fff6cf" stroke-width="2" opacity="0.6"/>
+</svg>

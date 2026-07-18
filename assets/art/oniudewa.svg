@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="oniudewa-aura" cx="50%" cy="50%" r="52%">
+      <stop offset="0%" stop-color="#e2574c" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#e2574c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="52" fill="url(#oniudewa-aura)"/>
+  <!-- 棘 -->
+  <g fill="#c9a24b" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round">
+    <path d="M56 32 L 64 14 L 72 32 Z"/>
+    <path d="M44.5 35 L 25 25 L 35 44.5 Z"/>
+    <path d="M83.5 35 L 103 25 L 93 44.5 Z"/>
+    <path d="M32 56 L 15 64 L 32 72 Z"/>
+    <path d="M96 56 L 113 64 L 96 72 Z"/>
+  </g>
+  <!-- 金環 -->
+  <path d="M64 31 A 33 33 0 1 0 64.01 31 Z M64 45 A 19 19 0 1 1 63.99 45 Z"
+        fill="#ffb347" fill-rule="evenodd" stroke="#5a2030" stroke-width="4.5"/>
+  <path d="M42 46 A 29 29 0 0 1 59 36" fill="none" stroke="#fff6cf" stroke-width="5" stroke-linecap="round" opacity="0.85"/>
+  <!-- 鬼面の飾り -->
+  <path d="M55 86 l -4 -8 l 8 3 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M73 86 l 4 -8 l -8 3 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="64" cy="94" r="12" fill="#e2574c" stroke="#5a2030" stroke-width="4"/>
+  <path d="M55 91 l 6 2.5 M73 91 l -6 2.5" stroke="#2a1f3d" stroke-width="3" stroke-linecap="round"/>
+  <path d="M58 99 q 6 4 12 0" fill="none" stroke="#2a1f3d" stroke-width="3" stroke-linecap="round"/>
+  <path d="M58 100 l 1.5 -3.5 l 2 3 Z M70 100 l -1.5 -3.5 l -2 3 Z" fill="#f5f0e6"/>
+</svg>

@@ -1,6 +1,6 @@
 'use strict';
 
-let R = null; // 進行中のラン(保存しない=リロードで消える)
+let R = null; // 進行中のラン(RUN_KEYへ随時保存。リロード後に再開可)
 
 function rand(n) { return Math.floor(Math.random() * n); }
 function pick(arr) { return arr[rand(arr.length)]; }
@@ -18,8 +18,50 @@ function dungeonUnlocked(id) {
 function startRun(dungeonId) {
   const hp = runMaxHp();
   R = { dungeon: dungeonId, depth: 0, hp, maxHp: hp, fuda: 3, captured: [], clear: false };
+  B = null;
   G.stats.runs++;
   save();
+  saveRun();
+}
+
+// ===== ラン途中セーブ =====
+// R/Bを引継ぎコード(G)とは別キーで保存する。captured等のユニットはuidで持ち、復元時にrosterへ結び直す
+const RUN_KEY = 'hyakki_run_v1';
+
+function serializeRun() {
+  return {
+    r: Object.assign({}, R, { captured: R.captured.map(u => u.uid) }),
+    b: B ? Object.assign({}, B, { captured: B.captured.map(u => u.uid) }) : null,
+  };
+}
+
+function saveRun() {
+  if (!R) { clearRun(); return; }
+  localStorage.setItem(RUN_KEY, JSON.stringify(serializeRun()));
+}
+
+function clearRun() { localStorage.removeItem(RUN_KEY); }
+
+// 保存済みランの中身を覗く(壊れていればnull)
+function peekRun() {
+  try {
+    const d = JSON.parse(localStorage.getItem(RUN_KEY));
+    if (!d || !d.r || !DUNGEONS[d.r.dungeon]) return null;
+    return d;
+  } catch (e) { return null; }
+}
+
+function loadRun() {
+  const d = peekRun();
+  if (!d) return false;
+  const toUnits = uids => (uids || []).map(uid => getUnit(uid)).filter(Boolean);
+  R = Object.assign({}, d.r, { captured: toUnits(d.r.captured) });
+  if (d.b) {
+    B = Object.assign({}, d.b, { captured: toUnits(d.b.captured) });
+    const uids = new Set(G.roster.map(u => u.uid));
+    ['draw', 'discard', 'hand', 'deckAtStart'].forEach(k => { B[k] = (B[k] || []).filter(id => uids.has(id)); });
+  } else B = null;
+  return true;
 }
 
 function currentDungeon() { return DUNGEONS[R.dungeon]; }
@@ -98,14 +140,17 @@ function applyTreasure() {
     const id = randomItemId();
     gainItem(id);
     save();
+    saveRun();
     return { kind: 'item', id };
   }
   const extra = Math.random() < 0.4 ? 2 : 1;
   R.fuda += extra;
+  saveRun();
   return { kind: 'fuda', extra };
 }
 
 function applyRest(choice) {
   if (choice === 'heal') R.hp = Math.min(R.maxHp, R.hp + Math.round(R.maxHp * 0.4));
   else R.fuda += 2;
+  saveRun();
 }

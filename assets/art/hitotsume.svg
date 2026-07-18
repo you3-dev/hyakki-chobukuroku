@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 一つ目小僧: 大きな一つ目の小坊主 -->
+  <!-- 下駄足 -->
+  <ellipse cx="54" cy="109" rx="7" ry="4.5" fill="#c9a24b" stroke="#5a2030" stroke-width="3.5"/>
+  <ellipse cx="74" cy="109" rx="7" ry="4.5" fill="#c9a24b" stroke="#5a2030" stroke-width="3.5"/>
+  <!-- 法衣 -->
+  <path d="M47 76 C 39 84, 35 96, 36 107 L 92 107 C 93 96, 89 84, 81 76 Z"
+        fill="#e2574c" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 手 -->
+  <circle cx="38" cy="94" r="5" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5"/>
+  <circle cx="90" cy="94" r="5" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5"/>
+  <!-- 衿 -->
+  <path d="M54 79 L 64 92 L 74 79" fill="none" stroke="#fff6cf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 耳 -->
+  <circle cx="34" cy="54" r="5.5" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5"/>
+  <circle cx="94" cy="54" r="5.5" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5"/>
+  <!-- つるつる頭 -->
+  <path d="M35 50 C 35 30, 47 18, 64 18 C 81 18, 93 30, 93 50 C 93 66, 81 77, 64 77 C 47 77, 35 66, 35 50 Z"
+        fill="#fff6cf" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 剃り跡の照り -->
+  <path d="M45 30 q 8 -7 17 -6" fill="none" stroke="#f5f0e6" stroke-width="4" stroke-linecap="round"/>
+  <!-- 大きな一つ目 -->
+  <ellipse cx="64" cy="48" rx="14" ry="15.5" fill="#f5f0e6" stroke="#5a2030" stroke-width="4"/>
+  <circle cx="64" cy="50" r="7.5" fill="#5a2030"/>
+  <circle cx="61.5" cy="47" r="2.6" fill="#fff6cf"/>
+  <!-- 頬 -->
+  <circle cx="45" cy="63" r="4.5" fill="#e2574c" opacity="0.4"/>
+  <circle cx="83" cy="63" r="4.5" fill="#e2574c" opacity="0.4"/>
+  <!-- にっ -->
+  <path d="M57 68 q 7 6 14 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+</svg>

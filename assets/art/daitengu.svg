@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="daitengu-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#5eb87a" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#5eb87a" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 木気のオーラと山嵐の渦 -->
+  <circle cx="64" cy="60" r="52" fill="url(#daitengu-aura)"/>
+  <path d="M14 50 C 22 40, 34 42, 36 52 C 37 58, 32 61, 28 58" fill="none" stroke="#5eb87a" stroke-width="4" stroke-linecap="round" opacity="0.85"/>
+  <path d="M114 96 C 106 106, 94 104, 92 94 C 91 88, 96 85, 100 88" fill="none" stroke="#5eb87a" stroke-width="4" stroke-linecap="round" opacity="0.85"/>
+  <!-- 天狗の翼 -->
+  <path d="M40 72 C 26 64, 20 52, 22 40 C 30 48, 38 54, 44 62 Z" fill="#3d2f5e" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M88 72 C 102 64, 108 52, 106 40 C 98 48, 90 54, 84 62 Z" fill="#3d2f5e" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 山伏装束の体 -->
+  <path d="M46 74 C 42 88, 40 98, 42 106 L 86 106 C 88 98, 86 88, 82 74 Z" fill="#5eb87a" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M52 74 L 64 92 L 76 74 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <circle cx="58" cy="96" r="4" fill="#fff6cf" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="70" cy="96" r="4" fill="#fff6cf" stroke="#5a2030" stroke-width="3"/>
+  <!-- 左袖 -->
+  <path d="M46 78 C 40 82, 38 88, 40 96 L 50 98 C 49 90, 50 84, 52 80 Z" fill="#5eb87a" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 赤ら顔 -->
+  <circle cx="64" cy="48" r="26" fill="#e2574c" stroke="#5a2030" stroke-width="5"/>
+  <!-- 白眉 -->
+  <path d="M41 44 C 43 36, 53 34, 57 40 C 51 40, 45 42, 41 44 Z" fill="#f5f0e6" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M87 44 C 85 36, 75 34, 71 40 C 77 40, 83 42, 87 44 Z" fill="#f5f0e6" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- 頭襟 -->
+  <rect x="55" y="15" width="18" height="13" rx="3" fill="#2a1f3d" stroke="#5a2030" stroke-width="4"/>
+  <!-- にんまり閉じ目 -->
+  <path d="M44 51 q 5 -5 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M74 51 q 5 -5 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="43" cy="60" r="5" fill="#e2574c" opacity="0.45"/>
+  <circle cx="85" cy="60" r="5" fill="#e2574c" opacity="0.45"/>
+  <!-- 長い鼻 -->
+  <path d="M59 52 C 59 47, 69 47, 69 52 L 68 78 A 4.5 4.5 0 0 1 60 78 Z" fill="#e2574c" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M62 56 L 62 73" stroke="#fff6cf" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <!-- 羽団扇と右腕 -->
+  <path d="M78 78 C 88 80, 94 86, 98 92 L 92 100 C 86 94, 80 90, 76 88 Z" fill="#5eb87a" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M103 84 C 95 82, 90 74, 91 64 C 92 56, 98 51, 104 52 C 111 53, 116 60, 116 69 C 116 78, 110 85, 103 84 Z" fill="#5eb87a" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M103 57 L 103 81 M96 64 L 103 68 M96 73 L 103 76 M111 62 L 104 66 M112 71 L 104 74" fill="none" stroke="#5a2030" stroke-width="2.5" stroke-linecap="round"/>
+  <rect x="100" y="83" width="6" height="11" rx="3" fill="#c9a24b" stroke="#5a2030" stroke-width="3.5"/>
+  <circle cx="103" cy="94" r="5" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5"/>
+</svg>
