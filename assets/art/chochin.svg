@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="chochin-glow" cx="50%" cy="45%" r="65%">
+      <stop offset="0%" stop-color="#fff6cf"/>
+      <stop offset="55%" stop-color="#ffc25e"/>
+      <stop offset="100%" stop-color="#ffb347"/>
+    </radialGradient>
+  </defs>
+  <!-- 持ち手と上蓋 -->
+  <path d="M50 15 Q 64 4 78 15" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <rect x="46" y="13" width="36" height="10" rx="5" fill="#3d2f5e" stroke="#5a2030" stroke-width="3.5"/>
+  <!-- 提灯本体 -->
+  <path d="M64 22 C 46 22, 34 40, 34 62 C 34 84, 46 100, 64 100 C 82 100, 94 84, 94 62 C 94 40, 82 22, 64 22 Z"
+        fill="url(#chochin-glow)" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 骨(ひご) -->
+  <path d="M37 38 Q 64 46 91 38" fill="none" stroke="#e2574c" stroke-width="2.5" opacity="0.5"/>
+  <path d="M34 62 Q 64 70 94 62" fill="none" stroke="#e2574c" stroke-width="2.5" opacity="0.5"/>
+  <path d="M40 86 Q 64 92 88 86" fill="none" stroke="#e2574c" stroke-width="2.5" opacity="0.5"/>
+  <!-- 破れ目 -->
+  <path d="M93 36 L 82 42 L 90 46 L 80 54 L 92 52 L 95 44 Z" fill="#5a2030" opacity="0.9"/>
+  <!-- 下蓋 -->
+  <rect x="50" y="96" width="28" height="9" rx="4.5" fill="#3d2f5e" stroke="#5a2030" stroke-width="3.5"/>
+  <!-- 頬 -->
+  <circle cx="42" cy="66" r="5" fill="#e2574c" opacity="0.4"/>
+  <circle cx="86" cy="66" r="5" fill="#e2574c" opacity="0.4"/>
+  <!-- 一つ目 -->
+  <ellipse cx="64" cy="54" rx="11" ry="12" fill="#f5f0e6" stroke="#5a2030" stroke-width="3.5"/>
+  <circle cx="64" cy="56" r="5" fill="#5a2030"/>
+  <circle cx="62" cy="54" r="1.6" fill="#f5f0e6"/>
+  <!-- 裂けた口と長い舌 -->
+  <path d="M48 72 C 54 78, 74 78, 80 72 C 82 84, 74 92, 64 92 C 54 92, 46 84, 48 72 Z" fill="#5a2030"/>
+  <path d="M57 84 C 55 94, 53 100, 58 106 C 63 111, 72 108, 71 100 C 70 94, 70 90, 69 84 Z"
+        fill="#e2574c" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M63 90 C 63 96, 63 100, 64 103" fill="none" stroke="#5a2030" stroke-width="2" opacity="0.5" stroke-linecap="round"/>
+</svg>

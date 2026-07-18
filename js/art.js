@@ -4,6 +4,9 @@
 // 絵文字がイラストに切り替わる(妖怪・ボス・呪具すべて共通)
 const ART = [
   'onibi', // 画風サンプル
+  // 宵の小径(d1)の野生種
+  'chochin', 'karakasa', 'tanuki', 'kamaitachi', 'nekomata',
+  'kawauso', 'kodama', 'kappa', 'yamawaro', 'tsuchigumo',
 ];
 
 function artHtml(id, emoji) {

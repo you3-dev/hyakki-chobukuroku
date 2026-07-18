@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 甲羅 -->
+  <ellipse cx="64" cy="78" rx="34" ry="26" fill="#c9a24b" stroke="#2a1f3d" stroke-width="4"/>
+  <!-- きゅうり -->
+  <g transform="rotate(-40 100 80)">
+    <rect x="93" y="56" width="13" height="48" rx="6.5" fill="#5eb87a" stroke="#2a1f3d" stroke-width="3.5"/>
+    <path d="M97 62 L 97 96 M102 62 L 102 96" fill="none" stroke="#2a1f3d" stroke-width="1.6" opacity="0.4"/>
+  </g>
+  <!-- 体 -->
+  <path d="M64 14 C 48 14, 38 26, 38 42 C 38 48, 40 54, 44 58 C 36 64, 32 74, 34 84 C 36 96, 48 104, 64 104 C 80 104, 92 96, 94 84 C 96 74, 92 64, 84 58 C 88 54, 90 48, 90 42 C 90 26, 80 14, 64 14 Z"
+        fill="#5eb87a" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 頭の皿 -->
+  <ellipse cx="64" cy="18" rx="17" ry="7" fill="#fff6cf" stroke="#2a1f3d" stroke-width="4"/>
+  <ellipse cx="64" cy="18" rx="11" ry="4" fill="#5b8dd9"/>
+  <!-- 腹(甲羅の腹側) -->
+  <ellipse cx="64" cy="82" rx="15" ry="14" fill="#fff6cf"/>
+  <path d="M50 78 Q 64 81 78 78 M51 88 Q 64 91 77 88" fill="none" stroke="#2a1f3d" stroke-width="2" opacity="0.3"/>
+  <!-- 目 -->
+  <circle cx="52" cy="36" r="5.5" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="3"/>
+  <circle cx="76" cy="36" r="5.5" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="3"/>
+  <circle cx="52" cy="37" r="2.5" fill="#2a1f3d"/>
+  <circle cx="76" cy="37" r="2.5" fill="#2a1f3d"/>
+  <!-- くちばし -->
+  <path d="M52 44 C 56 38, 72 38, 76 44 C 72 52, 56 52, 52 44 Z" fill="#ffc25e" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M52 45 Q 64 49 76 45" fill="none" stroke="#2a1f3d" stroke-width="2.5"/>
+  <circle cx="60" cy="42.5" r="1.3" fill="#2a1f3d"/>
+  <circle cx="68" cy="42.5" r="1.3" fill="#2a1f3d"/>
+  <!-- 頬 -->
+  <circle cx="44" cy="46" r="4.5" fill="#e2574c" opacity="0.4"/>
+  <circle cx="84" cy="46" r="4.5" fill="#e2574c" opacity="0.4"/>
+  <!-- きゅうりを掴む手 -->
+  <circle cx="90" cy="68" r="6" fill="#5eb87a" stroke="#2a1f3d" stroke-width="3.5"/>
+  <!-- 水かき足 -->
+  <path d="M44 102 C 40 108, 44 112, 50 110 L 56 104 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M84 102 C 88 108, 84 112, 78 110 L 72 104 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+</svg>
