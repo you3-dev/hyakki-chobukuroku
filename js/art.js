@@ -10,6 +10,9 @@ const ART = [
   // 深山の霧道(d2)の野生種
   'hitotsume', 'amanojaku', 'okuriinu', 'dorotabo', 'kudagitsune',
   'amefuri', 'yukionna', 'karasutengu', 'ogama', 'nue', 'zashiki',
+  // 憑合限定
+  'daitengu', 'kyubi', 'yoroi', 'ryujin', 'omukade',
+  'yatagarasu', 'muramasa', 'tsukumogami', 'tamamo',
 ];
 
 function artHtml(id, emoji) {

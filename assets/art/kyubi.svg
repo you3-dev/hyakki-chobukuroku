@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="kyubi-aura" cx="50%" cy="55%" r="50%">
+      <stop offset="0%" stop-color="#ffc25e" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ffc25e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="66" r="54" fill="url(#kyubi-aura)"/>
+  <!-- 九本の尾(扇状) -->
+  <g stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round">
+    <path d="M64 92 Q41 79 19 84 Q38 97 64 92 Z" fill="#e2574c"/>
+    <path d="M64 92 Q87 79 109 84 Q90 97 64 92 Z" fill="#e2574c"/>
+    <path d="M64 92 Q47 72 24 69 Q38 87 64 92 Z" fill="#ffb347"/>
+    <path d="M64 92 Q81 72 104 69 Q90 87 64 92 Z" fill="#ffb347"/>
+    <path d="M64 92 Q55 67 34 57 Q41 79 64 92 Z" fill="#e2574c"/>
+    <path d="M64 92 Q73 67 94 57 Q87 79 64 92 Z" fill="#e2574c"/>
+    <path d="M64 92 Q64 65 48 49 Q47 72 64 92 Z" fill="#ffb347"/>
+    <path d="M64 92 Q64 65 80 49 Q81 72 64 92 Z" fill="#ffb347"/>
+    <path d="M64 92 Q55 67 64 44 Q73 67 64 92 Z" fill="#fff6cf"/>
+  </g>
+  <!-- 狐火 -->
+  <path d="M18 46 C 15 38, 20 33, 21 27 C 26 34, 27 41, 23 46 A 4.5 4.5 0 1 1 18 46 Z" fill="#e2574c" stroke="#5a2030" stroke-width="3.5" opacity="0.9"/>
+  <path d="M104 46 C 101 38, 106 33, 107 27 C 112 34, 113 41, 109 46 A 4.5 4.5 0 1 1 104 46 Z" fill="#ffb347" stroke="#5a2030" stroke-width="3.5" opacity="0.9"/>
+  <!-- 座った体 -->
+  <path d="M46 100 C 44 84, 50 76, 64 76 C 78 76, 84 84, 82 100 C 82 104, 78 106, 74 106 L 54 106 C 50 106, 46 104, 46 100 Z" fill="#ffb347" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <ellipse cx="64" cy="94" rx="10" ry="11" fill="#fff6cf"/>
+  <!-- 耳 -->
+  <path d="M44 36 L 38 14 L 58 26 Z" fill="#ffb347" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M84 36 L 90 14 L 70 26 Z" fill="#ffb347" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M46 31 L 43 21 L 52 26 Z" fill="#e2574c"/>
+  <path d="M82 31 L 85 21 L 76 26 Z" fill="#e2574c"/>
+  <!-- 頭 -->
+  <circle cx="64" cy="51" r="24" fill="#ffb347" stroke="#5a2030" stroke-width="5"/>
+  <ellipse cx="64" cy="62" rx="13" ry="9" fill="#fff6cf"/>
+  <path d="M64 33 C 66 37, 66 42, 64 45 C 62 42, 62 37, 64 33 Z" fill="#fff6cf"/>
+  <!-- 妖艶な閉じ目とにんまり口 -->
+  <path d="M45 52 q 5 -5 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M73 52 q 5 -5 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M61 58 L 67 58 L 64 62 Z" fill="#5a2030"/>
+  <path d="M58 66 q 6 5 12 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="44" cy="60" r="4.5" fill="#e2574c" opacity="0.45"/>
+  <circle cx="84" cy="60" r="4.5" fill="#e2574c" opacity="0.45"/>
+</svg>

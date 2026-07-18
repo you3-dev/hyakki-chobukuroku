@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="tamamo-aura" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffc25e" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ffc25e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="60" r="54" fill="url(#tamamo-aura)"/>
+  <!-- 狐火 -->
+  <path d="M18 34 C 15 27, 19 22, 20 16 C 25 23, 26 29, 22 34 A 4 4 0 1 1 18 34 Z" fill="#e2574c" stroke="#5a2030" stroke-width="3.5" opacity="0.9"/>
+  <path d="M106 34 C 103 27, 107 22, 108 16 C 113 23, 114 29, 110 34 A 4 4 0 1 1 106 34 Z" fill="#ffb347" stroke="#5a2030" stroke-width="3.5" opacity="0.9"/>
+  <!-- 金の尾 -->
+  <path d="M34 86 C 22 86, 13 76, 15 62 C 20 70, 27 75, 34 77 Z" fill="#ffb347" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M94 86 C 106 86, 115 76, 113 62 C 108 70, 101 75, 94 77 Z" fill="#ffb347" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M17 65 C 20 70, 24 73, 29 75" fill="none" stroke="#fff6cf" stroke-width="3" stroke-linecap="round"/>
+  <path d="M111 65 C 108 70, 104 73, 99 75" fill="none" stroke="#fff6cf" stroke-width="3" stroke-linecap="round"/>
+  <!-- 長い黒髪(後ろ) -->
+  <path d="M64 14 C 88 14, 98 32, 97 54 C 96 76, 92 92, 85 102 L 43 102 C 36 92, 32 76, 31 54 C 30 32, 40 14, 64 14 Z" fill="#3d2f5e" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 狐耳 -->
+  <path d="M46 22 L 40 5 L 58 12 Z" fill="#ffb347" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M82 22 L 88 5 L 70 12 Z" fill="#ffb347" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M47 18 L 44 10 L 52 13 Z" fill="#e2574c"/>
+  <path d="M81 18 L 84 10 L 76 13 Z" fill="#e2574c"/>
+  <!-- 十二単 -->
+  <path d="M48 58 C 38 72, 32 90, 30 104 L 98 104 C 96 90, 90 72, 80 58 C 74 64, 54 64, 48 58 Z" fill="#e2574c" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M33 96 C 46 92, 82 92, 95 96" fill="none" stroke="#ffb347" stroke-width="4" stroke-linecap="round"/>
+  <path d="M31 101 C 45 97, 83 97, 97 101" fill="none" stroke="#fff6cf" stroke-width="4" stroke-linecap="round"/>
+  <!-- 襟の重ね -->
+  <path d="M51 56 L 64 68 L 77 56" fill="none" stroke="#ffb347" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M54 60 L 64 74 L 74 60" fill="none" stroke="#fff6cf" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 広袖 -->
+  <path d="M48 62 C 38 66, 30 76, 28 88 C 34 90, 44 88, 50 82 Z" fill="#e2574c" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M80 62 C 90 66, 98 76, 100 88 C 94 90, 84 88, 78 82 Z" fill="#e2574c" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M31 84 C 37 86, 43 85, 48 81" fill="none" stroke="#fff6cf" stroke-width="3" stroke-linecap="round"/>
+  <path d="M97 84 C 91 86, 85 85, 80 81" fill="none" stroke="#fff6cf" stroke-width="3" stroke-linecap="round"/>
+  <!-- 顔 -->
+  <circle cx="64" cy="39" r="19" fill="#f5f0e6" stroke="#5a2030" stroke-width="4.5"/>
+  <!-- 姫カットの前髪と横髪 -->
+  <path d="M46 33 C 45 19, 54 13, 64 13 C 74 13, 83 19, 82 33 C 78 26, 73 29, 69 24 C 66 28, 62 28, 59 24 C 55 29, 50 26, 46 33 Z" fill="#3d2f5e" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M44 27 C 42 40, 42 52, 44 61 L 50 59 C 48 50, 48 39, 49 29 Z" fill="#3d2f5e" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M84 27 C 86 40, 86 52, 84 61 L 78 59 C 80 50, 80 39, 79 29 Z" fill="#3d2f5e" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 引眉・伏し目・紅 -->
+  <ellipse cx="56" cy="36" rx="3.2" ry="1.7" fill="#3d2f5e"/>
+  <ellipse cx="72" cy="36" rx="3.2" ry="1.7" fill="#3d2f5e"/>
+  <path d="M51 44 q 5.5 -4.5 11 0" fill="none" stroke="#5a2030" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M66 44 q 5.5 -4.5 11 0" fill="none" stroke="#5a2030" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M61 52 q 3 2.5 6 0" fill="none" stroke="#e2574c" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="51" cy="49" r="3.5" fill="#e2574c" opacity="0.4"/>
+  <circle cx="77" cy="49" r="3.5" fill="#e2574c" opacity="0.4"/>
+</svg>

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="ryujin-aura" cx="50%" cy="55%" r="50%">
+      <stop offset="0%" stop-color="#5b8dd9" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#5b8dd9" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="ryujin-orb" cx="45%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#fff6cf"/>
+      <stop offset="55%" stop-color="#ffc25e"/>
+      <stop offset="100%" stop-color="#e2574c"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="54" fill="url(#ryujin-aura)"/>
+  <!-- 濁流の渦 -->
+  <path d="M12 106 C 18 98, 26 98, 28 104" fill="none" stroke="#5b8dd9" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+  <path d="M100 108 C 106 100, 114 100, 116 106" fill="none" stroke="#5b8dd9" stroke-width="4" stroke-linecap="round" opacity="0.8"/>
+  <!-- 尾ひれ -->
+  <path d="M42 64 C 35 58, 33 49, 36 42 C 40 49, 44 55, 48 60 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- とぐろを巻く胴 -->
+  <path d="M78 52 C 96 58, 104 72, 98 86 C 92 100, 72 106, 52 102 C 38 99, 28 90, 28 78 C 28 70, 33 64, 40 62 C 37 68, 37 72, 39 76 C 42 86, 52 92, 64 90 C 78 88, 86 80, 82 70 C 79 62, 72 58, 66 58 Z" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 背びれ -->
+  <path d="M94 62 L 103 55 L 105 66 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M97 90 L 106 94 L 97 100 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M58 102 L 61 112 L 68 104 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3" stroke-linejoin="round"/>
+  <!-- 腹 -->
+  <path d="M70 62 C 79 66, 83 74, 79 82 C 74 90, 62 93, 52 89" fill="none" stroke="#fff6cf" stroke-width="5.5" stroke-linecap="round" opacity="0.9"/>
+  <path d="M92 66 L 84 70 M94 82 L 84 80 M70 98 L 68 90 M44 96 L 48 88" fill="none" stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- 宝珠 -->
+  <path d="M58 66 C 62 62, 62 57, 58 52 C 54 57, 54 62, 58 66 Z" fill="#ffc25e" stroke="#2a1f3d" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="58" cy="75" r="9" fill="url(#ryujin-orb)" stroke="#2a1f3d" stroke-width="4"/>
+  <circle cx="55" cy="72" r="2.2" fill="#fff6cf"/>
+  <!-- たてがみ -->
+  <path d="M44 26 C 36 22, 30 24, 28 32 C 34 30, 39 32, 42 36 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M84 26 C 92 22, 98 24, 100 32 C 94 30, 89 32, 86 36 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M40 36 C 32 34, 27 37, 26 44 C 32 41, 37 43, 40 47 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M88 36 C 96 34, 101 37, 102 44 C 96 41, 91 43, 88 47 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- 角 -->
+  <path d="M52 22 C 50 13, 55 6, 62 6 C 58 11, 58 16, 60 20 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M68 21 C 70 12, 76 7, 82 9 C 77 13, 76 17, 75 22 Z" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- 頭 -->
+  <circle cx="64" cy="40" r="22" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="5"/>
+  <!-- ひげ -->
+  <path d="M52 50 C 42 53, 35 51, 31 44" fill="none" stroke="#fff6cf" stroke-width="2.8" stroke-linecap="round"/>
+  <path d="M76 50 C 86 53, 93 51, 97 44" fill="none" stroke="#fff6cf" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- 鼻先と口 -->
+  <ellipse cx="64" cy="49" rx="11" ry="8" fill="#fff6cf" stroke="#2a1f3d" stroke-width="4"/>
+  <circle cx="59" cy="46" r="1.6" fill="#2a1f3d"/>
+  <circle cx="69" cy="46" r="1.6" fill="#2a1f3d"/>
+  <path d="M60 51 q 4 4 8 0" fill="none" stroke="#2a1f3d" stroke-width="3" stroke-linecap="round"/>
+  <!-- 閉じ目 -->
+  <path d="M45 38 q 5 -5 10 0" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M73 38 q 5 -5 10 0" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="47" cy="46" r="4" fill="#e2574c" opacity="0.35"/>
+  <circle cx="81" cy="46" r="4" fill="#e2574c" opacity="0.35"/>
+</svg>

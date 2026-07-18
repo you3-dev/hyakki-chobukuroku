@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="tsukumogami-aura" cx="50%" cy="55%" r="50%">
+      <stop offset="0%" stop-color="#ffc25e" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffc25e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="68" r="52" fill="url(#tsukumogami-aura)"/>
+  <!-- 百年の霊気 -->
+  <path d="M100 30 C 106 24, 106 16, 100 12" fill="none" stroke="#f5f0e6" stroke-width="3.5" stroke-linecap="round" opacity="0.8"/>
+  <path d="M24 34 l 0 10 M19 39 l 10 0" fill="none" stroke="#fff6cf" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="106" cy="86" r="2.5" fill="#fff6cf"/>
+  <!-- 足 -->
+  <rect x="42" y="96" width="13" height="13" rx="5.5" fill="#c9a24b" stroke="#5a2030" stroke-width="4"/>
+  <rect x="73" y="96" width="13" height="13" rx="5.5" fill="#c9a24b" stroke="#5a2030" stroke-width="4"/>
+  <!-- 茶釜の体 -->
+  <path d="M64 40 C 86 40, 100 54, 100 72 C 100 90, 85 100, 64 100 C 43 100, 28 90, 28 72 C 28 54, 42 40, 64 40 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 鐶付 -->
+  <circle cx="30" cy="60" r="4.5" fill="#aab2c0" stroke="#5a2030" stroke-width="3.5"/>
+  <circle cx="98" cy="60" r="4.5" fill="#aab2c0" stroke="#5a2030" stroke-width="3.5"/>
+  <!-- 蓋 -->
+  <ellipse cx="64" cy="42" rx="18" ry="7" fill="#aab2c0" stroke="#5a2030" stroke-width="4.5"/>
+  <circle cx="64" cy="35" r="5" fill="#aab2c0" stroke="#5a2030" stroke-width="4"/>
+  <!-- 継ぎ当てとひび -->
+  <path d="M80 50 L 94 54 L 91 66 L 77 62 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M80 52 l -4 -3 M92 57 l 4 -2 M79 61 l -4 2" fill="none" stroke="#5a2030" stroke-width="2" stroke-linecap="round"/>
+  <path d="M38 84 l 5 4 l -3 5" fill="none" stroke="#5a2030" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 顔 -->
+  <circle cx="52" cy="66" r="8" fill="#f5f0e6" stroke="#5a2030" stroke-width="4"/>
+  <circle cx="53" cy="67" r="3.5" fill="#2a1f3d"/>
+  <path d="M70 64 q 5 -5 10 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M50 80 q 14 10 28 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M60 84 C 61 90, 67 90, 68 84 Z" fill="#e2574c" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="40" cy="76" r="4.5" fill="#e2574c" opacity="0.4"/>
+  <circle cx="88" cy="76" r="4.5" fill="#e2574c" opacity="0.4"/>
+</svg>

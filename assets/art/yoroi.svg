@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="yoroi-aura" cx="50%" cy="48%" r="50%">
+      <stop offset="0%" stop-color="#5b8dd9" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#5b8dd9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="58" r="52" fill="url(#yoroi-aura)"/>
+  <!-- 霊気の青い炎 -->
+  <path d="M16 88 C 13 78, 19 72, 20 64 C 26 73, 27 82, 22 88 A 5 5 0 1 1 16 88 Z" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="3.5" opacity="0.9"/>
+  <path d="M104 84 C 101 76, 106 71, 107 64 C 112 72, 113 79, 109 84 A 4.5 4.5 0 1 1 104 84 Z" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="3.5" opacity="0.9"/>
+  <!-- 袖(肩鎧) -->
+  <path d="M32 62 C 24 66, 21 78, 25 90 L 41 84 C 38 76, 38 70, 40 64 Z" fill="#aab2c0" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M96 62 C 104 66, 107 78, 103 90 L 87 84 C 90 76, 90 70, 88 64 Z" fill="#aab2c0" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M27 72 L 39 68 M27 80 L 40 76" fill="none" stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M101 72 L 89 68 M101 80 L 88 76" fill="none" stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- 胴 -->
+  <path d="M44 66 C 40 70, 38 84, 40 96 C 42 104, 50 106, 64 106 C 78 106, 86 104, 88 96 C 90 84, 88 70, 84 66 Z" fill="#aab2c0" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M42 78 C 54 82, 74 82, 86 78 M41 88 C 54 92, 74 92, 87 88 M43 97 C 54 101, 74 101, 85 97" fill="none" stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M54 68 L 54 104 M74 68 L 74 104" fill="none" stroke="#e2574c" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+  <!-- 空洞の顔と光る眼 -->
+  <ellipse cx="64" cy="54" rx="19" ry="16" fill="#2a1f3d"/>
+  <circle cx="56" cy="52" r="6" fill="#5b8dd9" opacity="0.55"/>
+  <circle cx="72" cy="52" r="6" fill="#5b8dd9" opacity="0.55"/>
+  <circle cx="56" cy="52" r="3" fill="#fff6cf"/>
+  <circle cx="72" cy="52" r="3" fill="#fff6cf"/>
+  <!-- 面頬 -->
+  <path d="M48 58 C 48 70, 54 77, 64 77 C 74 77, 80 70, 80 58 C 76 63, 70 65, 64 65 C 58 65, 52 63, 48 58 Z" fill="#e2574c" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M55 67 l 3 3 l 3 -3 l 3 3 l 3 -3 l 3 3 l 3 -3" fill="none" stroke="#fff6cf" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <!-- 兜 -->
+  <path d="M38 44 C 38 26, 50 16, 64 16 C 78 16, 90 26, 90 44 C 82 40, 74 38, 64 38 C 54 38, 46 40, 38 44 Z" fill="#aab2c0" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M36 46 L 26 39 L 28 54 L 38 57 Z" fill="#aab2c0" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M92 46 L 102 39 L 100 54 L 90 57 Z" fill="#aab2c0" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M36 44 C 46 38, 82 38, 92 44 C 94 46, 92 50, 88 49 C 74 44, 54 44, 40 49 C 36 50, 34 46, 36 44 Z" fill="#3d2f5e" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- 三日月の前立 -->
+  <path d="M47 31 C 49 19, 79 19, 81 31 C 73 24, 55 24, 47 31 Z" fill="#ffc25e" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="64" cy="32" r="2.8" fill="#ffc25e" stroke="#2a1f3d" stroke-width="3"/>
+</svg>
