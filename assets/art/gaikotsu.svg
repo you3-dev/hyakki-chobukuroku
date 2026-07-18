@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 太刀(背後) -->
+  <path d="M96 14 C 105 28, 108 50, 101 68 L 92 64 C 97 48 96 32 89 20 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M96 48 L 99 60" stroke="#aab2c0" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+  <ellipse cx="97" cy="67" rx="8" ry="5" fill="#c9a24b" stroke="#2a1f3d" stroke-width="3" transform="rotate(-24 97 67)"/>
+  <path d="M94 72 L 88 86" stroke="#3d2f5e" stroke-width="8" stroke-linecap="round" fill="none"/>
+  <!-- 胴(具足) -->
+  <path d="M42 88 C 35 94 32 102 31 111 L 97 111 C 96 102 93 94 86 88 Z" fill="#3d2f5e" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M36 100 L 92 100" stroke="#aab2c0" stroke-width="3" fill="none"/>
+  <path d="M34 106 L 94 106" stroke="#aab2c0" stroke-width="3" fill="none"/>
+  <!-- 髑髏 -->
+  <path d="M38 64 C 38 46 49 36 64 36 C 79 36 90 46 90 64 C 90 74 86 81 80 85 L 79 92 C 74 97 54 97 49 92 L 48 85 C 42 81 38 74 38 64 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- ひび -->
+  <path d="M84 56 l 4 5 l -3 4" fill="none" stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- 兜 -->
+  <path d="M31 63 q -13 2 -15 15 q 11 4 18 -3 Z" fill="#aab2c0" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M97 63 q 13 2 15 15 q -11 4 -18 -3 Z" fill="#aab2c0" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M30 62 C 30 41 45 28 64 28 C 83 28 98 41 98 62 L 98 66 C 86 59 42 59 30 66 Z" fill="#aab2c0" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M64 28 L 64 52" stroke="#2a1f3d" stroke-width="2.5" fill="none" opacity="0.5"/>
+  <path d="M46 31 C 43 38 42 46 43 55" stroke="#2a1f3d" stroke-width="2.5" fill="none" opacity="0.5"/>
+  <path d="M82 31 C 85 38 86 46 85 55" stroke="#2a1f3d" stroke-width="2.5" fill="none" opacity="0.5"/>
+  <!-- 鍬形+前立 -->
+  <path d="M55 30 C 48 24 45 15 47 7 C 53 13 57 21 58 28 Z" fill="#c9a24b" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M73 30 C 80 24 83 15 81 7 C 75 13 71 21 70 28 Z" fill="#c9a24b" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="64" cy="32" r="6" fill="#c9a24b" stroke="#2a1f3d" stroke-width="3.5"/>
+  <!-- 顔 -->
+  <circle cx="54" cy="64" r="8.5" fill="#2a1f3d"/>
+  <circle cx="74" cy="64" r="8.5" fill="#2a1f3d"/>
+  <circle cx="56" cy="65" r="2.6" fill="#ffb347"/>
+  <circle cx="72" cy="65" r="2.6" fill="#ffb347"/>
+  <path d="M64 74 l -3.5 6 h 7 Z" fill="#2a1f3d"/>
+  <path d="M53 87 Q 64 91 75 87" fill="none" stroke="#2a1f3d" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M58 87.5 l 0 4.5 M 64 89 l 0 4.5 M 70 87.5 l 0 4.5" stroke="#2a1f3d" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <circle cx="44" cy="76" r="4" fill="#e2574c" opacity="0.35"/>
+  <circle cx="84" cy="76" r="4" fill="#e2574c" opacity="0.35"/>
+</svg>

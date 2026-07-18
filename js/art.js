@@ -10,6 +10,9 @@ const ART = [
   // 深山の霧道(d2)の野生種
   'hitotsume', 'amanojaku', 'okuriinu', 'dorotabo', 'kudagitsune',
   'amefuri', 'yukionna', 'karasutengu', 'ogama', 'nue', 'zashiki',
+  // 百鬼の御堂(d3)の野生種
+  'gaikotsu', 'kasha', 'hyakume', 'yamanba', 'onyudo',
+  'shiranui', 'itsumade', 'nureonna', 'satori', 'umibozu', 'oboroguruma',
   // 憑合限定
   'daitengu', 'kyubi', 'yoroi', 'ryujin', 'omukade',
   'yatagarasu', 'muramasa', 'tsukumogami', 'tamamo',
