@@ -48,6 +48,7 @@ function startTurn() {
   B.block = 0;
   B.energy = Math.min(2 + B.turn, ENERGY_MAX);
   drawCards(Math.max(0, HAND_SIZE - B.hand.length));
+  saveRun(); // リロード時はこのターン頭に復元される
 }
 
 function aliveEnemies() { return B.enemies.filter(e => e.state === 'alive'); }
@@ -177,6 +178,7 @@ function tryCapture(idx) {
     if (G.deck.includes(nu.uid)) B.discard.push(nu.uid); // 即戦列入り
     addLog(`${e.name}を調伏した!(成功率${rate}%)`);
     save();
+    saveRun(); // ターン頭に巻き戻すと調伏済み妖怪が二重になるため、成功直後の状態で上書き
     checkWin();
     return { ok: true };
   }
@@ -249,6 +251,7 @@ function finishBattle(win) {
     }
   }
   save();
+  saveRun(); // 報酬付与済みの決着状態で上書き(巻き戻すと報酬が二重になる)
 }
 
 // ===== 式神代行(オートバトル) =====

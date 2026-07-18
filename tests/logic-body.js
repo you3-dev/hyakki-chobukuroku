@@ -267,6 +267,58 @@ ok(dungeonUnlocked('d2'), 'd2解放');
   ok(B.captured.length === 0, 'オートでは調伏しない');
 }
 
+// --- ラン途中セーブ(M1) ---
+{
+  localStorage.removeItem(SAVE_KEY);
+  clearRun();
+  load();
+
+  // 戦闘外: ラン開始時点で保存され、分かれ道から再開できる
+  startRun('d1');
+  ok(peekRun() && peekRun().b === null, 'ラン開始で保存(戦闘なし)');
+  R = null; B = null;
+  ok(loadRun() && R.depth === 0 && B === null, '戦闘外の復元');
+
+  // 戦闘中: ターン頭の状態が保存され、ターン途中の変化は巻き戻る
+  R.depth = 1;
+  startBattle(makeGroup('battle'), { expMult: 1 });
+  const snap = JSON.stringify(serializeRun());
+  const handAtTurnStart = B.hand.join(',');
+  R.hp -= 7; B.energy = 0; B.hand = []; B.enemies[0].hp = 1;
+  ok(loadRun(), '戦闘中の保存を復元できる');
+  ok(JSON.stringify(serializeRun()) === snap, '復元でターン頭の状態に一致');
+  ok(B.hand.join(',') === handAtTurnStart, '手札がターン頭に戻る');
+
+  // 調伏成功は即時上書き保存され、復元しても妖怪が二重にならない
+  const cap = aliveEnemies()[0];
+  cap.hp = 1;
+  let captured2 = false;
+  for (let i = 0; i < 60 && !captured2; i++) {
+    R.fuda = 9; B.energy = 9;
+    captured2 = !!tryCapture(B.enemies.indexOf(cap)).ok;
+  }
+  if (captured2) {
+    const rosterLen = G.roster.length;
+    ok(loadRun(), '調伏後の保存を復元できる');
+    ok(G.roster.length === rosterLen, '復元で手持ちが増減しない');
+    ok(B.enemies.some(e => e.state === 'captured'), '復元後も調伏済みのまま(二重調伏不可)');
+    ok(R.captured.every(u => G.roster.includes(u)), '復元したcapturedはrosterの個体を指す');
+  } else ok(false, '調伏成功する(確率試行・ランセーブ)');
+
+  // ノードイベントでも保存が更新される
+  R.depth++;
+  applyTreasure();
+  const d = peekRun();
+  ok(d && d.r.depth === R.depth && d.r.hp === R.hp && d.r.fuda === R.fuda, '宝でラン保存が更新される');
+
+  // 引継ぎコードにラン状態は含めない(手持ちだけ持ち運ぶ)
+  const dec = JSON.parse(decodeURIComponent(escape(atob(exportSave().slice(8)))));
+  ok(dec.dungeon === undefined && dec.hand === undefined && dec.enemies === undefined, '引継ぎコードにラン状態を含めない');
+
+  clearRun();
+  ok(!peekRun() && !loadRun(), 'clearRunで保存が消える');
+}
+
 // --- 自動プレイ: d1→d2→d3を成長込みで通しシミュレーション ---
 localStorage.removeItem(SAVE_KEY);
 load();

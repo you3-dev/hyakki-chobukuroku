@@ -126,6 +126,29 @@ check('action: 引継ぎ読み込み(正常)', () => {
   handleAction('save-import');
 });
 
+// M1: ラン途中セーブ
+check('resume(進行中ランあり)', () => {
+  handleAction('run-close');
+  startRun('d1');
+  R.depth = 1;
+  startBattle(makeGroup('battle'), { expMult: 1 });
+  R = null; B = null; // リロードを模擬
+  if (!peekRun()) throw new Error('ランが保存されていない');
+  screen = 'resume'; render();
+  if (!appStub.innerHTML.includes('夜行を再開する')) throw new Error('再開ボタンがない');
+});
+check('action: 夜行を再開(戦闘へ復帰)', () => {
+  handleAction('resume-run');
+  if (screen !== 'battle') throw new Error('戦闘画面に復帰していない: ' + screen);
+  if (!R || !B || B.over) throw new Error('R/Bが復元されていない');
+});
+check('action: 諦めて拠点へ', () => {
+  if (!peekRun()) throw new Error('前提: 保存済みランがない');
+  handleAction('resume-discard');
+  if (peekRun()) throw new Error('ラン保存が消えていない');
+  if (R !== null || screen !== 'home') throw new Error('拠点に戻っていない');
+});
+
 console.log(fails === 0 ? 'ALL PASS' : fails + ' FAILURES');
 process.exit(fails === 0 ? 0 : 1);
 `;

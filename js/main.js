@@ -2,7 +2,7 @@
 
 const app = document.getElementById('app');
 
-let screen = 'home';        // home | deck | fusion | dex | save | dungeon | node | battle | event | runend
+let screen = 'home';        // home | deck | fusion | dex | save | dungeon | node | battle | event | runend | resume
 let selCard = null;         // 選択中の手札uid
 let captureMode = false;
 let toast = '';
@@ -48,6 +48,7 @@ function setToast(m) { toast = m || ''; }
 function gotoNodeScreen() {
   nodeOpts = nodeOptions();
   screen = 'node';
+  saveRun();
 }
 
 function chooseNode(i) {
@@ -83,7 +84,7 @@ function handleAction(action, arg) {
     case 'nav-items': screen = 'items'; itemSel = null; setToast(''); break;
     case 'nav-save': screen = 'save'; setToast(''); break;
     case 'reset-save':
-      if (confirm('セーブデータを消して最初からやり直しますか?')) { resetSave(); R = null; screen = 'home'; }
+      if (confirm('セーブデータを消して最初からやり直しますか?')) { resetSave(); clearRun(); R = null; B = null; screen = 'home'; }
       break;
 
     case 'start-run': screen = 'dungeon'; setToast(''); break;
@@ -94,7 +95,7 @@ function handleAction(action, arg) {
       break;
     }
     case 'abandon-run':
-      if (confirm('夜行を諦めて帰りますか?(調伏した妖怪は持ち帰れます)')) { screen = 'runend'; }
+      if (confirm('夜行を諦めて帰りますか?(調伏した妖怪は持ち帰れます)')) { clearRun(); screen = 'runend'; }
       break;
     case 'choose-node': chooseNode(Number(arg)); break;
 
@@ -200,20 +201,26 @@ function handleAction(action, arg) {
       endTurn();
       break;
     case 'battle-continue':
-      if (B.over === 'win' && !B.boss) { gotoNodeScreen(); }
-      else { screen = 'runend'; }
+      if (B.over === 'win' && !B.boss) { B = null; gotoNodeScreen(); }
+      else { clearRun(); screen = 'runend'; }
       break;
 
     case 'rest-heal': applyRest('heal'); E = { kind: 'done', msg: '茶屋で一服。体力が回復した' }; break;
     case 'rest-fuda': applyRest('fuda'); E = { kind: 'done', msg: '茶屋の主人から調伏札を2枚仕入れた' }; break;
     case 'event-continue': E = null; gotoNodeScreen(); break;
 
-    case 'run-close': R = null; B = null; screen = 'home'; break;
+    case 'run-close': clearRun(); R = null; B = null; screen = 'home'; break;
+
+    case 'resume-run':
+      if (loadRun()) { if (B) screen = 'battle'; else gotoNodeScreen(); }
+      else { clearRun(); screen = 'home'; }
+      break;
+    case 'resume-discard': clearRun(); R = null; B = null; screen = 'home'; break;
 
     case 'save-import': {
       const ta = document.getElementById('import-text');
       const val = ta ? ta.value : importText;
-      if (importSave(val)) { R = null; B = null; setToast('引継ぎ完了!'); }
+      if (importSave(val)) { clearRun(); R = null; B = null; setToast('引継ぎ完了!'); }
       else setToast('引継ぎコードが正しくない');
       break;
     }
@@ -575,6 +582,20 @@ function renderBattle() {
   </div>`;
 }
 
+function renderResume() {
+  const d = peekRun();
+  if (!d) { screen = 'home'; renderHome(); return; }
+  const dg = DUNGEONS[d.r.dungeon];
+  const inBattle = !!(d.b && !d.b.over);
+  app.innerHTML = `<div class="screen center">
+    <h2 class="h2">🌙 進行中の夜行がある</h2>
+    <p>${dg.emoji} ${dg.name} — ${d.r.depth}/${dg.length}歩 / ❤️ ${d.r.hp}/${d.r.maxHp} / 🧧 札×${d.r.fuda}${inBattle ? '(戦闘中)' : ''}</p>
+    <p class="hint">再開すると${inBattle ? 'そのターンの頭から戦闘の' : '分かれ道から'}続きが遊べる。諦めても調伏済みの妖怪は手元に残る。</p>
+    <div class="btn-row"><button class="btn btn-primary btn-big" data-action="resume-run">夜行を再開する</button></div>
+    <div class="btn-row"><button class="btn" data-action="resume-discard">諦めて拠点へ</button></div>
+  </div>`;
+}
+
 function renderRunEnd() {
   const caps = R.captured.map(u => `<li>${SPECIES[u.sp].emoji}${SPECIES[u.sp].name}(仲間になった)</li>`).join('');
   app.innerHTML = `<div class="screen center">
@@ -598,8 +619,10 @@ function render() {
     case 'battle': renderBattle(); break;
     case 'event': renderEvent(); break;
     case 'runend': renderRunEnd(); break;
+    case 'resume': renderResume(); break;
   }
 }
 
 load();
+if (peekRun()) screen = 'resume';
 render();
