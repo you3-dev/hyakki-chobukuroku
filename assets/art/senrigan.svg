@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="senrigan-aura" cx="50%" cy="46%" r="52%">
+      <stop offset="0%" stop-color="#5b8dd9" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#5b8dd9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="58" r="52" fill="url(#senrigan-aura)"/>
+  <!-- 柄 -->
+  <path d="M58 90 L 56 112 C 56 115 58 117 61 117 L 67 117 C 70 117 72 115 72 112 L 70 90 Z"
+        fill="#c9a24b" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- 鏡縁 -->
+  <circle cx="64" cy="56" r="36" fill="#c9a24b" stroke="#5a2030" stroke-width="5"/>
+  <g fill="#5a2030" opacity="0.6">
+    <circle cx="64" cy="24" r="2"/>
+    <circle cx="86.6" cy="33.4" r="2"/>
+    <circle cx="96" cy="56" r="2"/>
+    <circle cx="86.6" cy="78.6" r="2"/>
+    <circle cx="41.4" cy="78.6" r="2"/>
+    <circle cx="32" cy="56" r="2"/>
+    <circle cx="41.4" cy="33.4" r="2"/>
+  </g>
+  <!-- 鏡面(遠くの山と月を映す) -->
+  <circle cx="64" cy="56" r="28" fill="#5b8dd9" stroke="#5a2030" stroke-width="3"/>
+  <path d="M38 64 L 52 46 L 60 56 L 70 42 L 89 64 L 84 71 C 72 77 52 77 44 71 Z" fill="#3d2f5e" opacity="0.9"/>
+  <circle cx="78" cy="38" r="5.5" fill="#fff6cf"/>
+  <path d="M40 68 H 88" stroke="#fff6cf" stroke-width="2.5" stroke-linecap="round" opacity="0.4"/>
+  <path d="M46 38 L 58 30" stroke="#fff6cf" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <path d="M43 46 L 51 41" stroke="#fff6cf" stroke-width="3" stroke-linecap="round" opacity="0.5"/>
+  <!-- 結び紐 -->
+  <circle cx="64" cy="92" r="3.5" fill="#e2574c" stroke="#5a2030" stroke-width="3"/>
+</svg>

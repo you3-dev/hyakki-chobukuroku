@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="tengugeta-aura" cx="50%" cy="50%" r="52%">
+      <stop offset="0%" stop-color="#e2574c" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#e2574c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="64" r="52" fill="url(#tengugeta-aura)"/>
+  <!-- 天狗の羽根 -->
+  <path d="M104 56 C 112 68 112 88 102 102 C 96 108 88 110 82 107 C 84 95 88 78 96 66 C 99 61 102 57 104 56 Z"
+        fill="#f5f0e6" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M101 62 C 96 76 91 92 86 104" fill="none" stroke="#aab2c0" stroke-width="3" stroke-linecap="round"/>
+  <path d="M90 88 C 95 86 99 82 102 77 M93 76 C 97 74 100 71 102 68" fill="none" stroke="#aab2c0" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- 鼻緒 -->
+  <g fill="none" stroke-linecap="round">
+    <path d="M46 31 C 58 24 74 28 82 42" stroke="#5a2030" stroke-width="8.5"/>
+    <path d="M46 31 C 38 30 32 34 28 42" stroke="#5a2030" stroke-width="8.5"/>
+    <path d="M46 32 C 46 38 46 42 46 46" stroke="#5a2030" stroke-width="8"/>
+    <path d="M46 31 C 58 24 74 28 82 42" stroke="#e2574c" stroke-width="5"/>
+    <path d="M46 31 C 38 30 32 34 28 42" stroke="#e2574c" stroke-width="5"/>
+    <path d="M46 32 C 46 38 46 42 46 46" stroke="#e2574c" stroke-width="4.5"/>
+  </g>
+  <!-- 台 -->
+  <path d="M26 44 L 90 44 C 93 44 94 46 94 48 L 94 52 C 94 55 92 56 89 56 L 27 56 C 24 56 22 55 22 52 L 22 48 C 22 45 23 44 26 44 Z"
+        fill="#c9a24b" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M30 50 H 40 M56 50 H 86" fill="none" stroke="#5a2030" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
+  <!-- 一本歯 -->
+  <path d="M48 56 L 46 100 C 46 103 48 105 51 105 L 65 105 C 68 105 70 103 70 100 L 68 56 Z"
+        fill="#c9a24b" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M53 64 C 54 76 54 88 53 98" fill="none" stroke="#5a2030" stroke-width="2.2" stroke-linecap="round" opacity="0.4"/>
+  <!-- 風 -->
+  <path d="M12 70 q 8 -4 16 0 M10 84 q 7 -3 13 0" fill="none" stroke="#fff6cf" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+</svg>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="shibarinawa-aura" cx="50%" cy="50%" r="52%">
+      <stop offset="0%" stop-color="#ffb347" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ffb347" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="66" r="52" fill="url(#shibarinawa-aura)"/>
+  <!-- 縄の輪 -->
+  <circle cx="64" cy="66" r="30" fill="none" stroke="#5a2030" stroke-width="19"/>
+  <circle cx="64" cy="66" r="30" fill="none" stroke="#c9a24b" stroke-width="13"/>
+  <!-- 縄の綯い目 -->
+  <g stroke="#5a2030" stroke-width="3.5" stroke-linecap="round" opacity="0.8" fill="none">
+    <path d="M87 63 L 99 71"/>
+    <path d="M82 80 L 86 95"/>
+    <path d="M67 89 L 59 101"/>
+    <path d="M50 84 L 35 88"/>
+    <path d="M41 69 L 28 61"/>
+    <path d="M46 52 L 42 37"/>
+    <path d="M61 43 L 69 30"/>
+    <path d="M78 48 L 93 44"/>
+  </g>
+  <!-- 結び端 -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M58 34 C 50 28 44 26 38 27" stroke="#5a2030" stroke-width="12"/>
+    <path d="M70 34 C 78 28 84 26 90 27" stroke="#5a2030" stroke-width="12"/>
+    <path d="M58 34 C 50 28 44 26 38 27" stroke="#c9a24b" stroke-width="7"/>
+    <path d="M70 34 C 78 28 84 26 90 27" stroke="#c9a24b" stroke-width="7"/>
+  </g>
+  <!-- 藁の房 -->
+  <path d="M50 96 L 47 110 L 55 98 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M78 96 L 81 110 L 73 98 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+  <!-- 紙垂(結び目から下がる) -->
+  <g fill="#f5f0e6" stroke="#5a2030" stroke-width="3" stroke-linejoin="round">
+    <rect x="58" y="44" width="12" height="10"/>
+    <rect x="63" y="52" width="12" height="10"/>
+    <rect x="58" y="60" width="12" height="10"/>
+    <rect x="63" y="68" width="12" height="10"/>
+  </g>
+</svg>

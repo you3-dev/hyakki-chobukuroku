@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="gashadokuro-aura" cx="50%" cy="48%" r="52%">
+      <stop offset="0%" stop-color="#3d2f5e" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#3d2f5e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- 妖気 -->
+  <circle cx="64" cy="60" r="58" fill="url(#gashadokuro-aura)"/>
+  <!-- 浮遊する骨片 -->
+  <path d="M12 30 l 9 -4 l -2 10 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M116 36 l -9 -3 l 3 9 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="3" stroke-linejoin="round"/>
+  <!-- 背骨と肋骨 -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M64 93 V 118" stroke="#2a1f3d" stroke-width="9"/>
+    <path d="M64 93 V 118" stroke="#f5f0e6" stroke-width="5"/>
+    <path d="M62 99 C 53 100 47 104 47 110" stroke="#2a1f3d" stroke-width="8"/>
+    <path d="M66 99 C 75 100 81 104 81 110" stroke="#2a1f3d" stroke-width="8"/>
+    <path d="M62 108 C 55 109 51 112 51 116" stroke="#2a1f3d" stroke-width="8"/>
+    <path d="M66 108 C 71 108.5 74 110 75 111" stroke="#2a1f3d" stroke-width="8"/>
+    <path d="M62 99 C 53 100 47 104 47 110" stroke="#f5f0e6" stroke-width="4.5"/>
+    <path d="M66 99 C 75 100 81 104 81 110" stroke="#f5f0e6" stroke-width="4.5"/>
+    <path d="M62 108 C 55 109 51 112 51 116" stroke="#f5f0e6" stroke-width="4.5"/>
+    <!-- 折れた肋骨 -->
+    <path d="M66 108 C 71 108.5 74 110 75 111" stroke="#f5f0e6" stroke-width="4.5"/>
+  </g>
+  <!-- 画面下を掴む骨の手(左) -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M10 108 C 9 101 10 95 14 90" stroke="#2a1f3d" stroke-width="10"/>
+    <path d="M19 106 C 19 98 20 92 24 88" stroke="#2a1f3d" stroke-width="10"/>
+    <path d="M28 108 C 28 101 30 96 34 92" stroke="#2a1f3d" stroke-width="10"/>
+    <path d="M10 108 C 9 101 10 95 14 90" stroke="#f5f0e6" stroke-width="5.5"/>
+    <path d="M19 106 C 19 98 20 92 24 88" stroke="#f5f0e6" stroke-width="5.5"/>
+    <path d="M28 108 C 28 101 30 96 34 92" stroke="#f5f0e6" stroke-width="5.5"/>
+  </g>
+  <circle cx="19" cy="113" r="8.5" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="4.5"/>
+  <!-- 骨の手(右) -->
+  <g stroke-linecap="round" fill="none">
+    <path d="M118 108 C 119 101 118 95 114 90" stroke="#2a1f3d" stroke-width="10"/>
+    <path d="M109 106 C 109 98 108 92 104 88" stroke="#2a1f3d" stroke-width="10"/>
+    <path d="M100 108 C 100 101 98 96 94 92" stroke="#2a1f3d" stroke-width="10"/>
+    <path d="M118 108 C 119 101 118 95 114 90" stroke="#f5f0e6" stroke-width="5.5"/>
+    <path d="M109 106 C 109 98 108 92 104 88" stroke="#f5f0e6" stroke-width="5.5"/>
+    <path d="M100 108 C 100 101 98 96 94 92" stroke="#f5f0e6" stroke-width="5.5"/>
+  </g>
+  <circle cx="109" cy="113" r="8.5" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="4.5"/>
+  <!-- 頭蓋骨(見下ろす巨大な骸骨) -->
+  <path d="M64 8 C 34 8 19 28 21 50 C 22 64 31 73 41 76 L 41 87 C 41 91 44 93 47 93 L 81 93 C 84 93 87 91 87 87 L 87 76 C 97 73 106 64 107 50 C 109 28 94 8 64 8 Z"
+        fill="#f5f0e6" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 頭頂ハイライト -->
+  <path d="M42 20 C 34 26 30 34 29 42" fill="none" stroke="#fff6cf" stroke-width="5" stroke-linecap="round" opacity="0.8"/>
+  <!-- ひび(欠けた骨) -->
+  <path d="M84 12 l 5 11 l -7 7 l 6 9" fill="none" stroke="#2a1f3d" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 眉稜(怒りの傾き) -->
+  <path d="M33 38 L 56 45" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M95 38 L 72 45" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <!-- 眼窩と鬼火の瞳 -->
+  <circle cx="45" cy="56" r="11.5" fill="#2a1f3d"/>
+  <circle cx="83" cy="56" r="11.5" fill="#2a1f3d"/>
+  <circle cx="46" cy="58" r="5" fill="#e2574c"/>
+  <circle cx="82" cy="58" r="5" fill="#e2574c"/>
+  <circle cx="46" cy="58" r="2.3" fill="#ffb347"/>
+  <circle cx="82" cy="58" r="2.3" fill="#ffb347"/>
+  <!-- 鼻腔 -->
+  <path d="M64 62 l -5 9 h 10 Z" fill="#2a1f3d"/>
+  <!-- 頬 -->
+  <circle cx="34" cy="66" r="5" fill="#e2574c" opacity="0.4"/>
+  <circle cx="94" cy="66" r="5" fill="#e2574c" opacity="0.4"/>
+  <!-- 歯列(1本欠け) -->
+  <path d="M41 77 C 50 80 78 80 87 77" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <rect x="61" y="78" width="10" height="13" rx="3" fill="#2a1f3d"/>
+  <path d="M48 79 V 91 M55 79.5 V 91.5 M75 79.5 V 91.5 M81 79 V 91" fill="none" stroke="#2a1f3d" stroke-width="3.5" stroke-linecap="round"/>
+</svg>

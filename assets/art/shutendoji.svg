@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <radialGradient id="shutendoji-aura" cx="50%" cy="46%" r="52%">
+      <stop offset="0%" stop-color="#ffb347" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#ffb347" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="64" cy="58" r="58" fill="url(#shutendoji-aura)"/>
+  <!-- 荒ぶる蓬髪 -->
+  <path d="M64 4 C 46 4 32 10 25 22 L 33 26 L 19 34 L 30 40 L 16 50 L 29 54 L 20 66 L 33 64 L 30 78 L 41 70 L 42 82 L 50 74 L 78 74 L 86 82 L 87 70 L 98 78 L 95 64 L 108 66 L 99 54 L 112 50 L 98 40 L 109 34 L 95 26 L 103 22 C 96 10 82 4 64 4 Z"
+        fill="#3d2f5e" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- 二本角 -->
+  <path d="M45 18 C 41 12 38 7 38 3 C 43 4 49 9 52 14 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M83 18 C 87 12 90 7 90 3 C 85 4 79 9 76 14 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 胴体 -->
+  <path d="M36 74 C 30 82 27 94 27 106 C 27 112 31 116 37 116 L 91 116 C 97 116 101 112 101 106 C 101 94 98 82 92 74 Z"
+        fill="#e2574c" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 虎柄の帯 -->
+  <path d="M28 103 L 100 103 L 100 106 C 100 112 97 116 91 116 L 37 116 C 31 116 28 112 28 106 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M35 104 l3 8 l3 -8 Z M47 104 l3 8 l3 -8 Z M75 104 l3 8 l3 -8 Z M87 104 l3 8 l3 -8 Z" fill="#2a1f3d"/>
+  <!-- 赤ら顔 -->
+  <path d="M64 18 C 42 18 31 33 32 50 C 33 67 45 76 64 76 C 83 76 95 67 96 50 C 97 33 86 18 64 18 Z"
+        fill="#e2574c" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 太眉と眼 -->
+  <path d="M41 37 L 56 42" stroke="#2a1f3d" stroke-width="5" stroke-linecap="round"/>
+  <path d="M87 37 L 72 42" stroke="#2a1f3d" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="48" cy="49" rx="5.5" ry="6.5" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <ellipse cx="80" cy="49" rx="5.5" ry="6.5" fill="#f5f0e6" stroke="#5a2030" stroke-width="3"/>
+  <circle cx="49" cy="50" r="3" fill="#2a1f3d"/>
+  <circle cx="79" cy="50" r="3" fill="#2a1f3d"/>
+  <!-- 酔いの頬 -->
+  <circle cx="39" cy="59" r="5.5" fill="#ffb347" opacity="0.5"/>
+  <circle cx="89" cy="59" r="5.5" fill="#ffb347" opacity="0.5"/>
+  <!-- にやりと笑う口と乱杭歯 -->
+  <path d="M46 58 C 52 66 76 66 82 58 C 80 72 48 72 46 58 Z" fill="#5a2030"/>
+  <path d="M50 61 l3.5 6 l3.5 -6 Z M58 63 l3.5 7 l3.5 -6 Z M66 63.5 l3.5 6 l3.5 -7 Z M73 61 l3 5 l3 -6 Z" fill="#f5f0e6"/>
+  <!-- 下顎の大牙 -->
+  <path d="M46 64 L 50 51 L 56 62 Z" fill="#f5f0e6" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M82 64 L 78 51 L 72 62 Z" fill="#f5f0e6" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+  <!-- 大盃 -->
+  <path d="M56 96 L 53 107 L 75 107 L 72 96 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <ellipse cx="64" cy="88" rx="31" ry="10.5" fill="#c9a24b" stroke="#5a2030" stroke-width="4.5"/>
+  <ellipse cx="64" cy="88" rx="23.5" ry="6.5" fill="#fff6cf"/>
+  <path d="M50 88 q 7 3 14 0 q 7 -3 14 0" fill="none" stroke="#c9a24b" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <!-- 盃を掴む拳 -->
+  <circle cx="33" cy="90" r="8.5" fill="#e2574c" stroke="#5a2030" stroke-width="4.5"/>
+  <circle cx="95" cy="90" r="8.5" fill="#e2574c" stroke="#5a2030" stroke-width="4.5"/>
+  <!-- こぼれる酒 -->
+  <path d="M40 98 C 37 103 37.5 107 40.5 107 C 43.5 107 43.5 103 40 98 Z" fill="#fff6cf" opacity="0.9"/>
+  <path d="M88 100 C 85 105 85.5 109 88.5 109 C 91.5 109 91.5 105 88 100 Z" fill="#fff6cf" opacity="0.9"/>
+</svg>

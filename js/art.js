@@ -18,6 +18,11 @@ const ART = [
   'yatagarasu', 'muramasa', 'tsukumogami', 'tamamo',
   'kirin', 'hakutaku', 'tatarigami', 'genbu',
   'byakko', 'seiryu', 'suzaku', 'nurarihyon',
+  // ボス
+  'gashadokuro', 'shutendoji', 'orochi',
+  // 呪具
+  'oniudewa', 'iwakabuto', 'juzu', 'dokuga',
+  'tengugeta', 'kanzashi', 'senrigan', 'shibarinawa',
 ];
 
 function artHtml(id, emoji) {
