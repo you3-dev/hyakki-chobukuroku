@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 天邪鬼: あかんべえする小鬼 -->
+  <!-- 足 -->
+  <path d="M52 98 L 50 110 L 60 110 L 60 98 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M76 98 L 78 110 L 68 110 L 68 98 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 胴 -->
+  <path d="M50 74 C 47 86, 48 96, 52 101 C 60 105, 68 105, 76 101 C 80 96, 81 86, 78 74 Z"
+        fill="#c9a24b" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 虎柄ふんどし -->
+  <path d="M49 87 Q 64 95 79 87 L 77 101 Q 64 107 51 101 Z" fill="#ffb347" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M57 92 l 2 8 M69 92 l -2 8" fill="none" stroke="#5a2030" stroke-width="3" stroke-linecap="round"/>
+  <!-- 右腕(腰に) -->
+  <path d="M78 78 C 88 80, 92 88, 88 94" fill="none" stroke="#5a2030" stroke-width="10" stroke-linecap="round"/>
+  <path d="M78 78 C 88 80, 92 88, 88 94" fill="none" stroke="#c9a24b" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- 左腕(あかんべえの手) -->
+  <path d="M52 80 C 42 78, 37 72, 40 64" fill="none" stroke="#5a2030" stroke-width="10" stroke-linecap="round"/>
+  <path d="M52 80 C 42 78, 37 72, 40 64" fill="none" stroke="#c9a24b" stroke-width="5.5" stroke-linecap="round"/>
+  <!-- 頭 -->
+  <path d="M40 50 C 40 34, 50 24, 64 24 C 78 24, 88 34, 88 50 C 88 64, 78 74, 64 74 C 50 74, 40 64, 40 50 Z"
+        fill="#c9a24b" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 角 -->
+  <path d="M50 27 L 46 13 L 57 22 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M78 27 L 82 13 L 71 22 Z" fill="#fff6cf" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- ざんばら髪 -->
+  <path d="M41 46 C 42 31, 52 23, 64 23 C 76 23, 86 31, 87 46 L 81 40 L 77 46 L 71 38 L 64 45 L 57 38 L 51 46 L 47 40 Z"
+        fill="#5a2030" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+  <!-- 左目(下まぶたを引かれて白目むき出し) -->
+  <ellipse cx="55" cy="51" rx="6.5" ry="7.5" fill="#f5f0e6" stroke="#5a2030" stroke-width="3.5"/>
+  <circle cx="55.5" cy="47.5" r="3.2" fill="#5a2030"/>
+  <path d="M49 57.5 q 6 4 12 0" fill="none" stroke="#e2574c" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- あかんべえの指(下まぶたに掛かる) -->
+  <path d="M42 64 L 49 58.5" stroke="#5a2030" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M42 64 L 49 58.5" stroke="#c9a24b" stroke-width="4" stroke-linecap="round"/>
+  <!-- 右目(にやり閉じ目) -->
+  <path d="M70 50 q 5 -5 10 1" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <!-- べー(舌) -->
+  <path d="M58 64 q 6 4 12 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M59 65 q 5 2.5 10 0 L 69.5 75 q -5.5 5 -11 0 Z" fill="#e2574c" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M64.5 68 v 5" stroke="#5a2030" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <!-- 頬 -->
+  <circle cx="79" cy="59" r="4" fill="#e2574c" opacity="0.45"/>
+</svg>

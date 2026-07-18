@@ -7,6 +7,9 @@ const ART = [
   // 宵の小径(d1)の野生種
   'chochin', 'karakasa', 'tanuki', 'kamaitachi', 'nekomata',
   'kawauso', 'kodama', 'kappa', 'yamawaro', 'tsuchigumo',
+  // 深山の霧道(d2)の野生種
+  'hitotsume', 'amanojaku', 'okuriinu', 'dorotabo', 'kudagitsune',
+  'amefuri', 'yukionna', 'karasutengu', 'ogama', 'nue', 'zashiki',
 ];
 
 function artHtml(id, emoji) {

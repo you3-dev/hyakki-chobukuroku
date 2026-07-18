@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 大蝦蟇: 岩ほどの巨大な蟇蛙と毒の靄 -->
+  <!-- 毒の靄 -->
+  <path d="M20 74 C 12 72, 10 64, 16 60 C 12 54, 18 48, 24 51 C 24 44, 34 42, 37 49 C 33 55, 33 62, 30 68 C 27 72, 24 74, 20 74 Z"
+        fill="#3d2f5e" stroke="#2a1f3d" stroke-width="3.5" stroke-linejoin="round" opacity="0.9"/>
+  <path d="M20 66 q 5 -7 11 -9" fill="none" stroke="#5b8dd9" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <circle cx="14" cy="82" r="4.5" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="3" opacity="0.85"/>
+  <circle cx="24" cy="79" r="2.5" fill="#5b8dd9" opacity="0.8"/>
+  <!-- 後ろ足(左右のもも) -->
+  <path d="M22 108 C 16 96, 22 84, 34 82 C 44 82, 48 90, 46 100 L 42 108 Z"
+        fill="#5eb87a" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M106 108 C 112 96, 106 84, 94 82 C 84 82, 80 90, 82 100 L 86 108 Z"
+        fill="#5eb87a" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 巨体 -->
+  <path d="M28 82 C 26 56, 42 40, 64 40 C 86 40, 102 56, 100 82 C 99 98, 84 108, 64 108 C 44 108, 29 98, 28 82 Z"
+        fill="#5eb87a" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 白い腹 -->
+  <path d="M42 82 C 42 70, 52 64, 64 64 C 76 64, 86 70, 86 82 C 86 94, 76 101, 64 101 C 52 101, 42 94, 42 82 Z"
+        fill="#fff6cf" stroke="#2a1f3d" stroke-width="4"/>
+  <path d="M50 80 h 28 M48 88 h 32" stroke="#c9a24b" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+  <!-- 前足 -->
+  <path d="M40 96 L 36 110 L 52 110 L 50 98 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M88 96 L 92 110 L 76 110 L 78 98 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M40 110 v -5 M46 110 v -6 M82 110 v -6 M88 110 v -5" stroke="#2a1f3d" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- いぼ(水属性の青) -->
+  <circle cx="44" cy="52" r="3" fill="#5b8dd9" opacity="0.85"/>
+  <circle cx="84" cy="52" r="3" fill="#5b8dd9" opacity="0.85"/>
+  <circle cx="64" cy="45" r="2.5" fill="#5b8dd9" opacity="0.85"/>
+  <circle cx="34" cy="70" r="2.5" fill="#5b8dd9" opacity="0.85"/>
+  <circle cx="94" cy="70" r="2.5" fill="#5b8dd9" opacity="0.85"/>
+  <!-- 目玉(頭の上のこぶ) -->
+  <path d="M34 40 C 34 30, 42 26, 48 28 C 54 30, 56 38, 52 44 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M94 40 C 94 30, 86 26, 80 28 C 74 30, 72 38, 76 44 Z" fill="#5eb87a" stroke="#2a1f3d" stroke-width="4.5" stroke-linejoin="round"/>
+  <ellipse cx="45" cy="35" rx="5.5" ry="6" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3"/>
+  <ellipse cx="83" cy="35" rx="5.5" ry="6" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3"/>
+  <circle cx="45" cy="36" r="2.6" fill="#2a1f3d"/>
+  <circle cx="83" cy="36" r="2.6" fill="#2a1f3d"/>
+  <path d="M38 30 q 7 -4 13 0 M77 30 q 6 -4 13 0" fill="none" stroke="#2a1f3d" stroke-width="3" stroke-linecap="round"/>
+  <!-- 大口(への字) -->
+  <path d="M40 56 C 48 62, 80 62, 88 56" fill="none" stroke="#2a1f3d" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M40 56 q -2 4 -6 5 M88 56 q 2 4 6 5" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <!-- 頬 -->
+  <circle cx="38" cy="62" r="4" fill="#e2574c" opacity="0.4"/>
+  <circle cx="90" cy="62" r="4" fill="#e2574c" opacity="0.4"/>
+</svg>

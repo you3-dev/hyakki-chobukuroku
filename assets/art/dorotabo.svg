@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 泥田坊: 泥田から上半身・三本指・一つ目 -->
+  <!-- 三本指の腕(体の後ろから) -->
+  <path d="M48 90 C 34 86, 25 74, 26 58 L 19 47 L 28 51 L 26 36 L 34 47 L 41 37 L 39 51 C 41 63, 46 74, 54 80 Z"
+        fill="#c9a24b" stroke="#5a2030" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- 泥の上半身(頭と一体) -->
+  <path d="M40 104 C 38 84, 42 70, 46 62 C 42 58, 40 50, 42 42 C 45 30, 54 24, 64 24 C 74 24, 83 30, 86 42 C 88 50, 86 58, 82 62 C 86 70, 90 84, 88 104 Z"
+        fill="#c9a24b" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 泥のしずく -->
+  <path d="M88 76 C 93 78, 95 84, 92 88 C 89 86, 87 80, 88 76 Z" fill="#c9a24b" stroke="#5a2030" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- 一つ目 -->
+  <ellipse cx="64" cy="44" rx="11" ry="12" fill="#f5f0e6" stroke="#5a2030" stroke-width="4"/>
+  <circle cx="64" cy="46" r="5.5" fill="#5a2030"/>
+  <circle cx="62" cy="43.5" r="2" fill="#fff6cf"/>
+  <!-- 呻く口「田を返せ」 -->
+  <path d="M54 66 C 56 62, 72 62, 74 66 C 74 74, 68 78, 64 78 C 60 78, 54 74, 54 66 Z"
+        fill="#5a2030" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M58 66 q 6 -3 12 0" fill="none" stroke="#f5f0e6" stroke-width="3" stroke-linecap="round"/>
+  <!-- 泥のてかり -->
+  <path d="M50 34 q 6 -5 13 -4" fill="none" stroke="#fff6cf" stroke-width="3.5" stroke-linecap="round" opacity="0.7"/>
+  <!-- 田の水面 -->
+  <path d="M14 104 C 26 98, 40 108, 54 103 C 68 98, 82 108, 96 103 C 104 100, 110 102, 114 104 L 114 114 L 14 114 Z"
+        fill="#5b8dd9" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M26 108 q 8 -3 15 0 M86 108 q 8 -3 15 0" fill="none" stroke="#fff6cf" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+  <!-- 稲の苗 -->
+  <path d="M22 103 C 21 96, 24 92, 24 88 M22 103 C 24 98, 28 96, 29 92" fill="none" stroke="#5eb87a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M104 103 C 103 96, 106 92, 106 88 M104 103 C 106 98, 110 96, 111 92" fill="none" stroke="#5eb87a" stroke-width="3" stroke-linecap="round"/>
+</svg>

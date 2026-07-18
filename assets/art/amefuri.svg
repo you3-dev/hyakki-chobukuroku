@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 雨降小僧: 番傘を頭に載せた小僧と雨粒 -->
+  <!-- 雨粒 -->
+  <path d="M20 58 c 4 6 4 10 0 12.5 c -4 -2.5 -4 -6.5 0 -12.5 Z" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M108 58 c 4 6 4 10 0 12.5 c -4 -2.5 -4 -6.5 0 -12.5 Z" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M26 88 c 3.5 5 3.5 9 0 11 c -3.5 -2 -3.5 -6 0 -11 Z" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M102 88 c 3.5 5 3.5 9 0 11 c -3.5 -2 -3.5 -6 0 -11 Z" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- 下駄 -->
+  <ellipse cx="55" cy="110" rx="7" ry="4" fill="#c9a24b" stroke="#2a1f3d" stroke-width="3.5"/>
+  <ellipse cx="73" cy="110" rx="7" ry="4" fill="#c9a24b" stroke="#2a1f3d" stroke-width="3.5"/>
+  <!-- 着物 -->
+  <path d="M50 80 C 44 88, 41 98, 42 108 L 86 108 C 87 98, 84 88, 78 80 Z"
+        fill="#3d2f5e" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 帯 -->
+  <path d="M44 96 C 56 100, 72 100, 84 96" fill="none" stroke="#5b8dd9" stroke-width="5" stroke-linecap="round"/>
+  <!-- 衿 -->
+  <path d="M55 82 L 64 94 L 73 82" fill="none" stroke="#fff6cf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- 手 -->
+  <circle cx="43" cy="93" r="4.5" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5"/>
+  <circle cx="85" cy="93" r="4.5" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3.5"/>
+  <!-- 顔 -->
+  <path d="M42 62 C 42 48, 51 40, 64 40 C 77 40, 86 48, 86 62 C 86 74, 77 82, 64 82 C 51 82, 42 74, 42 62 Z"
+        fill="#fff6cf" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 番傘(頭に載せる) -->
+  <path d="M64 8 L 66 14 L 62 14 Z" fill="#2a1f3d"/>
+  <path d="M24 44 C 30 24, 46 13, 64 13 C 82 13, 98 24, 104 44 C 90 38, 78 36, 64 36 C 50 36, 38 38, 24 44 Z"
+        fill="#5b8dd9" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M64 14 L 64 36 M40 20 C 36 26, 33 32, 31 41 M88 20 C 92 26, 95 32, 97 41" fill="none" stroke="#2a1f3d" stroke-width="3" stroke-linecap="round" opacity="0.8"/>
+  <path d="M34 27 q 30 -12 60 0" fill="none" stroke="#fff6cf" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+  <!-- にこにこ顔 -->
+  <path d="M50 62 q 5 -6 10 0" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M68 62 q 5 -6 10 0" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M58 71 q 6 6 12 0" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="46" cy="68" r="4" fill="#e2574c" opacity="0.4"/>
+  <circle cx="82" cy="68" r="4" fill="#e2574c" opacity="0.4"/>
+</svg>

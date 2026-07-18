@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- 管狐: 竹筒から顔を出す小狐 -->
+  <!-- 尻尾(筒の反対側の口から) -->
+  <path d="M95 77 C 105 74, 111 66, 109 56 C 115 62, 116 73, 108 81 C 103 85, 96 84, 95 77 Z"
+        fill="#ffc25e" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M109 58 C 112 64, 111 71, 107 76 C 113 70, 114 62, 109 58 Z" fill="#fff6cf" opacity="0.9"/>
+  <!-- 竹筒 -->
+  <path d="M28 72 C 26 68, 26 64, 28 60 L 98 66 C 100 70, 100 74, 98 78 L 28 84 C 26 80, 26 76, 28 72 Z"
+        fill="#5eb87a" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 節 -->
+  <path d="M56 62.5 C 58 68, 58 76, 56 81.5 M78 64.5 C 80 69, 80 75, 78 79.5" fill="none" stroke="#5a2030" stroke-width="3" stroke-linecap="round" opacity="0.75"/>
+  <!-- 筒の口(手前) -->
+  <ellipse cx="29" cy="72" rx="5.5" ry="12" fill="#fff6cf" stroke="#5a2030" stroke-width="4"/>
+  <!-- 御札紐(金属アクセント) -->
+  <path d="M66 63 L 66 81 L 71 80.5 L 71 63.5 Z" fill="#aab2c0" stroke="#5a2030" stroke-width="3" stroke-linejoin="round"/>
+  <!-- 前足(筒のふちにちょこん) -->
+  <circle cx="45" cy="65" r="4.2" fill="#ffc25e" stroke="#5a2030" stroke-width="3.5"/>
+  <path d="M42.5 64 v 2.5 M45 64.5 v 2.5 M47.5 64 v 2.5" stroke="#5a2030" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- 耳 -->
+  <path d="M28 44 L 24 26 L 40 34 Z" fill="#ffc25e" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M52 42 L 58 26 L 40 32 Z" fill="#ffc25e" stroke="#5a2030" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M30 40 L 28 32 L 36 36 Z" fill="#e2574c" opacity="0.6"/>
+  <path d="M50 39 L 53 31 L 45 34 Z" fill="#e2574c" opacity="0.6"/>
+  <!-- 顔(筒から) -->
+  <path d="M22 52 C 22 42, 30 36, 40 36 C 50 36, 58 42, 58 52 C 58 60, 52 68, 40 68 C 28 68, 22 60, 22 52 Z"
+        fill="#ffc25e" stroke="#5a2030" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 白いマズル -->
+  <path d="M32 54 C 34 50, 46 50, 48 54 C 48 61, 44 65, 40 65 C 36 65, 32 61, 32 54 Z" fill="#fff6cf"/>
+  <!-- にこにこ閉じ目 -->
+  <path d="M28 49 q 4.5 -5 9 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <path d="M43 49 q 4.5 -5 9 0" fill="none" stroke="#5a2030" stroke-width="4" stroke-linecap="round"/>
+  <!-- 鼻・口 -->
+  <circle cx="40" cy="56" r="2.4" fill="#5a2030"/>
+  <path d="M37 61 q 3 3 6 0" fill="none" stroke="#5a2030" stroke-width="3" stroke-linecap="round"/>
+  <!-- 頬 -->
+  <circle cx="27" cy="57" r="3.5" fill="#e2574c" opacity="0.45"/>
+  <circle cx="53" cy="57" r="3.5" fill="#e2574c" opacity="0.45"/>
+</svg>
