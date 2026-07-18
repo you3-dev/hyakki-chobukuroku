@@ -11,6 +11,7 @@ let fusionResult = null;    // 直近の憑合結果unit
 let nodeOpts = null;        // 現在のノード2択
 let E = null;               // イベント画面データ
 let importText = '';        // 引継ぎコード入力
+let itemSel = null;         // 呪具画面で選択中の呪具id
 
 const NODE_INFO = {
   battle:   { emoji: '⚔️', name: '戦闘',   desc: '妖怪と戦う。弱らせて調伏の好機' },
@@ -57,11 +58,14 @@ function chooseNode(i) {
   selCard = null; captureMode = false; setToast('');
   const dg = currentDungeon();
   if (opt.type === 'battle') { startBattle(makeGroup('battle'), { expMult: dg.expMult }); screen = 'battle'; }
-  else if (opt.type === 'elite') { startBattle(makeGroup('elite'), { expMult: dg.expMult * 2 }); screen = 'battle'; }
+  else if (opt.type === 'elite') { startBattle(makeGroup('elite'), { expMult: dg.expMult * 2, elite: true }); screen = 'battle'; }
   else if (opt.type === 'boss') { startBattle(makeGroup('boss'), { boss: true, expMult: dg.expMult }); screen = 'battle'; }
   else if (opt.type === 'treasure') {
-    const extra = applyTreasure();
-    E = { kind: 'treasure', msg: `古びた祠に調伏札が${extra}枚。体力も少し回復した(+4)` };
+    const t = applyTreasure();
+    const msg = t.kind === 'item'
+      ? `古びた祠に呪具「${ITEMS[t.id].emoji}${ITEMS[t.id].name}」が眠っていた。体力も少し回復(+4)`
+      : `古びた祠に調伏札が${t.extra}枚。体力も少し回復した(+4)`;
+    E = { kind: 'treasure', msg };
     screen = 'event';
   } else if (opt.type === 'rest') {
     E = { kind: 'rest' };
@@ -76,6 +80,7 @@ function handleAction(action, arg) {
     case 'nav-deck': screen = 'deck'; setToast(''); break;
     case 'nav-fusion': screen = 'fusion'; fusionSel = []; fusionResult = null; setToast(''); break;
     case 'nav-dex': screen = 'dex'; setToast(''); break;
+    case 'nav-items': screen = 'items'; itemSel = null; setToast(''); break;
     case 'nav-save': screen = 'save'; setToast(''); break;
     case 'reset-save':
       if (confirm('セーブデータを消して最初からやり直しますか?')) { resetSave(); R = null; screen = 'home'; }
@@ -103,6 +108,26 @@ function handleAction(action, arg) {
         G.deck.push(uid);
       }
       save();
+      break;
+    }
+
+    case 'item-select': {
+      itemSel = (itemSel === arg) ? null : arg;
+      setToast(itemSel ? `${ITEMS[itemSel].name}を装備する妖怪をタップ` : '');
+      break;
+    }
+    case 'item-target': {
+      const uid = Number(arg);
+      if (itemSel) {
+        if (equipItem(uid, itemSel)) {
+          setToast('装備した');
+          if (itemCount(itemSel) < 1) itemSel = null;
+        } else setToast('装備できない');
+      } else {
+        const u = getUnit(uid);
+        if (u && u.item) { unequipItem(uid); setToast('はずした'); }
+        else setToast('呪具を選んでから妖怪をタップ');
+      }
       break;
     }
 
@@ -225,10 +250,11 @@ function unitCard(u, opts) {
   if (o.selected) cls.push('selected');
   if (o.inDeck) cls.push('indeck');
   const action = o.action ? `data-action="${o.action}" data-arg="${u.uid}"` : '';
+  const itemMark = u.item && ITEMS[u.item] ? ` ${ITEMS[u.item].emoji}` : '';
   return `<div class="${cls.join(' ')}" ${action}>
-    <div class="unit-top"><span class="unit-emoji">${s.emoji}</span>${elemChip(s.element)}<span class="cost">◆${s.cost}</span></div>
+    <div class="unit-top"><span class="unit-emoji">${s.emoji}</span>${elemChip(s.element)}<span class="cost">◆${effCost(u)}</span></div>
     <div class="unit-name">${esc(s.name)}${starText(u)}</div>
-    <div class="unit-lv">Lv${unitLevel(u)} ${s.role}</div>
+    <div class="unit-lv">Lv${unitLevel(u)} ${s.role}${itemMark}</div>
     <div class="unit-effect">${effectText(u)}</div>
     ${o.badge ? `<div class="unit-badge">${o.badge}</div>` : ''}
   </div>`;
@@ -250,6 +276,7 @@ function renderHome() {
     <div class="btn-row">
       <button class="btn" data-action="nav-deck">編成 (${G.deck.length}/${DECK_MAX})</button>
       <button class="btn" data-action="nav-fusion">憑合</button>
+      <button class="btn" data-action="nav-items">呪具 (${itemTotal()})</button>
       <button class="btn" data-action="nav-dex">図鑑</button>
       <button class="btn" data-action="nav-save">記録</button>
     </div>
@@ -348,6 +375,32 @@ function renderFusion() {
     ${preview}
     <div class="grid">${rosterHtml}</div>
     <details class="recipes"><summary>言い伝え(レシピヒント)</summary><ul>${hints}</ul></details>
+    <div class="btn-row"><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
+    ${toastHtml()}
+  </div>`;
+}
+
+function renderItems() {
+  const inv = Object.values(ITEMS).map(it => {
+    const n = itemCount(it.id);
+    return `<div class="unit item-card ${itemSel === it.id ? 'selected' : ''} ${n < 1 ? 'item-empty' : ''}"
+      ${n >= 1 ? `data-action="item-select" data-arg="${it.id}"` : ''}>
+      <div class="unit-emoji">${it.emoji}</div>
+      <div class="unit-name">${it.name}</div>
+      <div class="unit-effect">${it.desc}</div>
+      <div class="unit-lv">所持 ${n}</div>
+    </div>`;
+  }).join('');
+  const rosterHtml = G.roster.map(u => unitCard(u, {
+    action: 'item-target',
+    selected: !!u.item,
+  })).join('');
+  app.innerHTML = `<div class="screen">
+    <h2 class="h2">呪具 — 妖怪1体に1つ装備</h2>
+    <p class="hint">呪具をタップ→妖怪をタップで装備。装備中の妖怪をそのままタップではずす。強戦闘・ボス・宝で手に入る</p>
+    <div class="grid">${inv}</div>
+    <h2 class="h2">手持ち妖怪</h2>
+    <div class="grid">${rosterHtml}</div>
     <div class="btn-row"><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
     ${toastHtml()}
   </div>`;
@@ -472,14 +525,15 @@ function renderBattle() {
     const u = getUnit(uid);
     if (!u) return '';
     const s = SPECIES[u.sp];
-    const playable = B.energy >= s.cost;
+    const playable = B.energy >= effCost(u);
+    const itemMark = u.item && ITEMS[u.item] ? ITEMS[u.item].emoji : '';
     return `<div class="hand-card ${selCard === uid ? 'selected' : ''} ${playable ? '' : 'disabled'}"
       data-action="play-card" data-arg="${uid}">
-      <div class="unit-top"><span class="cost">◆${s.cost}</span>${elemChip(s.element)}</div>
+      <div class="unit-top"><span class="cost">◆${effCost(u)}</span>${elemChip(s.element)}</div>
       <div class="unit-emoji">${s.emoji}</div>
       <div class="unit-name">${esc(s.name)}${starText(u)}</div>
       <div class="unit-effect">${effectText(u)}</div>
-      <div class="unit-lv">Lv${unitLevel(u)}</div>
+      <div class="unit-lv">Lv${unitLevel(u)} ${itemMark}</div>
     </div>`;
   }).join('');
 
@@ -488,9 +542,12 @@ function renderBattle() {
     const win = B.over === 'win';
     const lvups = B.levelUps.map(l => `<li>${l.emoji}${l.name} Lv${l.from}→${l.to}</li>`).join('');
     const caps = B.captured.map(u => `<li>${SPECIES[u.sp].emoji}${SPECIES[u.sp].name} を調伏!</li>`).join('');
+    const drop = B.itemDrop && ITEMS[B.itemDrop]
+      ? `<p class="drop-line">呪具「${ITEMS[B.itemDrop].emoji}${ITEMS[B.itemDrop].name}」を手に入れた!</p>` : '';
     overlay = `<div class="overlay"><div class="overlay-box">
       <h2>${win ? (B.boss ? '🌅 夜行の主を討った!' : '⭐ 勝利') : '💤 力尽きた…'}</h2>
       ${win ? `<p>EXP +${B.expGained}(デッキ全員)</p>` : '<p>調伏した妖怪は持ち帰れる。</p>'}
+      ${drop}
       ${caps ? `<ul>${caps}</ul>` : ''}
       ${lvups ? `<ul>${lvups}</ul>` : ''}
       <button class="btn btn-primary btn-big" data-action="battle-continue">${win && !B.boss ? '先へ進む' : '結果へ'}</button>
@@ -535,6 +592,7 @@ function render() {
     case 'deck': renderDeck(); break;
     case 'fusion': renderFusion(); break;
     case 'dex': renderDex(); break;
+    case 'items': renderItems(); break;
     case 'save': renderSave(); break;
     case 'node': renderNode(); break;
     case 'battle': renderBattle(); break;

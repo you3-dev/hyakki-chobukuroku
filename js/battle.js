@@ -19,6 +19,8 @@ function startBattle(group, opts) {
     enemies: group,
     expMult: (opts && opts.expMult) || 1,
     boss: !!(opts && opts.boss),
+    elite: !!(opts && opts.elite),
+    itemDrop: null,
     turn: 0, energy: 0, block: 0,
     draw: shuffle(G.deck.slice()), discard: [], hand: [],
     killExp: 0, captured: [], levelUps: [], expGained: 0,
@@ -54,21 +56,31 @@ function addLog(m) { B.log.push(m); if (B.log.length > 4) B.log.shift(); }
 
 function enemyExpValue(e) { return e.boss ? e.expValue : EXP_BY_TIER[e.tier]; }
 
-// Lv/★補正込みのカード数値
-// 攻/防/回復: +1/Lv +2/★、毒: +1/★、ドロー: ★2以上で+1、弱体: 固定
+// Lv/★/呪具補正込みのカード数値
+// 攻/防/回復: +1/Lv +2/★、毒: +1/★、ドロー: ★2以上で+1、弱体/札: 固定
+// 呪具modは対応する効果を持つカードのみ強化
 function cardValues(u) {
   const s = SPECIES[u.sp], e = s.effect;
   const star = u.star || 0;
   const nb = (unitLevel(u) - 1) + star * 2;
+  const m = (u.item && ITEMS[u.item] && ITEMS[u.item].mod) || {};
   return {
-    dmg: e.dmg ? e.dmg + nb : 0,
-    dmgAll: e.dmgAll ? e.dmgAll + nb : 0,
-    block: e.block ? e.block + nb : 0,
-    heal: e.heal ? e.heal + nb : 0,
-    poison: e.poison ? e.poison + star : 0,
+    dmg: e.dmg ? e.dmg + nb + (m.dmg || 0) : 0,
+    dmgAll: e.dmgAll ? e.dmgAll + nb + (m.dmgAll || 0) : 0,
+    block: e.block ? e.block + nb + (m.block || 0) : 0,
+    heal: e.heal ? e.heal + nb + (m.heal || 0) : 0,
+    poison: e.poison ? e.poison + star + (m.poison || 0) : 0,
     weaken: e.weaken || 0,
-    draw: e.draw ? e.draw + Math.floor(star / 2) : 0,
+    draw: e.draw ? e.draw + Math.floor(star / 2) + (m.draw || 0) : 0,
+    fuda: e.fuda || 0,
   };
+}
+
+// 呪具のコスト補正込み(下限1)
+function effCost(u) {
+  const s = SPECIES[u.sp];
+  const m = (u.item && ITEMS[u.item] && ITEMS[u.item].mod) || {};
+  return Math.max(1, s.cost + (m.cost || 0));
 }
 
 function dealDamage(enemy, base, atkElement) {
@@ -90,8 +102,10 @@ function playCard(uid, targetIdx) {
   const u = getUnit(uid);
   if (!u || !B.hand.includes(uid)) return { err: 'そのカードは使えない' };
   const s = SPECIES[u.sp];
-  if (B.energy < s.cost) return { err: '霊力が足りない' };
+  const cost = effCost(u);
+  if (B.energy < cost) return { err: '霊力が足りない' };
   const v = cardValues(u);
+  const snare = !!(u.item && ITEMS[u.item] && ITEMS[u.item].snare);
   const needsTarget = v.dmg > 0 || v.poison > 0 || v.weaken > 0;
   let target = null;
   if (needsTarget) {
@@ -100,6 +114,7 @@ function playCard(uid, targetIdx) {
   }
   if (v.dmg) {
     const r = dealDamage(target, v.dmg, s.element);
+    if (snare) target.snareTag = true;
     addLog(`${s.name}の一撃! ${target.name}に${r.dmg}${multText(r.mult)}`);
   }
   if (v.poison && target.state === 'alive') {
@@ -111,13 +126,19 @@ function playCard(uid, targetIdx) {
     addLog(`${target.name}の腕が鈍った(弱体${target.weak})`);
   }
   if (v.dmgAll) {
-    const hits = aliveEnemies().map(e => dealDamage(e, v.dmgAll, s.element).dmg);
+    const targets = aliveEnemies();
+    const hits = targets.map(e => {
+      const r = dealDamage(e, v.dmgAll, s.element);
+      if (snare) e.snareTag = true;
+      return r.dmg;
+    });
     addLog(`${s.name}が薙ぎ払う! 全体に${hits.join('/')}`);
   }
   if (v.block) { B.block += v.block; addLog(`${s.name}が守りを固めた(防御+${v.block})`); }
   if (v.heal) { R.hp = Math.min(R.maxHp, R.hp + v.heal); addLog(`${s.name}の癒やし(HP+${v.heal})`); }
   if (v.draw) { drawCards(v.draw); addLog(`${s.name}が札を差し出す(${v.draw}枚)`); }
-  B.energy -= s.cost;
+  if (v.fuda) { R.fuda += v.fuda; addLog(`${s.name}が調伏札を差し出した(+${v.fuda})`); }
+  B.energy -= cost;
   B.hand = B.hand.filter(id => id !== uid);
   B.discard.push(uid);
   checkWin();
@@ -131,6 +152,7 @@ function captureRate(e) {
   const ratio = e.hp / e.maxHp;
   let rate = 50 + Math.round((0.30 - ratio) * 150);
   if (e.advTag) rate += 10;
+  if (e.snareTag) rate += 10; // 縛りの縄
   if (e.tier === 2) rate -= 10;
   rate -= e.rage * 5;
   return Math.max(5, Math.min(95, rate));
@@ -220,6 +242,11 @@ function finishBattle(win) {
       G.dungeonClears[R.dungeon] = (G.dungeonClears[R.dungeon] || 0) + 1;
       G.stats.clears++;
     }
+    // 呪具ドロップ: ボス確定 / 強戦闘40%
+    if (B.boss || (B.elite && Math.random() < 0.4)) {
+      B.itemDrop = randomItemId();
+      gainItem(B.itemDrop);
+    }
   }
   save();
 }
@@ -237,7 +264,7 @@ function autoResolveBattle() {
       for (const uid of B.hand.slice()) {
         const u = getUnit(uid);
         if (!u) continue;
-        if (B.energy < SPECIES[u.sp].cost) continue;
+        if (B.energy < effCost(u)) continue;
         const v = cardValues(u);
         const alive = aliveEnemies();
         if (!alive.length) break;

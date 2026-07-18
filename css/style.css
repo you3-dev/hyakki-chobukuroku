@@ -155,6 +155,10 @@ body {
 .hand-card.disabled { opacity: .45; }
 .battle-actions { margin-top: 4px; }
 
+/* 呪具 */
+.item-card.item-empty { opacity: .4; cursor: default; }
+.drop-line { color: var(--gold); font-weight: bold; margin: 6px 0; }
+
 /* ★・状態異常 */
 .star { color: var(--gold); font-size: .75em; margin-left: 2px; letter-spacing: -1px; }
 .poison { color: #b57ae0; font-weight: bold; }

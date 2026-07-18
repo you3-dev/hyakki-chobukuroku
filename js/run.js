@@ -57,7 +57,7 @@ function makeEnemy(spId, hpScale, atkScale) {
   return {
     sp: spId, boss: false, name: s.name, emoji: s.emoji, element: s.element, tier: s.tier,
     maxHp: hp, hp, atk: Math.round(s.enemy.atk * atkScale),
-    rage: 0, poison: 0, weak: 0, advTag: false, state: 'alive',
+    rage: 0, poison: 0, weak: 0, advTag: false, snareTag: false, state: 'alive',
   };
 }
 
@@ -70,7 +70,7 @@ function makeGroup(kind) {
     return [{
       sp: null, boss: true, name: b.name, emoji: b.emoji, element: null, tier: 0,
       maxHp: b.hp, hp: b.hp, atk: b.atk, bigAtk: b.bigAtk, expValue: b.expValue,
-      rage: 0, poison: 0, weak: 0, advTag: false, state: 'alive',
+      rage: 0, poison: 0, weak: 0, advTag: false, snareTag: false, state: 'alive',
     }];
   }
   const { t1, t2 } = dg.pools;
@@ -91,11 +91,18 @@ function makeGroup(kind) {
   return ids.map(id => makeEnemy(id, hpSc, atkSc));
 }
 
+// 宝: 30%で呪具、70%で調伏札。どちらでもHP+4
 function applyTreasure() {
+  R.hp = Math.min(R.maxHp, R.hp + 4);
+  if (Math.random() < 0.3) {
+    const id = randomItemId();
+    gainItem(id);
+    save();
+    return { kind: 'item', id };
+  }
   const extra = Math.random() < 0.4 ? 2 : 1;
   R.fuda += extra;
-  R.hp = Math.min(R.maxHp, R.hp + 4);
-  return extra;
+  return { kind: 'fuda', extra };
 }
 
 function applyRest(choice) {
