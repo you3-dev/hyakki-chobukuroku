@@ -276,6 +276,7 @@ body {
 .enemy.dead { opacity: .35; filter: grayscale(1); }
 .enemy.captured { opacity: .55; border-color: var(--gold); }
 .enemy.capturable { border-color: var(--gold); }
+.enemy.mercy-spared { border-color: #b9a6ff; box-shadow: 0 0 0 2px rgba(185, 166, 255, .18), 0 8px 18px rgba(0, 0, 0, .22); }
 .enemy.capture-target { box-shadow: 0 0 12px rgba(224, 182, 78, .8); }
 .enemy-emoji { font-size: 2.2rem; }
 .enemy-name { font-size: .78rem; margin: 2px 0; }
@@ -289,6 +290,8 @@ body {
   margin-top: 4px; font-size: .72rem; color: #201a10; background: var(--gold);
   border-radius: 8px; display: inline-block; padding: 1px 8px; font-weight: bold;
 }
+.mercy-mark { margin-top: 3px; color: #d8cdfd; font-size: .62rem; font-weight: bold; }
+.mercy-on { box-shadow: 0 0 0 2px rgba(224, 182, 78, .2); }
 
 .log {
   background: rgba(0, 0, 0, .3); border-radius: 8px; padding: 6px 10px;
@@ -305,6 +308,7 @@ body {
 .hand-card.selected { border-color: var(--gold); box-shadow: 0 0 10px rgba(224, 182, 78, .6); transform: translateY(-6px); }
 .hand-card.disabled { opacity: .45; }
 .battle-actions { margin-top: 4px; }
+.battle-actions .btn { min-height: 44px; }
 
 /* イラスト(絵文字と同じ大きさ感で置き換わる) */
 .sprite { width: 1.2em; height: 1.2em; vertical-align: -0.2em; }

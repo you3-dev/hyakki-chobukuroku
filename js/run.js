@@ -74,6 +74,7 @@ function loadRun() {
   if (timeMigrated) R.time = runTimeSnapshot(runTimeProvider());
   if (d.b) {
     B = Object.assign({}, d.b, { captured: toUnits(d.b.captured) });
+    B.mercy = mercyAvailable() && !B.boss ? !!B.mercy : false;
     const uids = new Set(G.roster.map(u => u.uid));
     ['draw', 'discard', 'hand', 'deckAtStart'].forEach(k => { B[k] = (B[k] || []).filter(id => uids.has(id)); });
   } else B = null;

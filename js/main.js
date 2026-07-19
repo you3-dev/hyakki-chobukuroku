@@ -231,6 +231,13 @@ function handleAction(action, arg) {
       selCard = null;
       setToast(captureMode ? '調伏する敵をタップ(HP30%以下のみ)' : '');
       break;
+    case 'toggle-mercy':
+      if (!B || !mercyAvailable()) { setToast('この夜行を一度踏破すると手加減を使える'); break; }
+      if (B.boss) { setToast('夜行の主に手加減は通じない'); break; }
+      B.mercy = !B.mercy;
+      setToast(B.mercy ? '手加減ON: 単体攻撃の致死ダメージをHP1で止める' : '手加減OFF');
+      saveRun();
+      break;
     case 'auto-battle':
       if (!autoAvailable()) { setToast('このダンジョンを一度踏破すると解放'); break; }
       selCard = null; captureMode = false; setToast('');
@@ -522,7 +529,7 @@ function renderDungeon() {
       <div class="node-emoji">${unlocked ? dg.emoji : '🔒'}</div>
       <div class="node-name">${unlocked ? dg.name : '???'}</div>
       <div class="node-desc">${unlocked
-        ? `全${dg.length}歩 / 踏破${clears}回${clears > 0 ? '<br>⚡式神代行 解放済み' : ''}`
+        ? `全${dg.length}歩 / 踏破${clears}回${clears > 0 ? '<br>⚡式神代行・🪶手加減 解放済み' : ''}`
         : `${DUNGEONS[dg.unlock].name}を踏破すると開通`}</div>
     </div>`;
   }).join('');
@@ -798,6 +805,7 @@ function enemyHtml(e, idx) {
   if (dead) cls.push(e.state === 'captured' ? 'captured' : 'dead');
   if (capturable) cls.push('capturable');
   if (captureMode && capturable) cls.push('capture-target');
+  if (e.mercyTag && e.state === 'alive') cls.push('mercy-spared');
   const ailments = [
     e.poison > 0 ? `<span class="poison">毒${e.poison}</span>` : '',
     e.weak > 0 ? `<span class="weakened">弱${e.weak}</span>` : '',
@@ -811,6 +819,7 @@ function enemyHtml(e, idx) {
       : `<div class="hpbar"><div class="hpfill" style="width:${Math.round(ratio * 100)}%"></div></div>
          <div class="enemy-hp">${e.hp}/${e.maxHp}</div>
          <div class="enemy-intent">攻撃予告: ${enemyAtk(e)} ${ailments}</div>
+         ${e.mercyTag ? '<div class="mercy-mark">🪶 手加減・HP1</div>' : ''}
          ${capturable ? `<div class="cap-mark">🧧調伏可 ${captureRate(e)}%</div>` : ''}`}
   </div>`;
 }
@@ -861,6 +870,7 @@ function renderBattle() {
         <div class="hand-row">${hand}</div>
         <div class="btn-row battle-actions">
           <button class="btn ${captureMode ? 'btn-active' : ''}" data-action="toggle-capture">🧧 調伏札(残${R.fuda})</button>
+          ${mercyAvailable() ? `<button class="btn ${B.mercy ? 'btn-active mercy-on' : ''}" data-action="toggle-mercy" aria-pressed="${B.mercy ? 'true' : 'false'}" ${B.boss ? 'disabled' : ''}>🪶 手加減 ${B.boss ? '無効' : (B.mercy ? 'ON' : 'OFF')}</button>` : ''}
           ${autoAvailable() ? `<button class="btn" data-action="auto-battle">⚡式神代行</button>` : ''}
           <button class="btn btn-primary" data-action="end-turn">ターン終了 ▶</button>
         </div>

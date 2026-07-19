@@ -9,16 +9,16 @@ const PROGRESSION_RANK_NAMES = Object.freeze([
 
 const PROGRESSION_MILESTONES = Object.freeze([
   { id: 'first_capture', name: '初めての調伏', description: '妖怪を1体調伏する', achievement: 'first_capture', area: 'dungeon', reward: '位階昇格と調伏師の歩みを記録' },
-  { id: 'clear_d1', name: '宵の小径踏破', description: '宵の小径を初めて踏破する', achievement: 'clear_d1', area: 'dungeon', reward: '深山の霧道・術士HP+15・宵の式神代行' },
+  { id: 'clear_d1', name: '宵の小径踏破', description: '宵の小径を初めて踏破する', achievement: 'clear_d1', area: 'dungeon', reward: '深山の霧道・術士HP+15・宵の式神代行/手加減' },
   { id: 'dex_10', name: '十妖怪使役', description: '図鑑で10種を使役する', achievement: 'dex_10', area: 'dex', reward: '次回夜行の初期調伏札+1' },
   { id: 'first_star3', name: '極めし一体', description: '★3の妖怪を作る', achievement: 'first_star3', area: 'fusion', reward: '入門呪具を1つ選んで獲得', choice: Object.freeze(['oniudewa', 'iwakabuto', 'juzu']) },
-  { id: 'clear_d2', name: '深山の霧道踏破', description: '深山の霧道を初めて踏破する', achievement: 'clear_d2', area: 'dungeon', reward: '百鬼の御堂・術士HP+15・霧道の式神代行' },
+  { id: 'clear_d2', name: '深山の霧道踏破', description: '深山の霧道を初めて踏破する', achievement: 'clear_d2', area: 'dungeon', reward: '百鬼の御堂・術士HP+15・霧道の式神代行/手加減' },
   { id: 'dex_25', name: '二十五妖怪使役', description: '図鑑で25種を使役する', achievement: 'dex_25', area: 'dex', reward: '初期調伏札+1・宝で報酬を選択可能' },
-  { id: 'clear_d3', name: '百鬼の御堂踏破', description: '百鬼の御堂を初めて踏破する', achievement: 'clear_d3', area: 'dungeon', reward: '百鬼の試練・術士HP+15・御堂の式神代行' },
+  { id: 'clear_d3', name: '百鬼の御堂踏破', description: '百鬼の御堂を初めて踏破する', achievement: 'clear_d3', area: 'dungeon', reward: '百鬼の試練・術士HP+15・御堂の式神代行/手加減' },
   { id: 'four_gods', name: '四神制覇', description: '玄武・白虎・青龍・朱雀を使役する', achievement: 'four_gods', area: 'fusion', reward: '特別称号「四神使い」' },
   { id: 'nurarihyon', name: '総大将誕生', description: 'ぬらりひょんを使役する', achievement: 'nurarihyon', area: 'fusion', reward: '特別称号「妖怪総大将」' },
   { id: 'dex_50', name: '百鬼図鑑', description: '図鑑50種をすべて使役する', achievement: 'dex_50', area: 'dex', reward: '初期調伏札+1・百鬼蒐集家の証' },
-  { id: 'final_trial', name: '百鬼の試練踏破', description: '最終夜行「百鬼の試練」を踏破する', dungeon: 'trial', area: 'dungeon', reward: 'エンディング・特別称号「大調伏師」・拠点の変化' },
+  { id: 'final_trial', name: '百鬼の試練踏破', description: '最終夜行「百鬼の試練」を踏破する', dungeon: 'trial', area: 'dungeon', reward: 'エンディング・称号「大調伏師」・拠点の変化・試練の手加減' },
 ].map(Object.freeze));
 
 function progressionMilestoneDefinition(id) {

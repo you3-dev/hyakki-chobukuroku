@@ -172,8 +172,24 @@ check('event(茶屋)', () => { E = { kind: 'rest' }; screen = 'event'; render();
 
 R.depth = 1;
 startBattle(makeGroup('battle'), { expMult: 1 });
-check('battle(通常)', () => { screen = 'battle'; render(); });
-check('battle(オートボタン表示)', () => { G.dungeonClears.d1 = 1; render(); G.dungeonClears.d1 = 0; });
+check('battle(通常・未踏破は手加減なし)', () => {
+  screen = 'battle'; render();
+  if (appStub.innerHTML.includes('data-action="toggle-mercy"')) throw new Error('未踏破で手加減ボタンが出ている');
+});
+check('battle(オート・手加減解放/切替)', () => {
+  G.dungeonClears.d1 = 1; render();
+  if (!appStub.innerHTML.includes('data-action="auto-battle"') || !appStub.innerHTML.includes('手加減 OFF')) throw new Error('踏破後の操作が解放されない');
+  handleAction('toggle-mercy');
+  if (!B.mercy || !appStub.innerHTML.includes('手加減 ON') || !appStub.innerHTML.includes('aria-pressed="true"')) throw new Error('手加減ON表示に切り替わらない');
+  handleAction('toggle-mercy');
+  G.dungeonClears.d1 = 0;
+});
+check('battle(手加減HP1表示・44px)', () => {
+  G.dungeonClears.d1 = 1; B.mercy = true; B.enemies[0].hp = 1; B.enemies[0].mercyTag = true; render();
+  if (!appStub.innerHTML.includes('手加減・HP1') || !appStub.innerHTML.includes('mercy-spared')) throw new Error('HP1の手加減表示がない');
+  if (!styleCss.includes('.battle-actions .btn { min-height: 44px; }')) throw new Error('手加減を含む戦闘ボタンが44px未満');
+  B.mercy = false; B.enemies[0].mercyTag = false; G.dungeonClears.d1 = 0;
+});
 check('battle(調伏モード・毒弱体表示)', () => {
   captureMode = true;
   B.enemies[0].hp = 1; B.enemies[0].poison = 2; B.enemies[0].weak = 1; B.enemies[0].rage = 1;

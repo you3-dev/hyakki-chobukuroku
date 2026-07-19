@@ -259,6 +259,16 @@ if (atkUid) {
   ok(!r.err, '攻撃カード使用');
   ok(B.enemies[idx].hp < before || B.enemies[idx].state === 'dead', 'ダメージ反映');
 }
+
+// M4.6: 未踏破中は手加減フラグを立てても致死ダメージを止めない
+{
+  const strong = addUnit('onibi', EXP_TABLE[LEVEL_MAX - 1]); strong.star = STAR_MAX;
+  const enemy = makeEnemy('onibi', 1, 1);
+  startBattle([enemy]); B.hand = [strong.uid]; B.energy = ENERGY_MAX; B.mercy = true;
+  playCard(strong.uid, 0);
+  ok(!mercyAvailable() && enemy.state === 'dead', 'M4.6: 未踏破ダンジョンでは手加減不可');
+  G.roster = G.roster.filter(u => u !== strong); G.deck = G.deck.filter(id => id !== strong.uid);
+}
 B.energy = 0;
 if (B.hand[0]) ok(playCard(B.hand[0], 0).err === '霊力が足りない', '霊力不足エラー');
 
@@ -333,6 +343,52 @@ dealDamage(bg[0], 999, null);
 checkWin();
 ok(B.over === 'win' && G.dungeonClears.d1 === 1 && R.clear, 'ボス撃破でd1クリア記録');
 ok(dungeonUnlocked('d2'), 'd2解放');
+
+// --- M4.6: 踏破済みダンジョンの手加減 ---
+{
+  const strong = addUnit('onibi', EXP_TABLE[LEVEL_MAX - 1]); strong.star = STAR_MAX;
+  const aoe = addUnit('shiranui', EXP_TABLE[LEVEL_MAX - 1]); aoe.star = STAR_MAX;
+  const poisoner = addUnit('okuriinu', EXP_TABLE[LEVEL_MAX - 1]); poisoner.star = STAR_MAX;
+
+  const normalTarget = makeEnemy('onibi', 1, 1);
+  startBattle([normalTarget]); B.hand = [strong.uid]; B.energy = ENERGY_MAX;
+  playCard(strong.uid, 0);
+  ok(mercyAvailable() && normalTarget.state === 'dead', 'M4.6: 手加減OFFなら高火力攻撃で通常どおり討伐');
+
+  const spared = makeEnemy('onibi', 1, 1);
+  startBattle([spared]); B.hand = [strong.uid]; B.energy = ENERGY_MAX; B.mercy = true;
+  playCard(strong.uid, 0);
+  ok(spared.state === 'alive' && spared.hp === 1 && spared.mercyTag, 'M4.6: 単体致死ダメージをHP1で止める');
+  ok(canCapture(spared) && B.log.some(line => line.includes('手加減して')), 'M4.6: 手加減直後に調伏可能でログを表示');
+
+  const sturdy = makeEnemy('kappa', 1, 1);
+  const sturdyBefore = sturdy.hp;
+  startBattle([sturdy]); B.hand = [strong.uid]; B.energy = ENERGY_MAX; B.mercy = true;
+  playCard(strong.uid, 0);
+  ok(sturdy.state === 'alive' && sturdy.hp < sturdyBefore && sturdy.hp > 1 && !sturdy.mercyTag, 'M4.6: 非致死の単体攻撃は通常ダメージ');
+
+  const swept = makeEnemy('onibi', 1, 1);
+  startBattle([swept]); B.hand = [aoe.uid]; B.energy = ENERGY_MAX; B.mercy = true;
+  playCard(aoe.uid);
+  ok(swept.state === 'dead', 'M4.6: 全体攻撃は手加減対象外');
+
+  const poisoned = makeEnemy('onibi', 1, 1); poisoned.hp = 5;
+  startBattle([poisoned]); B.hand = [poisoner.uid]; B.energy = ENERGY_MAX; B.mercy = true;
+  playCard(poisoner.uid, 0);
+  ok(poisoned.hp === 1 && poisoned.poison > 0, 'M4.6: 毒付き単体攻撃の直接ダメージはHP1で止める');
+  R.hp = R.maxHp; endTurn();
+  ok(poisoned.state === 'dead', 'M4.6: 継続毒ダメージは手加減対象外');
+
+  const boss = makeGroup('boss')[0]; boss.hp = 10;
+  startBattle([boss], { boss: true }); B.hand = [strong.uid]; B.energy = ENERGY_MAX; B.mercy = true;
+  playCard(strong.uid, 0);
+  ok(boss.state === 'dead', 'M4.6: ボスは手加減対象外');
+
+  startBattle([makeEnemy('onibi', 1, 1)]);
+  ok(B.mercy === false, 'M4.6: 別戦闘へ手加減ONを持ち越さない');
+  G.roster = G.roster.filter(u => ![strong, aoe, poisoner].includes(u));
+  G.deck = G.deck.filter(id => ![strong.uid, aoe.uid, poisoner.uid].includes(id));
+}
 
 // --- 重ね(同種憑合) ---
 {
@@ -556,9 +612,11 @@ ok(dungeonUnlocked('d2'), 'd2解放');
   R.depth = 1;
   startBattle(makeGroup('battle'), { expMult: 1 });
   ok(autoAvailable(), 'クリア済みでオート解放');
+  B.mercy = true;
   autoResolveBattle();
   ok(B.over === 'win' || B.over === 'lose', 'オートで戦闘が決着');
   ok(B.captured.length === 0, 'オートでは調伏しない');
+  ok(B.mercy === false, 'M4.6: 式神代行は手加減を使わない');
 }
 
 // --- ラン途中セーブ(M1) ---
@@ -587,6 +645,17 @@ ok(dungeonUnlocked('d2'), 'd2解放');
   // 戦闘中: ターン頭の状態が保存され、ターン途中の変化は巻き戻る
   R.depth = 1;
   startBattle(makeGroup('battle'), { expMult: 1 });
+  const legacyMercyRun = peekRun();
+  delete legacyMercyRun.b.mercy;
+  localStorage.setItem(RUN_KEY, JSON.stringify(legacyMercyRun));
+  R = null; B = null;
+  ok(loadRun() && B.mercy === false, 'M4.6: 旧ランの手加減状態をOFFで補完');
+  B.mercy = true; saveRun(); R = null; B = null;
+  ok(loadRun() && B.mercy === false, 'M4.6: 未踏破ダンジョンの不正な手加減ONを復元時に解除');
+  G.dungeonClears.d1 = 1;
+  B.mercy = true; saveRun(); R = null; B = null;
+  ok(loadRun() && B.mercy === true, 'M4.6: 踏破済みダンジョンの手加減ONを途中再開で復元');
+  B.mercy = false; saveRun();
   const snap = JSON.stringify(serializeRun());
   const handAtTurnStart = B.hand.join(',');
   R.hp -= 7; B.energy = 0; B.hand = []; B.enemies[0].hp = 1;

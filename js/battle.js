@@ -24,7 +24,7 @@ function startBattle(group, opts) {
     turn: 0, energy: 0, block: 0,
     draw: shuffle(G.deck.slice()), discard: [], hand: [],
     killExp: 0, captured: [], levelUps: [], expGained: 0,
-    log: [], over: null,
+    log: [], over: null, mercy: false,
     deckAtStart: G.deck.slice(),
   };
   group.forEach(e => { if (e.sp) markSeen(e.sp); });
@@ -84,17 +84,23 @@ function effCost(u) {
   return Math.max(1, s.cost + (m.cost || 0));
 }
 
-function dealDamage(enemy, base, atkElement) {
+function mercyAvailable() {
+  return !!(R && G && G.dungeonClears && G.dungeonClears[R.dungeon] > 0);
+}
+
+function dealDamage(enemy, base, atkElement, opts) {
   const mult = elementMult(atkElement, enemy.element);
   const dmg = Math.max(1, Math.round(base * mult));
-  enemy.hp -= dmg;
+  const spared = !!(opts && opts.mercy && mercyAvailable() && !enemy.boss && dmg >= enemy.hp);
+  enemy.hp = spared ? 1 : enemy.hp - dmg;
   enemy.advTag = mult > 1;
+  enemy.mercyTag = spared;
   if (enemy.hp <= 0) {
     enemy.hp = 0;
     enemy.state = 'dead';
     B.killExp += enemyExpValue(enemy);
   }
-  return { dmg, mult };
+  return { dmg, mult, spared };
 }
 
 function multText(mult) { return mult > 1 ? '(効果抜群)' : mult < 1 ? '(いまひとつ)' : ''; }
@@ -114,9 +120,10 @@ function playCard(uid, targetIdx) {
     if (!target || target.state !== 'alive') return { err: '対象の敵をタップ' };
   }
   if (v.dmg) {
-    const r = dealDamage(target, v.dmg, s.element);
+    const r = dealDamage(target, v.dmg, s.element, { mercy: B.mercy });
     if (snare) target.snareTag = true;
     addLog(`${s.name}の一撃! ${target.name}に${r.dmg}${multText(r.mult)}`);
+    if (r.spared) addLog(`🪶 手加減して${target.name}をHP1で踏みとどまらせた`);
   }
   if (v.poison && target.state === 'alive') {
     target.poison += v.poison;
@@ -259,6 +266,7 @@ function finishBattle(win) {
 function autoAvailable() { return G.dungeonClears[R.dungeon] > 0; }
 
 function autoResolveBattle() {
+  B.mercy = false;
   let guard = 0;
   while (!B.over && guard++ < 60) {
     let acted = true;
