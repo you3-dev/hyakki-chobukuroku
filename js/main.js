@@ -13,6 +13,7 @@ let E = null;               // イベント画面データ
 let importText = '';        // 引継ぎコード入力
 let itemSel = null;         // 呪具画面で選択中の呪具id
 let detailUid = null;       // 拡大表示中の手持ち妖怪uid
+let timeHelpOpen = false;   // 時間帯・月相の説明表示
 let gameTimeProvider = currentGameTime; // テストでは固定日時のコンテキストへ差し替え可能
 
 const NODE_INFO = {
@@ -85,6 +86,13 @@ function handleAction(action, arg) {
       break;
     }
     case 'unit-detail-close': detailUid = null; break;
+    case 'time-help-open': timeHelpOpen = true; break;
+    case 'time-help-close': timeHelpOpen = false; break;
+    case 'time-help-dex':
+      timeHelpOpen = false;
+      screen = 'dex';
+      setToast('');
+      break;
 
     case 'title-enter':
       screen = peekRun() ? 'resume' : 'home';
@@ -248,6 +256,10 @@ function handleAction(action, arg) {
 }
 
 app.addEventListener('click', (ev) => {
+  if (ev.target.matches && ev.target.matches('[data-time-help-backdrop]')) {
+    handleAction('time-help-close');
+    return;
+  }
   if (ev.target.matches && ev.target.matches('[data-detail-backdrop]')) {
     handleAction('unit-detail-close');
     return;
@@ -312,10 +324,45 @@ function unitDetailHtml() {
 function toastHtml() { return toast ? `<div class="toast">${esc(toast)}</div>` : ''; }
 
 function timeContextHtml(context) {
-  return `<aside class="time-context" aria-label="現在の時間帯と月相">
+  return `<button class="time-context" type="button" data-action="time-help-open" aria-haspopup="dialog" aria-label="現在の時間帯と月相。タップして出現の変化を見る">
     <span class="time-moon" aria-hidden="true">${context.moonPhase.icon}</span>
-    <span><strong>${esc(context.timeBand.name)}・${esc(context.moonPhase.name)}</strong><small>${esc(context.timeBand.text)}</small></span>
-  </aside>`;
+    <span class="time-copy"><strong>${esc(context.timeBand.name)}・${esc(context.moonPhase.name)}</strong><small>${esc(context.timeBand.text)}</small></span>
+    <span class="time-more" aria-hidden="true">？</span>
+  </button>`;
+}
+
+function encounterConditionText(species) {
+  const rule = species.encounter;
+  if (rule.timeBands) return rule.timeBands.map(id => TIME_BANDS.find(x => x.id === id).name).join('・');
+  if (rule.moonPhases) return rule.moonPhases.map(id => MOON_PHASES.find(x => x.id === id).name).join('・');
+  return '';
+}
+
+function timeHelpHtml() {
+  const context = gameTimeProvider();
+  const conditioned = Object.values(SPECIES).filter(s => s.encounter);
+  const boosted = conditioned.filter(s => encounterMatches(s.id, {
+    timeBand: context.timeBand.id,
+    moonPhase: context.moonPhase.id,
+  }));
+  const boostedHtml = boosted.length
+    ? `<ul class="time-help-active">${boosted.map(s => `<li>${artHtml(s.id, s.emoji)}<span><strong>${esc(s.name)}</strong><small>${esc(s.encounter.hint)}</small></span></li>`).join('')}</ul>`
+    : '<p class="time-help-none">今は特に出会いやすくなる妖怪はいないようだ。</p>';
+  const loreHtml = conditioned.map(s => `<li><strong>${esc(encounterConditionText(s))}：${esc(s.name)}</strong><span>${esc(s.encounter.hint)}</span></li>`).join('');
+
+  return `<div class="unit-detail-overlay time-help-overlay" data-time-help-backdrop role="presentation">
+    <section class="unit-detail-dialog time-help-dialog" role="dialog" aria-modal="true" aria-labelledby="time-help-title">
+      <button class="unit-detail-close" type="button" data-action="time-help-close" aria-label="閉じる">×</button>
+      <div class="time-help-heading"><span aria-hidden="true">${context.moonPhase.icon}</span><div><small>現在の空模様</small><h2 id="time-help-title">${esc(context.timeBand.name)}・${esc(context.moonPhase.name)}</h2></div></div>
+      <p class="time-help-lead">時間帯と月相によって、夜行で出会う妖怪の傾向が変わる。</p>
+      <h3>いま出会いやすい妖怪</h3>
+      ${boostedHtml}
+      <h3>時と月の言い伝え</h3>
+      <ul class="time-help-lore">${loreHtml}</ul>
+      <p class="time-help-note">変わるのは敵としての出現傾向だけ。手持ち妖怪の札性能は変わらない。出現条件は夜行へ出る時に決まり、その夜行が終わるまで固定される。</p>
+      <div class="btn-row"><button class="btn btn-primary" type="button" data-action="time-help-dex">図鑑でヒントを見る</button><button class="btn" type="button" data-action="time-help-close">閉じる</button></div>
+    </section>
+  </div>`;
 }
 
 // ===== 各画面 =====
@@ -714,6 +761,7 @@ function render() {
     case 'resume': renderResume(); break;
   }
   if (detailUid !== null) app.innerHTML += unitDetailHtml();
+  if (timeHelpOpen) app.innerHTML += timeHelpHtml();
 }
 
 load();

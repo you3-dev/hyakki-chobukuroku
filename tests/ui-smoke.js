@@ -60,6 +60,19 @@ check('title/home(全時間帯テーマ)', () => {
   }
   gameTimeProvider = currentGameTime;
 });
+check('時間バナーの説明導線', () => {
+  gameTimeProvider = () => gameTimeAt(new Date(2026, 6, 18, 22, 0));
+  screen = 'home'; render();
+  if (!appStub.innerHTML.includes('data-action="time-help-open"')) throw new Error('時間バナーが操作できない');
+  handleAction('time-help-open');
+  if (!timeHelpOpen || !appStub.innerHTML.includes('time-help-dialog')) throw new Error('説明パネルが開かない');
+  if (!appStub.innerHTML.includes('手持ち妖怪の札性能は変わらない')) throw new Error('性能への影響説明がない');
+  if (!appStub.innerHTML.includes(SPECIES.chochin.encounter.hint) || !appStub.innerHTML.includes(SPECIES.satori.encounter.hint)) throw new Error('出現ヒントが揃っていない');
+  if (!appStub.innerHTML.includes('提灯お化け') || !appStub.innerHTML.includes('不知火')) throw new Error('夜に出会いやすい妖怪がない');
+  handleAction('time-help-dex');
+  if (timeHelpOpen || screen !== 'dex') throw new Error('図鑑へ遷移できない');
+  gameTimeProvider = currentGameTime;
+});
 check('reduced-motion対応CSS', () => {
   if (!styleCss.includes('@media (prefers-reduced-motion: reduce)') || !styleCss.includes('.title-moon { animation: none; }')) throw new Error('reduced-motion指定がない');
   appStub.innerHTML = '<span>CSS検査済み</span>';
