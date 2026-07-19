@@ -3,7 +3,7 @@
 妖怪を「倒す」のではなく「調伏(捕獲)」して配下にする、和風デッキ構築ローグライト。
 iPhone向けPWA / 完全オフライン / 全操作タップのみ。
 
-**現在: P2 M3-D自動検証まで完了**(時間帯テーマ / 時刻・月相出現 / 全20時間条件の編成検査 / 妖怪50種到達性確認済み。実機・3ラン評価待ち)
+**現在: P2 M4-Aまで完了**(実績11件の定義・達成判定・旧セーブ補完を実装。M3-Dの実機・3ラン評価は継続確認)
 
 ## 遊びの核
 
@@ -41,6 +41,7 @@ css/style.css         全スタイル(縦横対応は landscape メディアク�
 js/data.js            マスターデータ: 五行・妖怪50種・レシピ・呪具・ダンジョン・ボス
 js/time.js            端末時刻の5区分・月齢/8月相・表示文言(純粋関数)
 js/art.js             イラスト差し替え(assets/art/のSVGと絵文字を切替)
+js/achievements.js    実績11件の定義・進捗計算・達成状態同期
 assets/art/           妖怪イラスト(SVG)。仕様は assets/art/README.md
 assets/icons/         iOS/PWA/favicon用アイコンと1024pxマスター
 tests/                スモークテスト(node tests/*.js で実行)
@@ -69,4 +70,4 @@ node tests/art-check.js     # イラスト・PWAアイコン・manifest整合
 
 ## 次のステップ
 
-[docs/開発計画.md](docs/開発計画.md) を参照(次はM3-DのiPhone実機確認と3ラン評価。その後M4)。
+[docs/開発計画.md](docs/開発計画.md) を参照(次はM4-Bの図鑑節目報酬。M3-DのiPhone実機確認と3ラン評価も継続)。

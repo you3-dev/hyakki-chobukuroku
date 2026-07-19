@@ -17,7 +17,7 @@ globalThis.document = { getElementById(id) { return id === 'app' ? globalThis.ap
 globalThis.confirm = () => true;
 globalThis.styleCss = fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8');
 
-const code = ['js/time.js', 'js/data.js', 'js/art.js', 'js/state.js', 'js/run.js', 'js/battle.js', 'js/main.js']
+const code = ['js/time.js', 'js/data.js', 'js/art.js', 'js/achievements.js', 'js/state.js', 'js/run.js', 'js/battle.js', 'js/main.js']
   .map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
 
 const testBody = `

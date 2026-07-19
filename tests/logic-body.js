@@ -38,6 +38,71 @@ ok(G.roster.length === 6, '初期手持ち6体');
 ok(G.deck.length === 6, '初期デッキ6枚');
 ok(G.roster.every(u => u.star === 0), '初期★0');
 ok(dexOwnedCount() === 5, '初期図鑑5種(鬼火重複)');
+ok(G.achievements && G.achievements.unlocked.length === 0, '初期実績は未達成');
+
+// --- M4-A: 実績データ・達成判定 ---
+{
+  const fixture = () => ({
+    roster: [], dex: {}, dungeonClears: { d1: 0, d2: 0, d3: 0 },
+    stats: { runs: 0, clears: 0, captures: 0, fusions: 0 }, achievements: { unlocked: [] },
+  });
+  const dexWith = count => {
+    const dex = {};
+    Object.keys(SPECIES).slice(0, count).forEach(id => { dex[id] = 2; });
+    return dex;
+  };
+  const progress = (id, game) => achievementProgress(achievementDefinition(id), game);
+
+  ok(ACHIEVEMENTS.length === 11 && new Set(ACHIEVEMENTS.map(def => def.id)).size === 11, '実績11件のIDが一意');
+  ok(ACHIEVEMENTS.every(def => def.id && def.name && def.description && def.condition && def.condition.target > 0), '実績の共通形式が揃う');
+
+  const pure = fixture();
+  pure.stats.captures = 1;
+  const pureBefore = JSON.stringify(pure);
+  evaluateAchievements(pure);
+  ok(JSON.stringify(pure) === pureBefore, '実績評価はセーブデータを書き換えない');
+
+  const stats = fixture();
+  ok(!progress('first_capture', stats).done && !progress('first_fusion', stats).done, '調伏・憑合0回は未達成');
+  stats.stats.captures = 1; stats.stats.fusions = 1;
+  ok(progress('first_capture', stats).done && progress('first_fusion', stats).done, '調伏・憑合1回で達成');
+
+  const clears = fixture();
+  clears.dungeonClears = { d1: 1, d2: 1, d3: 1 };
+  ok(['clear_d1', 'clear_d2', 'clear_d3'].every(id => progress(id, clears).done), '各ダンジョン1回踏破で実績達成');
+
+  const stars = fixture();
+  stars.roster = [{ star: 2 }];
+  ok(!progress('first_star3', stars).done, '★2は★3実績未達成');
+  stars.roster[0].star = 3;
+  ok(progress('first_star3', stars).done, '★3で実績達成');
+
+  for (const target of [10, 25, 50]) {
+    const dexGame = fixture();
+    dexGame.dex = dexWith(target - 1);
+    ok(!progress(`dex_${target}`, dexGame).done, `図鑑${target - 1}種は${target}種実績未達成`);
+    dexGame.dex = dexWith(target);
+    ok(progress(`dex_${target}`, dexGame).done, `図鑑${target}種で実績達成`);
+  }
+
+  const legends = fixture();
+  FOUR_GOD_IDS.slice(0, 3).forEach(id => { legends.dex[id] = 2; });
+  ok(!progress('four_gods', legends).done, '四神3種は未達成');
+  legends.dex.suzaku = 2;
+  ok(progress('four_gods', legends).done, '四神4種で達成');
+  ok(!progress('nurarihyon', legends).done, 'ぬらりひょん未使役は未達成');
+  legends.dex.nurarihyon = 2;
+  ok(progress('nurarihyon', legends).done, 'ぬらりひょん使役で達成');
+
+  const lasting = fixture();
+  lasting.roster = [{ star: 3 }];
+  lasting.achievements.unlocked = ['unknown_old_id'];
+  const firstSync = syncAchievementState(lasting);
+  lasting.roster = [];
+  const secondSync = syncAchievementState(lasting);
+  ok(firstSync.includes('first_star3') && secondSync.length === 0, '新規達成は一度だけ検出');
+  ok(progress('first_star3', lasting).done && !lasting.achievements.unlocked.includes('unknown_old_id'), '達成後に条件が消えても保持し不正IDは除去');
+}
 
 // --- 属性 ---
 ok(elementMult('wood', 'earth') === 1.5, '木剋土=1.5');
@@ -310,6 +375,7 @@ ok(dungeonUnlocked('d2'), 'd2解放');
   ok(G.roster.every(u => u.star === 0), '旧セーブ: star補完');
   ok(G.dungeonClears.d1 === 2, '旧セーブ: クリア数をd1へ移行');
   ok(G.dex.onibi === 2, '旧セーブ: 図鑑を所持から復元');
+  ok(['first_capture', 'first_fusion', 'clear_d1'].every(id => G.achievements.unlocked.includes(id)), '旧セーブ: 実績を既存記録から補完');
 }
 
 // --- 式神代行(オート) ---

@@ -12,7 +12,7 @@ globalThis.localStorage = {
   removeItem(k) { delete this._s[k]; },
 };
 
-const gameCode = ['js/time.js', 'js/data.js', 'js/art.js', 'js/state.js', 'js/run.js', 'js/battle.js']
+const gameCode = ['js/time.js', 'js/data.js', 'js/art.js', 'js/achievements.js', 'js/state.js', 'js/run.js', 'js/battle.js']
   .map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
 
 const testCode = fs.readFileSync(path.join(__dirname, 'logic-body.js'), 'utf8');

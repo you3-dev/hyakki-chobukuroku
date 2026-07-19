@@ -31,12 +31,16 @@ function newGame() {
     nextUid: 1, roster: [], deck: [], found: [], dex: {}, items: {},
     dungeonClears: { d1: 0, d2: 0, d3: 0 },
     stats: { runs: 0, clears: 0, captures: 0, fusions: 0 },
+    achievements: { unlocked: [] },
   };
   ['onibi', 'onibi', 'karakasa', 'tanuki', 'kamaitachi', 'kodama'].forEach(sp => addUnit(sp, 0));
   save();
 }
 
-function save() { localStorage.setItem(SAVE_KEY, JSON.stringify(G)); }
+function save() {
+  syncAchievementState(G);
+  localStorage.setItem(SAVE_KEY, JSON.stringify(G));
+}
 
 function load() {
   try {
@@ -50,7 +54,7 @@ function sanitize() {
   G.roster = (G.roster || []).filter(u => SPECIES[u.sp]);
   G.found = G.found || [];
   G.dex = G.dex || {};
-  G.stats = G.stats || { runs: 0, clears: 0, captures: 0, fusions: 0 };
+  G.stats = Object.assign({ runs: 0, clears: 0, captures: 0, fusions: 0 }, G.stats || {});
   // 検証版セーブからの移行: クリア数はd1のものとみなす
   G.dungeonClears = G.dungeonClears || { d1: G.stats.clears || 0, d2: 0, d3: 0 };
   G.items = G.items || {};
@@ -63,6 +67,7 @@ function sanitize() {
   const uids = new Set(G.roster.map(u => u.uid));
   G.deck = (G.deck || []).filter(id => uids.has(id));
   if (G.deck.length === 0) G.deck = G.roster.slice(0, DECK_MAX).map(u => u.uid);
+  syncAchievementState(G);
 }
 
 function resetSave() { localStorage.removeItem(SAVE_KEY); newGame(); }
