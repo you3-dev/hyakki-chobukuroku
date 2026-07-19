@@ -92,10 +92,17 @@ check('reduced-motion対応CSS', () => {
   if (!styleCss.includes('@media (prefers-reduced-motion: reduce)') || !styleCss.includes('.title-moon { animation: none; }')) throw new Error('reduced-motion指定がない');
   appStub.innerHTML = '<span>CSS検査済み</span>';
 });
+check('M5-A UI基盤トークン・共通状態', () => {
+  const tokens = ['--color-surface', '--color-accent', '--color-danger', '--space-1', '--radius-md', '--shadow-card', '--tap-min', '--focus-ring'];
+  if (tokens.some(token => !styleCss.includes(token + ':'))) throw new Error('UIトークンが不足');
+  if (!styleCss.includes('min-height: var(--tap-min)') || !styleCss.includes(':focus-visible') || !styleCss.includes('.btn:disabled')) throw new Error('タップ領域・フォーカス・無効状態の共通指定が不足');
+  appStub.innerHTML = '<span>UI基盤CSS検査済み</span>';
+});
 check('deck', () => { screen = 'deck'; render(); });
 check('dungeon(d2ロック中)', () => {
   screen = 'dungeon'; render();
   if (!appStub.innerHTML.includes('踏破ごとに+15')) throw new Error('最大HP成長の表示が仕様と違う');
+  if (!appStub.innerHTML.includes('class="node-card locked"') || !appStub.innerHTML.includes('aria-disabled="true"')) throw new Error('ロック状態が明示されない');
 });
 check('dungeon(全解放)', () => {
   G.dungeonClears.d1 = 1; G.dungeonClears.d2 = 1; G.dungeonClears.d3 = 1; render();
@@ -139,7 +146,10 @@ check('items(空)', () => { screen = 'items'; render(); });
 check('items(所持・装備あり)', () => {
   gainItem('oniudewa'); gainItem('tengugeta');
   equipItem(G.roster[0].uid, 'oniudewa');
+  itemSel = 'tengugeta';
   render();
+  if (!appStub.innerHTML.includes('選択中') || !appStub.innerHTML.includes('装備中')) throw new Error('呪具の選択・装備状態が文字で分からない');
+  itemSel = null;
 });
 check('save', () => { screen = 'save'; render(); });
 check('fusion(選択なし)', () => { screen = 'fusion'; fusionSel = []; render(); });
@@ -148,6 +158,7 @@ check('fusion(異種・レシピあり)', () => {
   const b = G.roster.find(u => u.sp === 'tanuki');
   fusionSel = [a.uid, b.uid]; render();
   if (!appStub.innerHTML.includes('完成予定 Lv')) throw new Error('異種憑合の完成予定Lvがない');
+  if (!appStub.innerHTML.includes('unit-badge">選択中')) throw new Error('選択した妖怪が文字で分からない');
 });
 check('fusion(同種・重ねプレビュー)', () => {
   const pair = G.roster.filter(u => u.sp === 'onibi');
@@ -193,11 +204,14 @@ check('battle(手加減HP1表示・44px)', () => {
 check('battle(調伏モード・毒弱体表示)', () => {
   captureMode = true;
   B.enemies[0].hp = 1; B.enemies[0].poison = 2; B.enemies[0].weak = 1; B.enemies[0].rage = 1;
-  render(); captureMode = false;
+  render();
+  if (!appStub.innerHTML.includes('aria-pressed="true"') || !appStub.innerHTML.includes('✓ 🧧')) throw new Error('調伏モードが色以外で分からない');
+  captureMode = false;
 });
 check('battle(勝利オーバーレイ)', () => {
   for (const e of aliveEnemies()) dealDamage(e, 999, null);
   checkWin(); render();
+  if (!appStub.innerHTML.includes('role="dialog"') || !appStub.innerHTML.includes('aria-modal="true"')) throw new Error('勝敗モーダルの役割がない');
 });
 check('runend(通常)', () => { screen = 'runend'; render(); });
 check('runend(踏破)', () => { R.clear = true; render(); });
@@ -281,6 +295,7 @@ check('resume(進行中ランあり)', () => {
   handleAction('title-enter');
   if (screen !== 'resume') throw new Error('再開確認画面へ進んでいない: ' + screen);
   if (!appStub.innerHTML.includes('夜行を再開する')) throw new Error('再開確認ボタンがない');
+  if (!appStub.innerHTML.includes('btn btn-danger') || !appStub.innerHTML.includes('諦めて拠点へ')) throw new Error('破棄操作が危険階層でない');
 });
 check('action: 夜行を再開(戦闘へ復帰)', () => {
   handleAction('resume-run');

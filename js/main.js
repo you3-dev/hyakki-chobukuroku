@@ -342,12 +342,13 @@ function unitCard(u, opts) {
   if (o.inDeck) cls.push('indeck');
   const action = o.action ? `data-action="${o.action}" data-arg="${u.uid}"` : '';
   const itemMark = u.item && ITEMS[u.item] ? ` ${ITEMS[u.item].emoji}` : '';
+  const badge = o.badge || (o.selected ? (o.selectedLabel || '選択中') : '');
   return `<div class="${cls.join(' ')}" ${action}>
     <div class="unit-top"><button class="unit-art-btn" type="button" data-action="unit-detail" data-arg="${u.uid}" aria-label="${esc(s.name)}のイラストを拡大"><span class="unit-emoji">${artHtml(s.id, s.emoji)}</span><span class="zoom-mark" aria-hidden="true">＋</span></button>${elemChip(s.element)}<span class="cost">◆${effCost(u)}</span></div>
     <div class="unit-name">${esc(s.name)}${starText(u)}</div>
     <div class="unit-lv">Lv${unitLevel(u)} ${s.role}${itemMark}</div>
     <div class="unit-effect">${effectText(u)}</div>
-    ${o.badge ? `<div class="unit-badge">${o.badge}</div>` : ''}
+    ${badge ? `<div class="unit-badge">${badge}</div>` : ''}
   </div>`;
 }
 
@@ -525,7 +526,7 @@ function renderDungeon() {
     const dg = DUNGEONS[id];
     const unlocked = dungeonUnlocked(id);
     const clears = G.dungeonClears[id] || 0;
-    return `<div class="node-card ${unlocked ? '' : 'locked'}" data-action="choose-dungeon" data-arg="${id}">
+    return `<div class="node-card ${unlocked ? '' : 'locked'}" data-action="choose-dungeon" data-arg="${id}" aria-disabled="${unlocked ? 'false' : 'true'}">
       <div class="node-emoji">${unlocked ? dg.emoji : '🔒'}</div>
       <div class="node-name">${unlocked ? dg.name : '???'}</div>
       <div class="node-desc">${unlocked
@@ -627,11 +628,13 @@ function renderItems() {
       <div class="unit-name">${it.name}</div>
       <div class="unit-effect">${it.desc}</div>
       <div class="unit-lv">所持 ${n}</div>
+      ${itemSel === it.id ? '<div class="unit-badge">選択中</div>' : ''}
     </div>`;
   }).join('');
   const rosterHtml = G.roster.map(u => unitCard(u, {
     action: 'item-target',
     selected: !!u.item,
+    selectedLabel: '装備中',
   })).join('');
   app.innerHTML = `<div class="screen">
     <h2 class="h2">呪具 — 妖怪1体に1つ装備</h2>
@@ -769,7 +772,7 @@ function renderNode() {
     <h2 class="h2">${currentDungeon().name} — ${R.depth + 1}歩目</h2>
     <p class="hint">進む道を選べ</p>
     <div class="node-row">${opts}</div>
-    <div class="btn-row"><button class="btn btn-small" data-action="abandon-run">夜行を諦める</button></div>
+    <div class="btn-row"><button class="btn btn-danger btn-small" data-action="abandon-run">夜行を諦める</button></div>
     ${toastHtml()}
   </div>`;
 }
@@ -832,7 +835,7 @@ function renderBattle() {
     const s = SPECIES[u.sp];
     const playable = B.energy >= effCost(u);
     const itemMark = u.item && ITEMS[u.item] ? ITEMS[u.item].emoji : '';
-    return `<div class="hand-card ${selCard === uid ? 'selected' : ''} ${playable ? '' : 'disabled'}"
+    return `<div class="hand-card ${selCard === uid ? 'selected' : ''} ${playable ? '' : 'disabled'}" aria-pressed="${selCard === uid ? 'true' : 'false'}"
       data-action="play-card" data-arg="${uid}">
       <div class="unit-top"><span class="cost">◆${effCost(u)}</span>${elemChip(s.element)}</div>
       <div class="unit-emoji">${artHtml(s.id, s.emoji)}</div>
@@ -849,14 +852,14 @@ function renderBattle() {
     const caps = B.captured.map(u => `<li>${SPECIES[u.sp].emoji}${SPECIES[u.sp].name} を調伏!</li>`).join('');
     const drop = B.itemDrop && ITEMS[B.itemDrop]
       ? `<p class="drop-line">呪具「${ITEMS[B.itemDrop].emoji}${ITEMS[B.itemDrop].name}」を手に入れた!</p>` : '';
-    overlay = `<div class="overlay"><div class="overlay-box">
-      <h2>${win ? (B.boss ? '🌅 夜行の主を討った!' : '⭐ 勝利') : '💤 力尽きた…'}</h2>
+    overlay = `<div class="overlay" role="presentation"><section class="overlay-box" role="dialog" aria-modal="true" aria-labelledby="battle-result-title">
+      <h2 id="battle-result-title">${win ? (B.boss ? '🌅 夜行の主を討った!' : '⭐ 勝利') : '💤 力尽きた…'}</h2>
       ${win ? `<p>EXP +${B.expGained}(デッキ全員)</p>` : '<p>調伏した妖怪は持ち帰れる。</p>'}
       ${drop}
       ${caps ? `<ul>${caps}</ul>` : ''}
       ${lvups ? `<ul>${lvups}</ul>` : ''}
       <button class="btn btn-primary btn-big" data-action="battle-continue">${win && !B.boss ? '先へ進む' : '結果へ'}</button>
-    </div></div>`;
+    </section></div>`;
   }
 
   app.innerHTML = `<div class="screen battle-screen">
@@ -869,7 +872,7 @@ function renderBattle() {
       <div class="battle-side">
         <div class="hand-row">${hand}</div>
         <div class="btn-row battle-actions">
-          <button class="btn ${captureMode ? 'btn-active' : ''}" data-action="toggle-capture">🧧 調伏札(残${R.fuda})</button>
+          <button class="btn ${captureMode ? 'btn-active' : ''}" data-action="toggle-capture" aria-pressed="${captureMode ? 'true' : 'false'}">${captureMode ? '✓ ' : ''}🧧 調伏札(残${R.fuda})</button>
           ${mercyAvailable() ? `<button class="btn ${B.mercy ? 'btn-active mercy-on' : ''}" data-action="toggle-mercy" aria-pressed="${B.mercy ? 'true' : 'false'}" ${B.boss ? 'disabled' : ''}>🪶 手加減 ${B.boss ? '無効' : (B.mercy ? 'ON' : 'OFF')}</button>` : ''}
           ${autoAvailable() ? `<button class="btn" data-action="auto-battle">⚡式神代行</button>` : ''}
           <button class="btn btn-primary" data-action="end-turn">ターン終了 ▶</button>
@@ -891,7 +894,7 @@ function renderResume() {
     <p>${dg.emoji} ${dg.name} — ${d.r.depth}/${dg.length}歩 / ❤️ ${d.r.hp}/${d.r.maxHp} / 🧧 札×${d.r.fuda}${inBattle ? '(戦闘中)' : ''}</p>
     <p class="hint">再開すると${inBattle ? 'そのターンの頭から戦闘の' : '分かれ道から'}続きが遊べる。諦めても調伏済みの妖怪は手元に残る。</p>
     <div class="btn-row"><button class="btn btn-primary btn-big" data-action="resume-run">夜行を再開する</button></div>
-    <div class="btn-row"><button class="btn" data-action="resume-discard">諦めて拠点へ</button></div>
+    <div class="btn-row"><button class="btn btn-danger" data-action="resume-discard">諦めて拠点へ</button></div>
   </div>`;
 }
 
