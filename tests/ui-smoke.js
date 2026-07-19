@@ -17,7 +17,7 @@ globalThis.document = { getElementById(id) { return id === 'app' ? globalThis.ap
 globalThis.confirm = () => true;
 globalThis.styleCss = fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8');
 
-const code = ['js/time.js', 'js/data.js', 'js/art.js', 'js/achievements.js', 'js/state.js', 'js/run.js', 'js/battle.js', 'js/main.js']
+const code = ['js/time.js', 'js/data.js', 'js/art.js', 'js/achievements.js', 'js/progression.js', 'js/state.js', 'js/run.js', 'js/battle.js', 'js/main.js']
   .map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
 
 const testBody = `
@@ -34,6 +34,10 @@ check('boot: title', () => {
   if (!appStub.innerHTML.includes('調伏の夜をはじめる')) throw new Error('新規開始ボタンがない');
 });
 check('home', () => { screen = 'home'; render(); });
+check('home(次の目標・位階導線)', () => {
+  screen = 'home'; render();
+  if (!appStub.innerHTML.includes('次の目標') || !appStub.innerHTML.includes('data-action="nav-ranks"')) throw new Error('次目標または位階導線がない');
+});
 check('home(イラスト差し替え)', () => {
   if (!ART.includes('onibi')) throw new Error('サンプルアートが未登録');
   render();
@@ -42,6 +46,17 @@ check('home(イラスト差し替え)', () => {
 check('home(イラスト拡大ボタン)', () => {
   screen = 'home'; render();
   if (!appStub.innerHTML.includes('data-action="unit-detail"')) throw new Error('拡大ボタンがない');
+});
+check('home(実績導線・複数達成通知)', () => {
+  const snapshot = JSON.stringify(G);
+  G.stats.captures = 1; G.stats.fusions = 1;
+  syncAchievementState(G);
+  screen = 'home'; render();
+  if (!appStub.innerHTML.includes('data-action="nav-achievements"') || !appStub.innerHTML.includes('NEW 2')) throw new Error('実績導線またはNEW件数がない');
+  if (!appStub.innerHTML.includes('初調伏') || !appStub.innerHTML.includes('初憑合')) throw new Error('複数達成通知が欠けている');
+  handleAction('achievement-notice-dismiss');
+  if (unseenAchievementIds(G).length !== 0 || appStub.innerHTML.includes('achievement-notice')) throw new Error('達成通知を閉じられない');
+  G = JSON.parse(snapshot); save();
 });
 check('title/home(全時間帯テーマ)', () => {
   const cases = [
@@ -82,7 +97,11 @@ check('dungeon(d2ロック中)', () => {
   screen = 'dungeon'; render();
   if (!appStub.innerHTML.includes('踏破ごとに+15')) throw new Error('最大HP成長の表示が仕様と違う');
 });
-check('dungeon(全解放)', () => { G.dungeonClears.d1 = 1; G.dungeonClears.d2 = 1; render(); G.dungeonClears.d1 = 0; G.dungeonClears.d2 = 0; });
+check('dungeon(全解放)', () => {
+  G.dungeonClears.d1 = 1; G.dungeonClears.d2 = 1; G.dungeonClears.d3 = 1; render();
+  if (!appStub.innerHTML.includes('百鬼の試練')) throw new Error('最終夜行が表示されない');
+  G.dungeonClears.d1 = 0; G.dungeonClears.d2 = 0; G.dungeonClears.d3 = 0;
+});
 check('dex', () => { screen = 'dex'; render(); });
 check('dex(未発見・目撃の出現条件ヒント)', () => {
   const oldYuki = G.dex.yukionna;
@@ -92,6 +111,29 @@ check('dex(未発見・目撃の出現条件ヒント)', () => {
   if (!appStub.innerHTML.includes(SPECIES.chochin.encounter.hint)) throw new Error('未発見の条件ヒントがない');
   if (!appStub.innerHTML.includes(SPECIES.yukionna.encounter.hint)) throw new Error('目撃済みの条件ヒントがない');
   if (oldYuki == null) delete G.dex.yukionna; else G.dex.yukionna = oldYuki;
+});
+check('achievements(一覧・報酬受取)', () => {
+  const snapshot = JSON.stringify(G);
+  Object.keys(SPECIES).slice(0, 10).forEach(id => { G.dex[id] = 2; });
+  syncAchievementState(G);
+  handleAction('nav-achievements');
+  const cards = (appStub.innerHTML.match(/class="achievement-card /g) || []).length;
+  if (screen !== 'achievements' || cards !== ACHIEVEMENTS.length) throw new Error('実績11件を表示できない');
+  if (!appStub.innerHTML.includes('data-action="achievement-claim"') || !appStub.innerHTML.includes('夜行開始時の調伏札 +1')) throw new Error('報酬受取導線がない');
+  handleAction('achievement-claim', 'dex_10');
+  if (!achievementRewardClaimed(G, 'dex_10') || !appStub.innerHTML.includes('受取済み')) throw new Error('報酬を受け取れない');
+  G = JSON.parse(snapshot); save(); screen = 'home'; render();
+});
+check('ranks(一覧・一度きりの呪具選択)', () => {
+  const snapshot = JSON.stringify(G);
+  G.roster[0].star = 3; save();
+  handleAction('nav-ranks');
+  const rows = (appStub.innerHTML.match(/class="rank-row /g) || []).length;
+  if (screen !== 'ranks' || rows !== PROGRESSION_MILESTONES.length) throw new Error('位階の節目一覧がない');
+  if (!appStub.innerHTML.includes('data-action="rank-choice"')) throw new Error('入門呪具の選択肢がない');
+  handleAction('rank-choice', 'first_star3:oniudewa');
+  if (!progressionChoiceClaimed(G, 'first_star3') || !appStub.innerHTML.includes('選択済み')) throw new Error('位階報酬を受け取れない');
+  G = JSON.parse(snapshot); save(); screen = 'home'; render();
 });
 check('items(空)', () => { screen = 'items'; render(); });
 check('items(所持・装備あり)', () => {
@@ -105,10 +147,12 @@ check('fusion(異種・レシピあり)', () => {
   const a = G.roster.find(u => u.sp === 'onibi');
   const b = G.roster.find(u => u.sp === 'tanuki');
   fusionSel = [a.uid, b.uid]; render();
+  if (!appStub.innerHTML.includes('完成予定 Lv')) throw new Error('異種憑合の完成予定Lvがない');
 });
 check('fusion(同種・重ねプレビュー)', () => {
   const pair = G.roster.filter(u => u.sp === 'onibi');
   fusionSel = [pair[0].uid, pair[1].uid]; render();
+  if (!appStub.innerHTML.includes('完成予定 Lv')) throw new Error('重ねの完成予定Lvがない');
 });
 check('fusion(異種・不一致)', () => {
   const a = G.roster.find(u => u.sp === 'onibi');
@@ -119,6 +163,11 @@ check('fusion(異種・不一致)', () => {
 startRun('d1');
 check('node', () => { gotoNodeScreen(); render(); });
 check('event(宝)', () => { E = { kind: 'treasure', msg: 'テスト' }; screen = 'event'; render(); });
+check('event(宝の2択)', () => {
+  E = { kind: 'treasure-choice', options: [{ kind: 'fuda', extra: 2 }, { kind: 'item', id: 'juzu' }] };
+  screen = 'event'; render();
+  if (!appStub.innerHTML.includes('data-action="treasure-choice"') || !appStub.innerHTML.includes('癒やしの数珠')) throw new Error('宝の選択肢がない');
+});
 check('event(茶屋)', () => { E = { kind: 'rest' }; screen = 'event'; render(); });
 
 R.depth = 1;
@@ -136,10 +185,15 @@ check('battle(勝利オーバーレイ)', () => {
 });
 check('runend(通常)', () => { screen = 'runend'; render(); });
 check('runend(踏破)', () => { R.clear = true; render(); });
+check('runend(百鬼の試練エンディング)', () => {
+  R.dungeon = 'trial'; R.clear = true; G.dungeonClears.trial = 1; screen = 'runend'; render();
+  if (!appStub.innerHTML.includes('百鬼調伏録・結') || !appStub.innerHTML.includes('大調伏師')) throw new Error('エンディングまたは称号がない');
+  G.dungeonClears.trial = 0; R.dungeon = 'd1';
+});
 
 // アクションを一通り叩く
 check('action: nav遷移', () => {
-  ['nav-deck','nav-fusion','nav-items','nav-dex','nav-save','nav-home'].forEach(a => handleAction(a));
+  ['nav-deck','nav-fusion','nav-items','nav-dex','nav-achievements','nav-ranks','nav-save','nav-home'].forEach(a => handleAction(a));
 });
 check('action: タイトルから拠点へ', () => {
   clearRun(); R = null; B = null; screen = 'title';

@@ -39,6 +39,8 @@ ok(G.deck.length === 6, '初期デッキ6枚');
 ok(G.roster.every(u => u.star === 0), '初期★0');
 ok(dexOwnedCount() === 5, '初期図鑑5種(鬼火重複)');
 ok(G.achievements && G.achievements.unlocked.length === 0, '初期実績は未達成');
+ok(G.achievements.seen.length === 0, '初期実績の確認済み記録は空');
+ok(G.achievementRewards && G.achievementRewards.claimed.length === 0, '初期の実績報酬は未受取');
 
 // --- M4-A: 実績データ・達成判定 ---
 {
@@ -104,10 +106,85 @@ ok(G.achievements && G.achievements.unlocked.length === 0, '初期実績は未�
   ok(progress('first_star3', lasting).done && !lasting.achievements.unlocked.includes('unknown_old_id'), '達成後に条件が消えても保持し不正IDは除去');
 }
 
+// --- M4-C: 新規達成の確認状態 ---
+{
+  const noticeGame = {
+    roster: [], dex: {}, dungeonClears: { d1: 0, d2: 0, d3: 0 },
+    stats: { runs: 0, clears: 0, captures: 1, fusions: 1 },
+    achievements: { unlocked: [], seen: [] }, achievementRewards: { claimed: [] },
+  };
+  syncAchievementState(noticeGame);
+  ok(unseenAchievementIds(noticeGame).join(',') === 'first_capture,first_fusion', '同時達成した実績をすべて未確認として保持');
+  markAchievementIdsSeen(noticeGame);
+  ok(unseenAchievementIds(noticeGame).length === 0 && noticeGame.achievements.seen.length === 2, '実績確認後にNEW状態を解除');
+  noticeGame.dungeonClears.d1 = 1;
+  syncAchievementState(noticeGame);
+  ok(unseenAchievementIds(noticeGame).join(',') === 'clear_d1', '確認後の新規達成だけを通知');
+}
+
+// --- M4-B: 図鑑節目報酬・永続保存 ---
+{
+  const rewardGame = {
+    roster: [], dex: {}, dungeonClears: { d1: 0, d2: 0, d3: 0 },
+    stats: { runs: 0, clears: 0, captures: 0, fusions: 0 },
+    achievements: { unlocked: [] }, achievementRewards: { claimed: [] },
+  };
+  const speciesIds = Object.keys(SPECIES);
+  speciesIds.slice(0, 10).forEach(id => { rewardGame.dex[id] = 2; });
+  syncAchievementState(rewardGame);
+
+  ok(ACHIEVEMENTS.filter(def => def.reward).map(def => def.id).join(',') === 'dex_10,dex_25,dex_50', '図鑑10・25・50に報酬を設定');
+  ok(!claimAchievementReward(rewardGame, 'dex_25').ok, '未達成の図鑑25報酬は受取不可');
+  ok(claimAchievementReward(rewardGame, 'dex_10').ok, '達成した図鑑10報酬を受取');
+  ok(rewardGame.achievements.unlocked.includes('dex_10') && rewardGame.achievementRewards.claimed.includes('dex_10'), '達成状態と受取状態を分離保存');
+  ok(!claimAchievementReward(rewardGame, 'dex_10').ok && achievementRewardTotal(rewardGame, 'startFuda') === 1, '同じ報酬を二重取得しない');
+  ok(unclaimedAchievementRewardIds(rewardGame).length === 0, '受取後は未受取報酬一覧から除外');
+  ok(runInitialFuda(rewardGame) === 4, '図鑑10報酬で次回の初期調伏札4枚');
+
+  speciesIds.slice(10, 50).forEach(id => { rewardGame.dex[id] = 2; });
+  syncAchievementState(rewardGame);
+  ok(claimAchievementReward(rewardGame, 'dex_25').ok && claimAchievementReward(rewardGame, 'dex_50').ok, '図鑑25・50報酬を順次受取');
+  ok(achievementRewardTotal(rewardGame, 'startFuda') === 3 && runInitialFuda(rewardGame) === 6, '図鑑報酬は累積して初期調伏札最大6枚');
+  rewardGame.achievementRewards.claimed.push('unknown_reward');
+  sanitizeAchievementRewardState(rewardGame);
+  ok(!rewardGame.achievementRewards.claimed.includes('unknown_reward'), '未知の報酬IDを移行時に除去');
+}
+
+// 実際のラン開始、引継ぎ、進行中ランへの非遡及を一時ゲーム状態で確認
+{
+  const originalGame = G;
+  G = JSON.parse(JSON.stringify(G));
+  Object.keys(SPECIES).slice(0, 10).forEach(id => { G.dex[id] = 2; });
+  syncAchievementState(G);
+  ok(claimReward('dex_10').ok, '永続データで図鑑10報酬を受取');
+  G = null;
+  load();
+  ok(G.achievementRewards.claimed.includes('dex_10'), 'リロード後も報酬受取状態を保持');
+  const rewardCode = exportSave();
+  G.achievementRewards.claimed = [];
+  ok(importSave(rewardCode) && G.achievementRewards.claimed.includes('dex_10'), '引継ぎコードで報酬受取状態を復元');
+  startRun('d1');
+  ok(R.fuda === 4, '受取済み報酬を夜行開始時に反映');
+  Object.keys(SPECIES).slice(10, 25).forEach(id => { G.dex[id] = 2; });
+  syncAchievementState(G);
+  ok(claimReward('dex_25').ok && R.fuda === 4, '進行中の夜行へ新しい恒久報酬を遡及しない');
+  clearRun(); R = null; B = null;
+  G = originalGame;
+  save();
+}
+
 // --- 属性 ---
 ok(elementMult('wood', 'earth') === 1.5, '木剋土=1.5');
 ok(elementMult('earth', 'wood') === 0.75, '土は木に0.75');
 ok(elementMult('fire', null) === 1, '無属性=1.0');
+
+// --- 憑合完成予定Lv ---
+{
+  const unit = (sp, lv) => ({ sp, exp: EXP_TABLE[lv - 1] });
+  ok(fusionResultLevel(unit('onibi', 1), unit('tanuki', 1)) === 1, '異種Lv1+Lv1→完成予定Lv1');
+  ok(fusionResultLevel(unit('onibi', 1), unit('tanuki', 5)) === 3, '異種Lv1+Lv5→完成予定Lv3');
+  ok(fusionResultLevel(unit('onibi', 1), unit('onibi', 5)) === 5, '同種Lv1+Lv5→高いLv5を維持');
+}
 
 // --- データ整合 ---
 ok(Object.keys(SPECIES).length === 50, '妖怪50種');
@@ -367,15 +444,107 @@ ok(dungeonUnlocked('d2'), 'd2解放');
   ok(JSON.stringify(G) === snapshot, 'セーブ/ロード往復一致');
 }
 
-// --- 検証版セーブの移行 ---
+// --- M4-D: 新規/M3旧セーブ/引継ぎコードの3経路 ---
 {
-  const old = { nextUid: 3, roster: [{ uid: 1, sp: 'onibi', exp: 10 }, { uid: 2, sp: 'tanuki', exp: 0 }], deck: [1, 2], found: [], stats: { runs: 5, clears: 2, captures: 3, fusions: 1 } };
+  localStorage.removeItem(SAVE_KEY);
+  load();
+  ok(G.achievements.unlocked.length === 0 && G.achievements.seen.length === 0
+    && G.achievementRewards.claimed.length === 0, 'M4-D新規開始: 実績・確認・報酬状態を初期化');
+
+  const oldRoster = Object.keys(SPECIES).slice(0, 10).map((sp, index) => ({ uid: index + 1, sp, exp: index === 0 ? 10 : 0 }));
+  const old = { nextUid: 11, roster: oldRoster, deck: oldRoster.map(u => u.uid), found: [], stats: { runs: 5, clears: 2, captures: 3, fusions: 1 } };
   localStorage.setItem(SAVE_KEY, JSON.stringify(old));
   load();
   ok(G.roster.every(u => u.star === 0), '旧セーブ: star補完');
   ok(G.dungeonClears.d1 === 2, '旧セーブ: クリア数をd1へ移行');
   ok(G.dex.onibi === 2, '旧セーブ: 図鑑を所持から復元');
-  ok(['first_capture', 'first_fusion', 'clear_d1'].every(id => G.achievements.unlocked.includes(id)), '旧セーブ: 実績を既存記録から補完');
+  ok(['first_capture', 'first_fusion', 'clear_d1', 'dex_10'].every(id => G.achievements.unlocked.includes(id)), '旧セーブ: 実績を既存記録から補完');
+  ok(G.achievementRewards.claimed.length === 0, '旧セーブ: 報酬受取状態を未受取で補完');
+
+  ok(claimReward('dex_10').ok, 'M4-D旧セーブ: 補完した実績報酬を一度受取');
+  const migratedCode = exportSave();
+  G.achievements = { unlocked: [], seen: [] };
+  G.achievementRewards = { claimed: [] };
+  ok(importSave(migratedCode), 'M4-D引継ぎ: 移行済みコードを復元');
+  ok(G.achievements.unlocked.includes('dex_10') && G.achievementRewards.claimed.join(',') === 'dex_10', 'M4-D引継ぎ: 達成・受取状態を保持');
+  ok(!claimReward('dex_10').ok && G.achievementRewards.claimed.length === 1, 'M4-D引継ぎ: 復元後も報酬を二重取得しない');
+}
+
+// --- M4-D: 全実績の同時到達可能性 ---
+{
+  const completeGame = {
+    roster: [{ uid: 1, sp: 'nurarihyon', exp: 0, star: 3 }],
+    dex: {}, dungeonClears: { d1: 1, d2: 1, d3: 1 },
+    stats: { runs: 3, clears: 3, captures: 1, fusions: 1 },
+    achievements: { unlocked: [], seen: [] }, achievementRewards: { claimed: [] },
+  };
+  Object.keys(SPECIES).forEach(id => { completeGame.dex[id] = 2; });
+  syncAchievementState(completeGame);
+  ok(completeGame.achievements.unlocked.length === ACHIEVEMENTS.length, 'M4-D: 全11実績を同一セーブで到達可能');
+  ok(evaluateAchievements(completeGame).every(status => status.done), 'M4-D: 全実績の条件判定が達成状態になる');
+}
+
+// --- M4.5: 目標・位階・一度きりの選択報酬 ---
+{
+  const progressionGame = {
+    roster: [], dex: {}, items: {}, dungeonClears: { d1: 0, d2: 0, d3: 0, trial: 0 },
+    stats: { runs: 0, clears: 0, captures: 0, fusions: 0 },
+    achievements: { unlocked: [], seen: [] }, achievementRewards: { claimed: [] },
+    progression: { unlocked: [], seen: [], choices: {} },
+  };
+  ok(PROGRESSION_MILESTONES.length === 11 && nextProgressionGoal(progressionGame).id === 'first_capture', 'M4.5: 最初の次目標は初調伏');
+  progressionGame.stats.captures = 1;
+  syncAchievementState(progressionGame);
+  syncProgressionState(progressionGame);
+  ok(currentProgressionRank(progressionGame).value === 1 && unseenProgressionMilestoneIds(progressionGame).join(',') === 'first_capture', 'M4.5: 節目達成で位階と解放通知を更新');
+  markProgressionMilestonesSeen(progressionGame);
+  ok(unseenProgressionMilestoneIds(progressionGame).length === 0, 'M4.5: 位階通知を確認済みにできる');
+
+  progressionGame.roster = [{ uid: 1, sp: 'onibi', exp: 0, star: 3 }];
+  syncAchievementState(progressionGame);
+  syncProgressionState(progressionGame);
+  const itemBefore = progressionGame.items.oniudewa || 0;
+  ok(claimProgressionChoice(progressionGame, 'first_star3', 'oniudewa').ok, 'M4.5: ★3報酬の入門呪具を選択');
+  ok(progressionGame.items.oniudewa === itemBefore + 1, 'M4.5: 選択した呪具を一度だけ加算');
+  ok(!claimProgressionChoice(progressionGame, 'first_star3', 'juzu').ok && progressionGame.items.juzu == null, 'M4.5: 位階選択報酬を二重取得しない');
+
+  Object.keys(SPECIES).slice(0, 25).forEach(id => { progressionGame.dex[id] = 2; });
+  syncAchievementState(progressionGame);
+  syncProgressionState(progressionGame);
+  ok(treasureChoiceUnlocked(progressionGame), 'M4.5: 図鑑25種で宝の選択肢を解放');
+
+  progressionGame.dungeonClears.trial = 1;
+  syncProgressionState(progressionGame);
+  ok(finalTrialCleared(progressionGame) && progressionGame.progression.unlocked.includes('final_trial'), 'M4.5: 最終夜行踏破を位階へ記録');
+}
+
+// --- M4.5: 百鬼の試練の解放・既存ボス再利用 ---
+{
+  localStorage.removeItem(SAVE_KEY);
+  load();
+  ok(!dungeonUnlocked('trial'), 'M4.5: 百鬼の試練は初期ロック');
+  G.dungeonClears.d1 = 1; G.dungeonClears.d2 = 1; G.dungeonClears.d3 = 1;
+  save();
+  ok(dungeonUnlocked('trial') && runMaxHp() === 75, 'M4.5: d3踏破で百鬼の試練を解放しHP上限75');
+  startRun('trial');
+  R.depth = DUNGEONS.trial.length;
+  const finalBosses = makeGroup('boss');
+  ok(finalBosses.length === 3 && finalBosses.every(enemy => enemy.boss), 'M4.5: 最終戦は既存3ボスの再臨');
+  const fudaBeforeChoice = R.fuda;
+  const itemBeforeChoice = itemTotal();
+  const choiceResults = treasureChoiceOptions();
+  ok(choiceResults.length === 2 && choiceResults.some(x => x.kind === 'fuda') && choiceResults.some(x => x.kind === 'item'), 'M4.5: 宝で札と呪具の2択を生成');
+  applyTreasureChoice(choiceResults.find(x => x.kind === 'fuda'));
+  ok(R.fuda > fudaBeforeChoice && itemTotal() === itemBeforeChoice, 'M4.5: 宝の札選択だけを反映');
+  G.roster[0].star = 3;
+  save();
+  ok(claimRankChoice('first_star3', 'juzu').ok, 'M4.5: 永続セーブで位階選択報酬を受取');
+  const rankRewardCode = exportSave();
+  const juzuAfterClaim = itemCount('juzu');
+  G.progression.choices = {}; G.items.juzu = 0;
+  ok(importSave(rankRewardCode) && progressionChoiceClaimed(G, 'first_star3') && itemCount('juzu') === juzuAfterClaim, 'M4.5: 引継ぎで位階報酬の選択と個数を保持');
+  ok(!claimRankChoice('first_star3', 'oniudewa').ok && itemCount('juzu') === juzuAfterClaim, 'M4.5: 引継ぎ後も位階報酬を二重取得しない');
+  clearRun(); R = null; B = null;
 }
 
 // --- 式神代行(オート) ---
@@ -493,7 +662,7 @@ ok(dungeonUnlocked('d2'), 'd2解放');
         R = { dungeon, depth: dg.length, time };
         const boss = makeGroup('boss');
         groupsGenerated++;
-        if (boss.length !== 1 || !boss[0].boss) missingBossGroups++;
+        if (boss.length < 1 || !boss.every(enemy => enemy.boss)) missingBossGroups++;
       }
     }
   } finally {
@@ -530,8 +699,19 @@ ok(dungeonUnlocked('d2'), 'd2解放');
 // --- 自動プレイ: d1→d2→d3を成長込みで通しシミュレーション ---
 localStorage.removeItem(SAVE_KEY);
 load();
+Object.keys(SPECIES).forEach(id => { G.dex[id] = 2; });
+syncAchievementState(G);
+ACHIEVEMENTS.filter(def => def.reward).forEach(def => claimAchievementReward(G, def.id));
+ok(achievementRewardTotal(G, 'startFuda') === 3 && runInitialFuda(G) === 6, 'M4-D: 全図鑑報酬でも初期調伏札は最大6枚');
+let simSeed = 0x4d3444;
+Math.random = () => {
+  simSeed = (Math.imul(simSeed, 1664525) + 1013904223) >>> 0;
+  return simSeed / 0x100000000;
+};
 const simResult = {};
-for (const dgId of DUNGEON_ORDER) {
+let simRunCount = 0;
+let allRewardRunsStartedAtSix = true;
+for (const dgId of STORY_DUNGEON_ORDER) {
   // d3は呪具なしAIで数〜10ラン想定(開発計画の基準値)。運の下振れでのフレークを避けるため上限に余裕を持たせる
   const maxTries = dgId === 'd3' ? 25 : 15;
   let clears = 0, tries = 0;
@@ -539,6 +719,8 @@ for (const dgId of DUNGEON_ORDER) {
     tries++;
     if (!dungeonUnlocked(dgId)) break;
     startRun(dgId);
+    simRunCount++;
+    allRewardRunsStartedAtSix = allRewardRunsStartedAtSix && R.fuda === 6;
     while (R.hp > 0 && !R.clear) {
       const opts = nodeOptions();
       const opt = opts[rand(opts.length)];
@@ -597,9 +779,50 @@ for (const dgId of DUNGEON_ORDER) {
   if (clears === 0) break;
 }
 console.log('通しシミュ結果:', JSON.stringify(simResult));
+console.log('M4-D報酬込み評価:', JSON.stringify({ runs: simRunCount, initialFuda: runInitialFuda(G), captures: G.stats.captures }));
 ok(simResult.d1 && simResult.d1.clears > 0, 'd1を踏破可能');
 ok(simResult.d2 && simResult.d2.clears > 0, 'd2を踏破可能(成長込み)');
 ok(simResult.d3 && simResult.d3.clears > 0, 'd3を踏破可能(成長込み)');
+ok(simRunCount >= 3 && allRewardRunsStartedAtSix, 'M4-D: 報酬込みで3ラン以上を実行し毎回6枚開始');
+ok(RUN_FUDA_BASE === 3 && achievementRewardTotal(G, 'startFuda') === 3, 'M4-D: 報酬は戦闘能力でなく初期調伏札+3に限定');
+
+// --- M4.5: 育成済み編成で百鬼の試練を通し踏破 ---
+localStorage.removeItem(SAVE_KEY);
+load();
+G.roster = []; G.deck = []; G.nextUid = 1;
+['suzaku', 'seiryu', 'ryujin', 'daitengu', 'yatagarasu', 'shiranui', 'tamamo', 'kirin', 'hakutaku', 'genbu', 'byakko', 'nurarihyon'].forEach(sp => {
+  const unit = addUnit(sp, EXP_TABLE[LEVEL_MAX - 1]);
+  unit.star = STAR_MAX;
+});
+G.dungeonClears = { d1: 1, d2: 1, d3: 1, trial: 0 };
+G.deck = G.roster.map(unit => unit.uid);
+save();
+let finalSeed = 0x4d3435;
+Math.random = () => {
+  finalSeed = (Math.imul(finalSeed, 1664525) + 1013904223) >>> 0;
+  return finalSeed / 0x100000000;
+};
+let finalTries = 0;
+while (!finalTrialCleared(G) && finalTries++ < 5) {
+  startRun('trial');
+  while (R.hp > 0 && !R.clear) {
+    const opts = nodeOptions();
+    let opt = R.hp < R.maxHp * 0.55 ? opts.find(x => x.type === 'rest') : null;
+    opt = opt || opts.find(x => x.type === 'treasure') || opts.find(x => x.type === 'battle') || opts[0];
+    R.depth++;
+    if (opt.type === 'treasure') { applyTreasure(); continue; }
+    if (opt.type === 'rest') { applyRest(R.hp < R.maxHp * 0.75 ? 'heal' : 'fuda'); continue; }
+    startBattle(makeGroup(opt.type === 'boss' ? 'boss' : opt.type), {
+      boss: opt.type === 'boss', elite: opt.type === 'elite',
+      expMult: DUNGEONS.trial.expMult * (opt.type === 'elite' ? 2 : 1),
+    });
+    autoResolveBattle();
+    if (B.over === 'lose') break;
+  }
+}
+console.log('M4.5最終夜行シミュ:', JSON.stringify({ tries: finalTries, clears: G.dungeonClears.trial }));
+ok(finalTrialCleared(G), 'M4.5: 育成・編成済みなら百鬼の試練を踏破可能');
+ok(currentProgressionRank(G).name === '大調伏師' && G.progression.unlocked.includes('final_trial'), 'M4.5: 最終踏破で大調伏師とエンディングを解放');
 
 console.log(fails === 0 ? '\nALL PASS' : `\n${fails} FAILURES`);
 process.exit(fails === 0 ? 0 : 1);

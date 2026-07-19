@@ -10,9 +10,9 @@ const ACHIEVEMENTS = Object.freeze([
   { id: 'clear_d2', name: '深山の霧道踏破', description: '深山の霧道を踏破する', condition: { type: 'dungeon', id: 'd2', target: 1 } },
   { id: 'clear_d3', name: '百鬼の御堂踏破', description: '百鬼の御堂を踏破する', condition: { type: 'dungeon', id: 'd3', target: 1 } },
   { id: 'first_star3', name: '極めし一体', description: '★3の妖怪を作る', condition: { type: 'rosterStar', target: 3 } },
-  { id: 'dex_10', name: '十妖怪使役', description: '図鑑で10種を使役済みにする', condition: { type: 'dexOwned', target: 10 } },
-  { id: 'dex_25', name: '二十五妖怪使役', description: '図鑑で25種を使役済みにする', condition: { type: 'dexOwned', target: 25 } },
-  { id: 'dex_50', name: '百鬼図鑑', description: '図鑑50種を使役済みにする', condition: { type: 'dexOwned', target: 50 } },
+  { id: 'dex_10', name: '十妖怪使役', description: '図鑑で10種を使役済みにする', condition: { type: 'dexOwned', target: 10 }, reward: Object.freeze({ type: 'startFuda', value: 1, label: '夜行開始時の調伏札 +1' }) },
+  { id: 'dex_25', name: '二十五妖怪使役', description: '図鑑で25種を使役済みにする', condition: { type: 'dexOwned', target: 25 }, reward: Object.freeze({ type: 'startFuda', value: 1, label: '夜行開始時の調伏札 +1' }) },
+  { id: 'dex_50', name: '百鬼図鑑', description: '図鑑50種を使役済みにする', condition: { type: 'dexOwned', target: 50 }, reward: Object.freeze({ type: 'startFuda', value: 1, label: '夜行開始時の調伏札 +1' }) },
   { id: 'four_gods', name: '四神制覇', description: '玄武・白虎・青龍・朱雀をすべて使役する', condition: { type: 'speciesSet', ids: FOUR_GOD_IDS, target: FOUR_GOD_IDS.length } },
   { id: 'nurarihyon', name: '総大将誕生', description: 'ぬらりひょんを使役する', condition: { type: 'speciesSet', ids: ['nurarihyon'], target: 1 } },
 ].map(Object.freeze));
@@ -55,6 +55,9 @@ function syncAchievementState(game) {
   const existing = game.achievements && Array.isArray(game.achievements.unlocked)
     ? game.achievements.unlocked.filter(id => knownIds.has(id))
     : [];
+  const existingSeen = game.achievements && Array.isArray(game.achievements.seen)
+    ? game.achievements.seen.filter(id => knownIds.has(id))
+    : [];
   const unlocked = new Set(existing);
   const newlyUnlocked = [];
   for (const def of ACHIEVEMENTS) {
@@ -63,6 +66,66 @@ function syncAchievementState(game) {
       newlyUnlocked.push(def.id);
     }
   }
-  game.achievements = { unlocked: ACHIEVEMENTS.map(def => def.id).filter(id => unlocked.has(id)) };
+  const orderedUnlocked = ACHIEVEMENTS.map(def => def.id).filter(id => unlocked.has(id));
+  game.achievements = {
+    unlocked: orderedUnlocked,
+    seen: orderedUnlocked.filter(id => existingSeen.includes(id)),
+  };
   return newlyUnlocked;
+}
+
+function unseenAchievementIds(game) {
+  const state = game.achievements || {};
+  const seen = new Set(Array.isArray(state.seen) ? state.seen : []);
+  return (Array.isArray(state.unlocked) ? state.unlocked : []).filter(id => !seen.has(id));
+}
+
+function markAchievementIdsSeen(game, ids) {
+  syncAchievementState(game);
+  const targets = new Set(ids || game.achievements.unlocked);
+  const seen = new Set(game.achievements.seen);
+  game.achievements.unlocked.forEach(id => { if (targets.has(id)) seen.add(id); });
+  game.achievements.seen = ACHIEVEMENTS.map(def => def.id).filter(id => seen.has(id));
+}
+
+function unclaimedAchievementRewardIds(game) {
+  const unlocked = new Set((game.achievements && game.achievements.unlocked) || []);
+  const claimed = new Set((game.achievementRewards && game.achievementRewards.claimed) || []);
+  return ACHIEVEMENTS.filter(def => def.reward && unlocked.has(def.id) && !claimed.has(def.id)).map(def => def.id);
+}
+
+function sanitizeAchievementRewardState(game) {
+  const rewardIds = new Set(ACHIEVEMENTS.filter(def => def.reward).map(def => def.id));
+  const unlocked = new Set((game.achievements && game.achievements.unlocked) || []);
+  const existing = game.achievementRewards && Array.isArray(game.achievementRewards.claimed)
+    ? game.achievementRewards.claimed
+    : [];
+  game.achievementRewards = {
+    claimed: ACHIEVEMENTS.map(def => def.id).filter(id => rewardIds.has(id) && unlocked.has(id) && existing.includes(id)),
+  };
+}
+
+function achievementRewardClaimed(game, id) {
+  return !!(game.achievementRewards && Array.isArray(game.achievementRewards.claimed)
+    && game.achievementRewards.claimed.includes(id));
+}
+
+function claimAchievementReward(game, id) {
+  const def = achievementDefinition(id);
+  if (!def || !def.reward) return { err: '受け取れる報酬がない' };
+  syncAchievementState(game);
+  sanitizeAchievementRewardState(game);
+  if (!game.achievements.unlocked.includes(id)) return { err: '実績が未達成' };
+  if (achievementRewardClaimed(game, id)) return { err: '報酬は受取済み' };
+  game.achievementRewards.claimed.push(id);
+  game.achievementRewards.claimed = ACHIEVEMENTS.map(item => item.id)
+    .filter(claimedId => game.achievementRewards.claimed.includes(claimedId));
+  return { ok: true, id, reward: def.reward };
+}
+
+function achievementRewardTotal(game, type) {
+  const claimed = new Set((game.achievementRewards && game.achievementRewards.claimed) || []);
+  const unlocked = new Set((game.achievements && game.achievements.unlocked) || []);
+  return ACHIEVEMENTS.reduce((total, def) => total +
+    (def.reward && def.reward.type === type && claimed.has(def.id) && unlocked.has(def.id) ? def.reward.value : 0), 0);
 }

@@ -2,18 +2,23 @@
 
 let R = null; // 進行中のラン(RUN_KEYへ随時保存。リロード後に再開可)
 let runTimeProvider = currentGameTime; // 出撃時だけ実時計を読み、ラン中はR.timeへ固定
+const RUN_FUDA_BASE = 3;
 
 function rand(n) { return Math.floor(Math.random() * n); }
 function pick(arr) { return arr[rand(arr.length)]; }
 
 // 術士の最大HP: ダンジョン踏破で成長
 function runMaxHp() {
-  return 30 + 15 * DUNGEON_ORDER.filter(d => G.dungeonClears[d] > 0).length;
+  return 30 + 15 * STORY_DUNGEON_ORDER.filter(d => G.dungeonClears[d] > 0).length;
 }
 
 function dungeonUnlocked(id) {
   const dg = DUNGEONS[id];
   return !dg.unlock || G.dungeonClears[dg.unlock] > 0;
+}
+
+function runInitialFuda(game) {
+  return RUN_FUDA_BASE + achievementRewardTotal(game, 'startFuda');
 }
 
 function runTimeSnapshot(context) {
@@ -26,7 +31,7 @@ function validRunTime(time) {
 
 function startRun(dungeonId) {
   const hp = runMaxHp();
-  R = { dungeon: dungeonId, depth: 0, hp, maxHp: hp, fuda: 3, captured: [], clear: false, time: runTimeSnapshot(runTimeProvider()) };
+  R = { dungeon: dungeonId, depth: 0, hp, maxHp: hp, fuda: runInitialFuda(G), captured: [], clear: false, time: runTimeSnapshot(runTimeProvider()) };
   B = null;
   G.stats.runs++;
   save();
@@ -141,12 +146,12 @@ function makeGroup(kind) {
   const seg = depthSegment(R.depth);
   const hpSc = dg.hpScale[seg], atkSc = dg.atkScale[seg];
   if (kind === 'boss') {
-    const b = dg.boss;
-    return [{
+    const bosses = dg.bosses || [dg.boss];
+    return bosses.map(b => ({
       sp: null, art: b.id, boss: true, name: b.name, emoji: b.emoji, element: null, tier: 0,
       maxHp: b.hp, hp: b.hp, atk: b.atk, bigAtk: b.bigAtk, expValue: b.expValue,
       rage: 0, poison: 0, weak: 0, advTag: false, snareTag: false, state: 'alive',
-    }];
+    }));
   }
   const t1 = encounterPool(dg.pools.t1, R.time);
   const t2 = encounterPool(dg.pools.t2, R.time);
@@ -167,20 +172,33 @@ function makeGroup(kind) {
   return ids.map(id => makeEnemy(id, hpSc, atkSc));
 }
 
-// 宝: 30%で呪具、70%で調伏札。どちらでもHP+4
-function applyTreasure() {
+function treasureChoiceOptions() {
+  return [
+    { kind: 'fuda', extra: Math.random() < 0.4 ? 2 : 1 },
+    { kind: 'item', id: randomItemId() },
+  ];
+}
+
+function applyTreasureChoice(choice) {
+  if (!choice || !['item', 'fuda'].includes(choice.kind)) return { err: '宝を選べない' };
+  if (choice.kind === 'item' && !ITEMS[choice.id]) return { err: '呪具を選べない' };
   R.hp = Math.min(R.maxHp, R.hp + 4);
-  if (Math.random() < 0.3) {
-    const id = randomItemId();
-    gainItem(id);
+  if (choice.kind === 'item') {
+    gainItem(choice.id);
     save();
     saveRun();
-    return { kind: 'item', id };
+    return { kind: 'item', id: choice.id };
   }
-  const extra = Math.random() < 0.4 ? 2 : 1;
+  const extra = Math.max(1, Math.min(2, Number(choice.extra) || 1));
   R.fuda += extra;
   saveRun();
   return { kind: 'fuda', extra };
+}
+
+// 宝: 30%で呪具、70%で調伏札。どちらでもHP+4
+function applyTreasure() {
+  const options = treasureChoiceOptions();
+  return applyTreasureChoice(Math.random() < 0.3 ? options[1] : options[0]);
 }
 
 function applyRest(choice) {

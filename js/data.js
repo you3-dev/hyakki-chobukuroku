@@ -122,8 +122,22 @@ const DUNGEONS = {
     },
     boss: { id: 'orochi', name: '八岐大蛇', emoji: '🐍', hp: 140, atk: 12, bigAtk: 18, expValue: 40 },
   },
+  trial: {
+    id: 'trial', name: '百鬼の試練', emoji: '🌌', length: 15,
+    hpScale: [1.9, 2.2, 2.5], atkScale: [1.3, 1.45, 1.6], expMult: 4, unlock: 'd3', hpReward: false, final: true,
+    pools: {
+      t1: ['onibi', 'chochin', 'karakasa', 'tanuki', 'kamaitachi', 'nekomata', 'kawauso', 'hitotsume', 'amanojaku', 'okuriinu', 'dorotabo', 'kudagitsune', 'amefuri'],
+      t2: ['kodama', 'kappa', 'yamawaro', 'tsuchigumo', 'yukionna', 'karasutengu', 'ogama', 'nue', 'zashiki', 'gaikotsu', 'kasha', 'hyakume', 'yamanba', 'onyudo', 'shiranui', 'itsumade', 'nureonna', 'satori', 'umibozu', 'oboroguruma'],
+    },
+    bosses: [
+      { id: 'gashadokuro', name: 'がしゃどくろ・再臨', emoji: '💀', hp: 45, atk: 6, bigAtk: 9, expValue: 15 },
+      { id: 'shutendoji', name: '酒呑童子・再臨', emoji: '👹', hp: 65, atk: 7, bigAtk: 11, expValue: 25 },
+      { id: 'orochi', name: '八岐大蛇・再臨', emoji: '🐍', hp: 90, atk: 8, bigAtk: 13, expValue: 40 },
+    ],
+  },
 };
-const DUNGEON_ORDER = ['d1', 'd2', 'd3'];
+const STORY_DUNGEON_ORDER = ['d1', 'd2', 'd3'];
+const DUNGEON_ORDER = [...STORY_DUNGEON_ORDER, 'trial'];
 
 // ===== 憑合レシピ(異種・順不同・32通り) =====
 // 同種×同種は「重ね」(★+1)としてレシピ不要で常に成立

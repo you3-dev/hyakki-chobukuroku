@@ -15,7 +15,7 @@ function ok(cond, msg) { if (!cond) { fails++; console.log('FAIL:', msg); } else
 const validIds = new Set([
   ...Object.keys(SPECIES),
   ...Object.keys(ITEMS),
-  ...Object.values(DUNGEONS).map(d => d.boss.id),
+  ...Object.values(DUNGEONS).flatMap(d => (d.bosses || [d.boss]).map(b => b.id)),
 ]);
 
 for (const id of ART) {

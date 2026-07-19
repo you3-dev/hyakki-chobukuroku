@@ -29,9 +29,11 @@ function addUnit(sp, exp) {
 function newGame() {
   G = {
     nextUid: 1, roster: [], deck: [], found: [], dex: {}, items: {},
-    dungeonClears: { d1: 0, d2: 0, d3: 0 },
+    dungeonClears: { d1: 0, d2: 0, d3: 0, trial: 0 },
     stats: { runs: 0, clears: 0, captures: 0, fusions: 0 },
-    achievements: { unlocked: [] },
+    achievements: { unlocked: [], seen: [] },
+    achievementRewards: { claimed: [] },
+    progression: { unlocked: [], seen: [], choices: {} },
   };
   ['onibi', 'onibi', 'karakasa', 'tanuki', 'kamaitachi', 'kodama'].forEach(sp => addUnit(sp, 0));
   save();
@@ -39,6 +41,8 @@ function newGame() {
 
 function save() {
   syncAchievementState(G);
+  sanitizeAchievementRewardState(G);
+  syncProgressionState(G);
   localStorage.setItem(SAVE_KEY, JSON.stringify(G));
 }
 
@@ -56,7 +60,7 @@ function sanitize() {
   G.dex = G.dex || {};
   G.stats = Object.assign({ runs: 0, clears: 0, captures: 0, fusions: 0 }, G.stats || {});
   // 検証版セーブからの移行: クリア数はd1のものとみなす
-  G.dungeonClears = G.dungeonClears || { d1: G.stats.clears || 0, d2: 0, d3: 0 };
+  G.dungeonClears = Object.assign({ d1: G.stats.clears || 0, d2: 0, d3: 0, trial: 0 }, G.dungeonClears || {});
   G.items = G.items || {};
   Object.keys(G.items).forEach(k => { if (!ITEMS[k]) delete G.items[k]; });
   G.roster.forEach(u => {
@@ -68,6 +72,8 @@ function sanitize() {
   G.deck = (G.deck || []).filter(id => uids.has(id));
   if (G.deck.length === 0) G.deck = G.roster.slice(0, DECK_MAX).map(u => u.uid);
   syncAchievementState(G);
+  sanitizeAchievementRewardState(G);
+  syncProgressionState(G);
 }
 
 function resetSave() { localStorage.removeItem(SAVE_KEY); newGame(); }
@@ -77,6 +83,19 @@ function resetSave() { localStorage.removeItem(SAVE_KEY); newGame(); }
 function markSeen(sp) { if (!G.dex[sp]) { G.dex[sp] = 1; save(); } }
 function markOwned(sp) { if ((G.dex[sp] || 0) < 2) G.dex[sp] = 2; }
 function dexOwnedCount() { return Object.values(G.dex).filter(v => v === 2).length; }
+
+// ===== 実績報酬 =====
+function claimReward(id) {
+  const result = claimAchievementReward(G, id);
+  if (result.ok) save();
+  return result;
+}
+
+function claimRankChoice(id, itemId) {
+  const result = claimProgressionChoice(G, id, itemId);
+  if (result.ok) save();
+  return result;
+}
 
 // ===== セーブの書き出し/読み込み(iOSの7日削除対策) =====
 function exportSave() {
@@ -128,6 +147,11 @@ function findRecipe(spA, spB) {
     (r.pair[0] === spA && r.pair[1] === spB) || (r.pair[0] === spB && r.pair[1] === spA));
 }
 
+function fusionResultLevel(a, b) {
+  if (a.sp === b.sp) return Math.max(unitLevel(a), unitLevel(b));
+  return Math.max(1, Math.min(LEVEL_MAX, Math.floor((unitLevel(a) + unitLevel(b)) / 2)));
+}
+
 // 同種→重ね(★+1)、異種→レシピ変化。戻り値 {unit} または {err}
 function fuseUnits(uidA, uidB) {
   const a = getUnit(uidA), b = getUnit(uidB);
@@ -149,7 +173,7 @@ function fuseUnits(uidA, uidB) {
   }
   const rec = findRecipe(a.sp, b.sp);
   if (!rec) return { err: 'この組み合わせは反応しない' };
-  const lv = Math.max(1, Math.min(LEVEL_MAX, Math.floor((unitLevel(a) + unitLevel(b)) / 2)));
+  const lv = fusionResultLevel(a, b);
   returnItems();
   G.roster = G.roster.filter(u => u !== a && u !== b);
   G.deck = G.deck.filter(id => id !== uidA && id !== uidB);

@@ -2,7 +2,7 @@
 
 const app = document.getElementById('app');
 
-let screen = 'title';       // title | home | deck | fusion | dex | save | dungeon | node | battle | event | runend | resume
+let screen = 'title';       // title | home | deck | fusion | dex | achievements | ranks | save | dungeon | node | battle | event | runend | resume
 let selCard = null;         // 選択中の手札uid
 let captureMode = false;
 let toast = '';
@@ -65,6 +65,12 @@ function chooseNode(i) {
   else if (opt.type === 'elite') { startBattle(makeGroup('elite'), { expMult: dg.expMult * 2, elite: true }); screen = 'battle'; }
   else if (opt.type === 'boss') { startBattle(makeGroup('boss'), { boss: true, expMult: dg.expMult }); screen = 'battle'; }
   else if (opt.type === 'treasure') {
+    if (treasureChoiceUnlocked(G)) {
+      E = { kind: 'treasure-choice', options: treasureChoiceOptions() };
+      saveRun();
+      screen = 'event';
+      return;
+    }
     const t = applyTreasure();
     const msg = t.kind === 'item'
       ? `古びた祠に呪具「${ITEMS[t.id].emoji}${ITEMS[t.id].name}」が眠っていた。体力も少し回復(+4)`
@@ -103,6 +109,18 @@ function handleAction(action, arg) {
     case 'nav-deck': screen = 'deck'; setToast(''); break;
     case 'nav-fusion': screen = 'fusion'; fusionSel = []; fusionResult = null; setToast(''); break;
     case 'nav-dex': screen = 'dex'; setToast(''); break;
+    case 'nav-achievements':
+      markAchievementIdsSeen(G);
+      save();
+      screen = 'achievements';
+      setToast('');
+      break;
+    case 'nav-ranks':
+      markProgressionMilestonesSeen(G);
+      save();
+      screen = 'ranks';
+      setToast('');
+      break;
     case 'nav-items': screen = 'items'; itemSel = null; setToast(''); break;
     case 'nav-save': screen = 'save'; setToast(''); break;
     case 'reset-save':
@@ -230,6 +248,16 @@ function handleAction(action, arg) {
     case 'rest-heal': applyRest('heal'); E = { kind: 'done', msg: '茶屋で一服。体力が回復した' }; break;
     case 'rest-fuda': applyRest('fuda'); E = { kind: 'done', msg: '茶屋の主人から調伏札を2枚仕入れた' }; break;
     case 'event-continue': E = null; gotoNodeScreen(); break;
+    case 'treasure-choice': {
+      const choice = E && E.kind === 'treasure-choice' ? E.options[Number(arg)] : null;
+      const result = applyTreasureChoice(choice);
+      if (result.err) { setToast(result.err); break; }
+      const msg = result.kind === 'item'
+        ? `選んだ呪具「${ITEMS[result.id].emoji}${ITEMS[result.id].name}」を手に入れた。体力も少し回復(+4)`
+        : `選んだ調伏札を${result.extra}枚手に入れた。体力も少し回復(+4)`;
+      E = { kind: 'done', msg };
+      break;
+    }
 
     case 'run-close': clearRun(); R = null; B = null; screen = 'home'; break;
 
@@ -250,6 +278,25 @@ function handleAction(action, arg) {
       const ta = document.getElementById('export-text');
       if (ta) { ta.focus(); ta.select(); }
       return; // 再レンダリングすると選択が消えるため
+    }
+    case 'achievement-claim': {
+      const result = claimReward(arg);
+      setToast(result.ok ? `報酬獲得: ${result.reward.label}` : result.err);
+      break;
+    }
+    case 'achievement-notice-dismiss':
+      markAchievementIdsSeen(G);
+      save();
+      break;
+    case 'progression-notice-dismiss':
+      markProgressionMilestonesSeen(G);
+      save();
+      break;
+    case 'rank-choice': {
+      const [milestoneId, itemId] = String(arg || '').split(':');
+      const result = claimRankChoice(milestoneId, itemId);
+      setToast(result.ok ? `位階報酬: ${ITEMS[itemId].emoji}${ITEMS[itemId].name}を獲得` : result.err);
+      break;
     }
   }
   render();
@@ -365,6 +412,36 @@ function timeHelpHtml() {
   </div>`;
 }
 
+function achievementNoticeHtml() {
+  const ids = unseenAchievementIds(G);
+  if (!ids.length) return '';
+  const names = ids.map(id => achievementDefinition(id)).filter(Boolean).map(def => esc(def.name));
+  return `<aside class="achievement-notice" aria-live="polite" aria-label="新しく達成した実績">
+    <span class="achievement-notice-icon" aria-hidden="true">🏆</span>
+    <span><strong>実績達成!</strong><small>${names.join('・')}</small></span>
+    <button type="button" data-action="achievement-notice-dismiss" aria-label="実績達成通知を閉じる">×</button>
+  </aside>`;
+}
+
+function progressionGoalHtml(area, compact) {
+  const goal = nextProgressionGoal(G, area);
+  if (!goal) return `<section class="progression-goal complete"><strong>🏆 ${area ? '関連目標を達成済み' : 'すべての調伏目標を達成'}</strong></section>`;
+  return `<section class="progression-goal ${compact ? 'compact' : ''}">
+    <span aria-hidden="true">🧭</span><div><small>次の目標</small><strong>${esc(goal.name)}</strong><p>${esc(goal.description)} → ${esc(goal.reward)}</p></div>
+    ${compact ? '' : '<button class="btn btn-small" type="button" data-action="nav-ranks">位階を見る</button>'}
+  </section>`;
+}
+
+function progressionNoticeHtml() {
+  const ids = unseenProgressionMilestoneIds(G);
+  if (!ids.length) return '';
+  const defs = ids.map(progressionMilestoneDefinition).filter(Boolean);
+  return `<aside class="progression-notice" aria-live="polite" aria-label="新しい位階と解放">
+    <span aria-hidden="true">✨</span><span><strong>位階昇格・新要素解放</strong><small>${defs.map(def => `${esc(def.name)}: ${esc(def.reward)}`).join(' / ')}</small></span>
+    <button type="button" data-action="progression-notice-dismiss" aria-label="位階昇格通知を閉じる">×</button>
+  </aside>`;
+}
+
 // ===== 各画面 =====
 function renderTitle() {
   const time = gameTimeProvider();
@@ -405,12 +482,19 @@ function renderTitle() {
 function renderHome() {
   const time = gameTimeProvider();
   const st = G.stats;
+  const achievementCount = G.achievements.unlocked.length;
+  const unseenCount = unseenAchievementIds(G).length;
+  const unclaimedCount = unclaimedAchievementRewardIds(G).length;
+  const rank = currentProgressionRank(G);
+  const ending = finalTrialCleared(G);
   const rosterHtml = G.roster.map(u => unitCard(u, { inDeck: G.deck.includes(u.uid) })).join('');
-  app.innerHTML = `<main class="home-time-shell time-${time.timeBand.id}" data-time-band="${time.timeBand.id}"><div class="screen home">
-    <h1 class="title">百鬼調伏録</h1>
-    <p class="subtitle">妖怪を調伏し、百鬼の図鑑を埋めよ</p>
+  app.innerHTML = `<main class="home-time-shell time-${time.timeBand.id} ${ending ? 'ending-unlocked' : ''}" data-time-band="${time.timeBand.id}"><div class="screen home">
+    <h1 class="title">${ending ? '百鬼調伏録・暁' : '百鬼調伏録'}</h1>
+    <p class="subtitle">${ending ? '大調伏師として、明けた夜をさらに歩め' : '妖怪を調伏し、百鬼の図鑑を埋めよ'}</p>
+    ${ending ? '<div class="ending-home-banner">🌅 百鬼の試練 踏破済み — 称号「大調伏師」</div>' : ''}
     ${timeContextHtml(time)}
-    <div class="stats-line">図鑑 ${dexOwnedCount()}/${Object.keys(SPECIES).length} | 出撃${st.runs} / 踏破${st.clears} / 調伏${st.captures} / 憑合${st.fusions}</div>
+    <div class="stats-line">位階 ${rank.value}/${rank.max}「${rank.name}」 | 図鑑 ${dexOwnedCount()}/${Object.keys(SPECIES).length} | 出撃${st.runs} / 踏破${st.clears} / 調伏${st.captures} / 憑合${st.fusions}</div>
+    ${progressionGoalHtml()}
     <div class="btn-row">
       <button class="btn btn-primary btn-big" data-action="start-run">🌙 夜行に出る</button>
     </div>
@@ -419,6 +503,8 @@ function renderHome() {
       <button class="btn" data-action="nav-fusion">憑合</button>
       <button class="btn" data-action="nav-items">呪具 (${itemTotal()})</button>
       <button class="btn" data-action="nav-dex">図鑑</button>
+      <button class="btn achievement-home-btn" data-action="nav-achievements">🏆 実績 ${achievementCount}/${ACHIEVEMENTS.length}${unseenCount ? `<span class="achievement-new">NEW ${unseenCount}</span>` : ''}${unclaimedCount ? `<span class="achievement-claimable">受取 ${unclaimedCount}</span>` : ''}</button>
+      <button class="btn" data-action="nav-ranks">🎖️ 位階 ${rank.value}/${rank.max}</button>
       <button class="btn" data-action="nav-save">記録</button>
     </div>
     <h2 class="h2">手持ち妖怪 (${G.roster.length})</h2>
@@ -443,6 +529,7 @@ function renderDungeon() {
   app.innerHTML = `<div class="screen">
     <h2 class="h2">夜行 — 行き先を選ぶ</h2>
     <p class="hint">術士の最大HP: ${runMaxHp()}(ダンジョン踏破ごとに+15)</p>
+    ${progressionGoalHtml('dungeon', true)}
     <div class="node-row dungeon-row">${cards}</div>
     <div class="btn-row"><button class="btn" data-action="nav-home">拠点へ戻る</button></div>
     ${toastHtml()}
@@ -487,6 +574,7 @@ function renderFusion() {
         ? `<div class="fusion-preview ng">これ以上重ねられない(★${STAR_MAX}が上限)</div>`
         : `<div class="fusion-preview ok">
             <div>${s.emoji} 重ね: <b>${s.name}</b> が <span class="star">${'★'.repeat(star)}</span> になる(数値+2/★)</div>
+            <div class="hint">完成予定 Lv${fusionResultLevel(a, b)} / ★${star}</div>
             <button class="btn btn-primary" data-action="fusion-exec">重ねる(2体は1体になる)</button>
           </div>`;
     } else {
@@ -496,6 +584,7 @@ function renderFusion() {
         const rs = SPECIES[rec.result];
         preview = `<div class="fusion-preview ok">
           <div>${SPECIES[a.sp].emoji} × ${SPECIES[b.sp].emoji} → ${known ? rs.emoji + ' ' + rs.name : '❓ 何かが生まれそうだ…'}</div>
+          <div class="hint">完成予定 Lv${fusionResultLevel(a, b)} / ★0</div>
           <button class="btn btn-primary" data-action="fusion-exec">憑合する(2体は消える)</button>
         </div>`;
       } else {
@@ -513,6 +602,7 @@ function renderFusion() {
   }).join('');
   app.innerHTML = `<div class="screen">
     <h2 class="h2">憑合(ひょうごう)</h2>
+    ${progressionGoalHtml('fusion', true)}
     ${preview}
     <div class="grid">${rosterHtml}</div>
     <details class="recipes"><summary>言い伝え(レシピヒント)</summary><ul>${hints}</ul></details>
@@ -550,7 +640,7 @@ function renderItems() {
 function renderDex() {
   const items = Object.values(SPECIES).map(s => {
     const state = G.dex[s.id] || 0;
-    const places = DUNGEON_ORDER.filter(d => DUNGEONS[d].pools.t1.includes(s.id) || DUNGEONS[d].pools.t2.includes(s.id))
+    const places = STORY_DUNGEON_ORDER.filter(d => DUNGEONS[d].pools.t1.includes(s.id) || DUNGEONS[d].pools.t2.includes(s.id))
       .map(d => DUNGEONS[d].emoji).join('');
     const habitat = s.tier === 0 ? '憑合のみ' : places;
     const conditionHint = s.encounter ? `<div class="dex-hint">🌙 ${esc(s.encounter.hint)}</div>` : '';
@@ -581,8 +671,63 @@ function renderDex() {
   app.innerHTML = `<div class="screen">
     <h2 class="h2">図鑑 — 使役 ${dexOwnedCount()}/${Object.keys(SPECIES).length}</h2>
     <p class="hint">🏮宵の小径 🌫️深山の霧道 ⛩️百鬼の御堂</p>
+    ${progressionGoalHtml('dex', true)}
     <div class="grid">${items}</div>
     <div class="btn-row"><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
+    ${toastHtml()}
+  </div>`;
+}
+
+function renderAchievements() {
+  const statuses = evaluateAchievements(G);
+  const unlockedCount = statuses.filter(status => status.done).length;
+  const rewardCount = statuses.filter(status => status.reward).length;
+  const claimedCount = statuses.filter(status => status.reward && achievementRewardClaimed(G, status.id)).length;
+  const items = statuses.map(status => {
+    const percent = Math.min(100, Math.round(status.value / status.target * 100));
+    let rewardHtml = '<span class="achievement-record">達成記録</span>';
+    if (status.reward) {
+      if (!status.done) rewardHtml = `<span class="achievement-reward">🎁 ${esc(status.reward.label)}</span>`;
+      else if (achievementRewardClaimed(G, status.id)) rewardHtml = `<span class="achievement-reward claimed">✓ 受取済み: ${esc(status.reward.label)}</span>`;
+      else rewardHtml = `<button class="btn btn-primary btn-small" type="button" data-action="achievement-claim" data-arg="${status.id}">🎁 ${esc(status.reward.label)}を受け取る</button>`;
+    }
+    return `<article class="achievement-card ${status.done ? 'done' : ''}">
+      <div class="achievement-card-head"><span class="achievement-medal" aria-hidden="true">${status.done ? '🏆' : '◌'}</span><div><h3>${esc(status.name)}</h3><p>${esc(status.description)}</p></div><strong>${status.done ? '達成' : `${status.value}/${status.target}`}</strong></div>
+      <div class="achievement-progress" role="progressbar" aria-label="${esc(status.name)}の進捗" aria-valuemin="0" aria-valuemax="${status.target}" aria-valuenow="${status.value}"><span style="width:${percent}%"></span></div>
+      <div class="achievement-card-foot">${rewardHtml}</div>
+    </article>`;
+  }).join('');
+  app.innerHTML = `<div class="screen achievements-screen">
+    <h2 class="h2">🏆 実績</h2>
+    <p class="hint">達成 ${unlockedCount}/${ACHIEVEMENTS.length}　報酬 ${claimedCount}/${rewardCount}受取済み</p>
+    <p class="achievement-guide">実績と報酬は最初からすべて確認できる。図鑑の節目報酬は、受け取った次の夜行から調伏札へ反映される。</p>
+    <div class="achievement-list">${items}</div>
+    <div class="btn-row"><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
+    ${toastHtml()}
+  </div>`;
+}
+
+function renderRanks() {
+  const rank = currentProgressionRank(G);
+  const rows = progressionStatuses(G).map((status, index) => {
+    let choiceHtml = '';
+    if (status.choice && status.done) {
+      const chosen = G.progression.choices[status.id];
+      choiceHtml = chosen
+        ? `<div class="rank-choice-claimed">✓ 選択済み: ${ITEMS[chosen].emoji}${ITEMS[chosen].name}</div>`
+        : `<div class="rank-choice-row">${status.choice.map(itemId => `<button class="btn btn-small" type="button" data-action="rank-choice" data-arg="${status.id}:${itemId}">${ITEMS[itemId].emoji}${ITEMS[itemId].name}</button>`).join('')}</div>`;
+    }
+    return `<article class="rank-row ${status.done ? 'done' : ''}">
+      <span class="rank-number">${status.done ? '✓' : index + 1}</span><div><strong>${esc(status.name)}</strong><p>${esc(status.description)}</p><small>解放: ${esc(status.reward)}</small>${choiceHtml}</div>
+    </article>`;
+  }).join('');
+  app.innerHTML = `<div class="screen ranks-screen">
+    <h2 class="h2">🎖️ 調伏師位階</h2>
+    <div class="rank-current"><small>現在の位階</small><strong>${rank.name}</strong><span>${rank.value}/${rank.max}節目</span></div>
+    ${progressionGoalHtml(null, true)}
+    <p class="achievement-guide">既存のHP成長、ダンジョン・式神代行・図鑑報酬もここで振り返れる。節目は異なる順で達成しても失われない。</p>
+    <div class="rank-list">${rows}</div>
+    <div class="btn-row"><button class="btn" data-action="nav-achievements">実績と報酬</button><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
     ${toastHtml()}
   </div>`;
 }
@@ -631,6 +776,12 @@ function renderEvent() {
         <button class="btn btn-primary" data-action="rest-heal">一服する(HP+${Math.round(R.maxHp * 0.4)})</button>
         <button class="btn btn-primary" data-action="rest-fuda">札を仕入れる(調伏札+2)</button>
       </div>`;
+  } else if (E.kind === 'treasure-choice') {
+    const buttons = E.options.map((option, index) => {
+      const label = option.kind === 'item' ? `${ITEMS[option.id].emoji}${ITEMS[option.id].name}` : `🧧 調伏札+${option.extra}`;
+      return `<button class="btn btn-primary" data-action="treasure-choice" data-arg="${index}">${label}</button>`;
+    }).join('');
+    body = `<div class="big-emoji">🎁</div><p>百妖頭の眼で、宝の気配を二つ見抜いた。どちらを持ち帰る?</p><div class="btn-row">${buttons}</div>`;
   } else {
     body = `<div class="big-emoji">${E.kind === 'treasure' ? '🎁' : '🍵'}</div>
       <p>${esc(E.msg)}</p>
@@ -736,9 +887,11 @@ function renderResume() {
 
 function renderRunEnd() {
   const caps = R.captured.map(u => `<li>${SPECIES[u.sp].emoji}${SPECIES[u.sp].name}(仲間になった)</li>`).join('');
+  const ending = R.clear && R.dungeon === 'trial';
   app.innerHTML = `<div class="screen center">
-    <h2 class="h2">${R.clear ? '🌅 夜行踏破!' : '🌙 夜行終了'}</h2>
-    <p>${R.clear ? `${currentDungeon().name}の主を討ち、夜が明けた。` : '今宵はここまで。'}</p>
+    <h2 class="h2">${ending ? '🌅 百鬼調伏録・結' : (R.clear ? '🌅 夜行踏破!' : '🌙 夜行終了')}</h2>
+    <p>${ending ? '三たび立ちはだかった夜行の主を越え、百鬼を率いる者として本当の夜明けを迎えた。' : (R.clear ? `${currentDungeon().name}の主を討ち、夜が明けた。` : '今宵はここまで。')}</p>
+    ${ending ? '<div class="ending-title">特別称号「大調伏師」</div><p class="hint">物語の区切り。図鑑や編成、任意の周回はこの先も続けられる。</p>' : ''}
     ${caps ? `<h3>今宵の調伏</h3><ul class="center-list">${caps}</ul>` : '<p class="hint">今宵の調伏はなし</p>'}
     <div class="btn-row"><button class="btn btn-primary btn-big" data-action="run-close">拠点へ帰る</button></div>
   </div>`;
@@ -752,6 +905,8 @@ function render() {
     case 'deck': renderDeck(); break;
     case 'fusion': renderFusion(); break;
     case 'dex': renderDex(); break;
+    case 'achievements': renderAchievements(); break;
+    case 'ranks': renderRanks(); break;
     case 'items': renderItems(); break;
     case 'save': renderSave(); break;
     case 'node': renderNode(); break;
@@ -762,6 +917,8 @@ function render() {
   }
   if (detailUid !== null) app.innerHTML += unitDetailHtml();
   if (timeHelpOpen) app.innerHTML += timeHelpHtml();
+  if (screen !== 'title') app.innerHTML += achievementNoticeHtml();
+  if (screen !== 'title') app.innerHTML += progressionNoticeHtml();
 }
 
 load();
