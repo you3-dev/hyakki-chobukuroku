@@ -731,16 +731,15 @@ function renderTitle() {
       <span class="title-art-side">${artHtml('tanuki', '🦝')}</span>
     </div>
     <section class="title-copy" aria-labelledby="game-title">
-      <p class="title-kicker">妖怪デッキ構築ローグライト</p>
       <div class="title-logo"><span aria-hidden="true">百</span><h1 id="game-title">百鬼調伏録</h1></div>
       <p class="title-reading">ひゃっきちょうぶくろく</p>
       <p class="title-tagline">倒すか、従えるか。百鬼を率いて夜を往け。</p>
     </section>
     ${timeContextHtml(time)}
-    <div class="title-guide" aria-label="遊び方の要点">
+    ${isNew ? `<div class="title-guide" aria-label="遊び方の要点">
       <div><span>🧧</span><strong>弱らせて調伏</strong><small>敵の体力30%以下が好機</small></div>
       <div><span>🔮</span><strong>集めて憑合</strong><small>組み合わせから新たな妖怪へ</small></div>
-    </div>
+    </div>` : ''}
     <div class="title-actions">
       <p class="title-state">${stateLabel}</p>
       <button class="title-enter-btn" type="button" data-action="title-enter">
@@ -751,7 +750,7 @@ function renderTitle() {
         <button type="button" data-action="title-record">記録</button>
         <button type="button" data-action="title-settings">設定</button>
       </nav>
-      <p class="title-autosave">自動保存・インストール対応 ・ v${APP_VERSION}</p>
+      <p class="title-version">v${APP_VERSION}</p>
     </div>
   </main>`;
 }

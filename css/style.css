@@ -70,6 +70,8 @@ button, [data-action] { touch-action: manipulation; }
   outline-offset: 3px;
   box-shadow: var(--focus-ring);
 }
+/* 画面遷移の読み上げ用にプログラムフォーカスする見出し。Tab到達不可のため輪郭は不要 */
+h1[tabindex="-1"]:focus-visible { outline: none; }
 
 #app { min-height: 100vh; }
 
@@ -226,7 +228,6 @@ button, [data-action] { touch-action: manipulation; }
 .title-art-side { opacity: .72; transform: translateY(14px); }
 .title-art-side .sprite { width: 72px; height: 72px; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .35)); }
 .title-copy { z-index: 1; }
-.title-kicker { color: var(--dim); font-size: .68rem; letter-spacing: .22em; }
 .title-logo { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 3px; }
 .title-logo > span {
   display: grid; place-items: center; width: 34px; height: 34px; flex: none;
@@ -273,7 +274,7 @@ button, [data-action] { touch-action: manipulation; }
   color: #d8d1e8; background: rgba(29, 24, 51, .76); border: 1px solid var(--line); border-radius: var(--radius-sm); font: inherit; font-size: .72rem;
 }
 .title-menu button:active { transform: scale(.97); }
-.title-autosave { margin-top: 5px; color: var(--dim); font-size: .62rem; }
+.title-version { margin-top: 5px; color: var(--dim); font-size: .62rem; }
 
 /* 初回導入・遊び方・設定 */
 .tutorial-screen, .utility-screen {
@@ -382,7 +383,7 @@ body.motion-reduced .unit-art-btn:active, body.motion-reduced .node-card:active 
   .title-art-side .sprite { width: 54px; height: 54px; }
   .title-copy h1 { font-size: 2rem; }
   .title-tagline { margin-top: 4px; }
-  .title-autosave { display: none; }
+  .title-version { display: none; }
   .tutorial-panel { padding-top: 13px; padding-bottom: 13px; }
   .tutorial-party, .tutorial-fusion, .tutorial-capture { min-height: 92px; margin: 2px 0 7px; }
   .tutorial-party .sprite, .tutorial-capture .sprite { width: 82px; height: 82px; }
@@ -396,7 +397,6 @@ body.motion-reduced .unit-art-btn:active, body.motion-reduced .node-card:active 
   .title-art-main .sprite { width: 72px; height: 72px; }
   .title-art-side { transform: translateY(7px); }
   .title-art-side .sprite { width: 42px; height: 42px; }
-  .title-kicker { font-size: .62rem; }
   .title-copy h1 { margin-top: 0; font-size: 1.65rem; }
   .title-reading { font-size: .62rem; }
   .title-tagline { margin-top: 2px; font-size: .72rem; }
