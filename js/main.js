@@ -2,7 +2,7 @@
 
 const app = document.getElementById('app');
 
-let screen = 'title';       // title | home | deck | fusion | dex | achievements | ranks | save | dungeon | node | battle | event | runend | resume
+let screen = 'title';       // title | tutorial | guide | settings | home | deck | fusion | dex | achievements | ranks | save | dungeon | node | battle | event | runend | resume
 let selCard = null;         // 選択中の手札uid
 let captureMode = false;
 let toast = '';
@@ -15,6 +15,13 @@ let itemSel = null;         // 呪具画面で選択中の呪具id
 let detailUid = null;       // 拡大表示中の手持ち妖怪uid
 let timeHelpOpen = false;   // 時間帯・月相の説明表示
 let gameTimeProvider = currentGameTime; // テストでは固定日時のコンテキストへ差し替え可能
+let tutorialStep = 0;       // 初回導入の現在ページ(0..2)
+let tutorialExit = 'home';  // 初回導入/再確認後の戻り先
+let utilityReturn = 'home'; // 遊び方・設定・記録から戻る画面
+let celebrationQueue = []; // M5-D: 初見・調伏・解放などの短い専用演出
+let lastRenderedScreen = null;
+let focusReturnSelector = '';
+let modalActiveLastRender = false;
 
 const NODE_INFO = {
   battle:   { emoji: '⚔️', name: '戦闘',   desc: '妖怪と戦う。弱らせて調伏の好機' },
@@ -47,6 +54,76 @@ function effectText(u) {
 
 function setToast(m) { toast = m || ''; }
 
+function queueCelebration(kind, kicker, title, detail, icon, art) {
+  celebrationQueue.push({ kind, kicker, title, detail, icon, art: art || '' });
+}
+
+function queueProgressionUnlocks(before) {
+  const added = (G.progression && G.progression.unlocked || []).filter(id => !before.has(id));
+  for (const id of added) {
+    const def = progressionMilestoneDefinition(id);
+    if (!def) continue;
+    const rank = currentProgressionRank(G);
+    queueCelebration('rank', '位階昇格', rank.name, `${def.name}を達成。${def.reward}`, '🎖️');
+  }
+}
+
+function queueDungeonUnlocks(before) {
+  for (const id of DUNGEON_ORDER) {
+    if (!before[id] && dungeonUnlocked(id)) {
+      const dg = DUNGEONS[id];
+      queueCelebration('unlock', '新たな夜路', dg.name, 'ダンジョンが解放された', dg.emoji);
+    }
+  }
+}
+
+function celebrationHtml() {
+  if (!celebrationQueue.length || (B && B.over && screen === 'battle')) return '';
+  const c = celebrationQueue[0];
+  const visual = c.art && SPECIES[c.art]
+    ? `<div class="celebration-art">${artHtml(c.art, SPECIES[c.art].emoji)}</div>`
+    : `<div class="celebration-icon" aria-hidden="true">${esc(c.icon)}</div>`;
+  return `<div class="celebration-overlay" role="presentation">
+    <section class="celebration-card celebration-${esc(c.kind)}" role="dialog" aria-modal="true" aria-labelledby="celebration-title" aria-describedby="celebration-detail" tabindex="-1">
+      <div class="celebration-rays" aria-hidden="true"></div>${visual}
+      <p>${esc(c.kicker)}</p><h2 id="celebration-title">${esc(c.title)}</h2>
+      <div id="celebration-detail" class="celebration-detail">${esc(c.detail)}</div>
+      <button class="btn btn-primary" type="button" data-action="celebration-dismiss">確認する</button>
+    </section>
+  </div>`;
+}
+
+function applyUiSettings() {
+  const body = document.body;
+  if (body && body.classList) body.classList.toggle('motion-reduced', !!G.ui.reducedMotion);
+}
+
+function applyPostRenderAccessibility(screenChanged) {
+  if (!document.querySelector) return;
+  const root = app.firstElementChild;
+  if (screenChanged && root && root.classList) root.classList.add('screen-enter');
+  const dialog = document.querySelector('.celebration-card, .unit-detail-dialog, .battle-result-card');
+  if (dialog) {
+    modalActiveLastRender = true;
+    const first = dialog.querySelector && dialog.querySelector('button:not(:disabled), [tabindex="0"]');
+    (first || dialog).focus();
+    return;
+  }
+  if (focusReturnSelector) {
+    const returned = document.querySelector(focusReturnSelector);
+    focusReturnSelector = '';
+    if (returned && returned.focus) { returned.focus(); modalActiveLastRender = false; return; }
+  }
+  if (screenChanged || modalActiveLastRender) {
+    const target = document.querySelector('#app h1') || root;
+    if (target && target.focus) {
+      if (!target.hasAttribute || !target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+      target.focus();
+    }
+  }
+  modalActiveLastRender = false;
+}
+
 // ===== 画面遷移 =====
 function gotoNodeScreen() {
   nodeOpts = nodeOptions();
@@ -61,9 +138,9 @@ function chooseNode(i) {
   nodeOpts = null;
   selCard = null; captureMode = false; setToast('');
   const dg = currentDungeon();
-  if (opt.type === 'battle') { startBattle(makeGroup('battle'), { expMult: dg.expMult }); screen = 'battle'; }
-  else if (opt.type === 'elite') { startBattle(makeGroup('elite'), { expMult: dg.expMult * 2, elite: true }); screen = 'battle'; }
-  else if (opt.type === 'boss') { startBattle(makeGroup('boss'), { boss: true, expMult: dg.expMult }); screen = 'battle'; }
+  if (opt.type === 'battle') startEncounter('battle', { expMult: dg.expMult });
+  else if (opt.type === 'elite') startEncounter('elite', { expMult: dg.expMult * 2, elite: true });
+  else if (opt.type === 'boss') startEncounter('boss', { boss: true, expMult: dg.expMult });
   else if (opt.type === 'treasure') {
     if (treasureChoiceUnlocked(G)) {
       E = { kind: 'treasure-choice', options: treasureChoiceOptions() };
@@ -76,6 +153,10 @@ function chooseNode(i) {
       ? `古びた祠に呪具「${ITEMS[t.id].emoji}${ITEMS[t.id].name}」が眠っていた。体力も少し回復(+4)`
       : `古びた祠に調伏札が${t.extra}枚。体力も少し回復した(+4)`;
     E = { kind: 'treasure', msg };
+    if (t.kind === 'item') {
+      const item = ITEMS[t.id];
+      queueCelebration('item', '呪具入手', item.name, item.desc, item.emoji);
+    }
     screen = 'event';
   } else if (opt.type === 'rest') {
     E = { kind: 'rest' };
@@ -83,8 +164,22 @@ function chooseNode(i) {
   }
 }
 
+function startEncounter(kind, opts) {
+  const group = makeGroup(kind);
+  const firstSeen = group.filter(e => e.sp && !G.dex[e.sp]);
+  startBattle(group, opts);
+  screen = 'battle';
+  if (firstSeen.length) {
+    const species = SPECIES[firstSeen[0].sp];
+    const more = firstSeen.length > 1 ? ` ほか${firstSeen.length - 1}種` : '';
+    queueCelebration('discovery', '初見妖怪', species.name + more, '図鑑へ目撃記録を追加した', '👁️', species.id);
+  }
+}
+
 // ===== アクション =====
 function handleAction(action, arg) {
+  const progressionBefore = new Set(G.progression && G.progression.unlocked || []);
+  const dungeonBefore = Object.fromEntries(DUNGEON_ORDER.map(id => [id, dungeonUnlocked(id)]));
   switch (action) {
     case 'unit-detail': {
       const uid = Number(arg);
@@ -99,10 +194,35 @@ function handleAction(action, arg) {
       screen = 'dex';
       setToast('');
       break;
+    case 'celebration-dismiss': celebrationQueue.shift(); break;
 
     case 'title-enter':
-      screen = peekRun() ? 'resume' : 'home';
+      if (peekRun()) screen = 'resume';
+      else if (!G.ui.onboardingSeen) { tutorialStep = 0; tutorialExit = 'home'; screen = 'tutorial'; }
+      else screen = 'home';
       setToast('');
+      break;
+
+    case 'title-guide': utilityReturn = 'title'; screen = 'guide'; setToast(''); break;
+    case 'title-settings': utilityReturn = 'title'; screen = 'settings'; setToast(''); break;
+    case 'title-record': utilityReturn = 'title'; screen = 'save'; setToast(''); break;
+    case 'nav-guide': utilityReturn = 'home'; screen = 'guide'; setToast(''); break;
+    case 'nav-settings': utilityReturn = 'home'; screen = 'settings'; setToast(''); break;
+    case 'utility-back': screen = utilityReturn; setToast(''); break;
+    case 'tutorial-next':
+      if (tutorialStep < 2) tutorialStep++;
+      else { G.ui.onboardingSeen = true; save(); screen = tutorialExit; }
+      break;
+    case 'tutorial-skip':
+      G.ui.onboardingSeen = true;
+      save();
+      screen = tutorialExit;
+      break;
+    case 'tutorial-replay': tutorialStep = 0; tutorialExit = 'guide'; screen = 'tutorial'; break;
+    case 'setting-motion':
+      G.ui.reducedMotion = !G.ui.reducedMotion;
+      save();
+      applyUiSettings();
       break;
 
     case 'nav-home': screen = 'home'; setToast(''); break;
@@ -122,9 +242,9 @@ function handleAction(action, arg) {
       setToast('');
       break;
     case 'nav-items': screen = 'items'; itemSel = null; setToast(''); break;
-    case 'nav-save': screen = 'save'; setToast(''); break;
+    case 'nav-save': utilityReturn = 'home'; screen = 'save'; setToast(''); break;
     case 'reset-save':
-      if (confirm('セーブデータを消して最初からやり直しますか?')) { resetSave(); clearRun(); R = null; B = null; screen = 'home'; }
+      if (confirm('セーブデータを消して最初からやり直しますか?')) { resetSave(); clearRun(); R = null; B = null; tutorialStep = 0; screen = 'title'; }
       break;
 
     case 'start-run': screen = 'dungeon'; setToast(''); break;
@@ -181,8 +301,17 @@ function handleAction(action, arg) {
     }
     case 'fusion-exec': {
       if (fusionSel.length !== 2) break;
+      const a = getUnit(fusionSel[0]), b = getUnit(fusionSel[1]);
+      const same = a && b && a.sp === b.sp;
+      const recipe = a && b && !same ? findRecipe(a.sp, b.sp) : null;
+      const wasOwned = recipe ? G.dex[recipe.result] === 2 : true;
       const res = fuseUnits(fusionSel[0], fusionSel[1]);
-      if (res.unit) { fusionResult = res.unit; fusionSel = []; }
+      if (res.unit) {
+        fusionResult = res.unit; fusionSel = [];
+        const species = SPECIES[res.unit.sp];
+        if (same) queueCelebration('star', '重ね成功', `${species.name} ${'★'.repeat(res.unit.star)}`, `札の力が★${res.unit.star}へ上昇した`, '★', species.id);
+        else queueCelebration('fusion', wasOwned ? '憑合成功' : '憑合新種', species.name, `Lv${unitLevel(res.unit)}の新たな妖怪が生まれた`, '🔮', species.id);
+      }
       else setToast(res.err);
       break;
     }
@@ -216,8 +345,13 @@ function handleAction(action, arg) {
     case 'target-enemy': {
       const idx = Number(arg);
       if (captureMode) {
+        const target = B.enemies[idx];
         const r = tryCapture(idx);
         setToast(r.err || '');
+        if (r.ok && target) {
+          const species = SPECIES[target.sp];
+          queueCelebration('capture', '調伏成功', species.name, '新たな仲間が百鬼へ加わった', '🧧', species.id);
+        }
         if (!r.err && (R.fuda < 1 || B.energy < 1)) captureMode = false;
       } else if (selCard !== null) {
         const r = playCard(selCard, idx);
@@ -263,6 +397,10 @@ function handleAction(action, arg) {
         ? `選んだ呪具「${ITEMS[result.id].emoji}${ITEMS[result.id].name}」を手に入れた。体力も少し回復(+4)`
         : `選んだ調伏札を${result.extra}枚手に入れた。体力も少し回復(+4)`;
       E = { kind: 'done', msg };
+      if (result.kind === 'item') {
+        const item = ITEMS[result.id];
+        queueCelebration('item', '呪具入手', item.name, item.desc, item.emoji);
+      }
       break;
     }
 
@@ -303,9 +441,20 @@ function handleAction(action, arg) {
       const [milestoneId, itemId] = String(arg || '').split(':');
       const result = claimRankChoice(milestoneId, itemId);
       setToast(result.ok ? `位階報酬: ${ITEMS[itemId].emoji}${ITEMS[itemId].name}を獲得` : result.err);
+      if (result.ok) {
+        const item = ITEMS[itemId];
+        queueCelebration('item', '位階報酬', item.name, item.desc, item.emoji);
+      }
       break;
     }
   }
+  if (B && B.itemDrop && !B.uiItemCelebrated) {
+    const item = ITEMS[B.itemDrop];
+    queueCelebration('item', B.boss ? '主からの戦利品' : '強敵からの戦利品', item.name, item.desc, item.emoji);
+    B.uiItemCelebrated = true;
+  }
+  queueProgressionUnlocks(progressionBefore);
+  queueDungeonUnlocks(dungeonBefore);
   render();
 }
 
@@ -320,13 +469,40 @@ app.addEventListener('click', (ev) => {
   }
   const t = ev.target.closest('[data-action]');
   if (!t) return;
+  if (t.dataset.action === 'unit-detail') focusReturnSelector = `[data-action="unit-detail"][data-arg="${t.dataset.arg}"]`;
+  else if (t.dataset.action === 'time-help-open') focusReturnSelector = '[data-action="time-help-open"]';
   handleAction(t.dataset.action, t.dataset.arg);
+});
+
+app.addEventListener('keydown', (ev) => {
+  const dialog = document.querySelector && document.querySelector('[role="dialog"]');
+  if (ev.key === 'Escape') {
+    if (celebrationQueue.length && !(B && B.over && screen === 'battle')) handleAction('celebration-dismiss');
+    else if (detailUid !== null) handleAction('unit-detail-close');
+    else if (timeHelpOpen) handleAction('time-help-close');
+    return;
+  }
+  if (ev.key === 'Tab' && dialog && dialog.querySelectorAll) {
+    const focusable = [...dialog.querySelectorAll('button:not(:disabled), [href], input:not(:disabled), textarea:not(:disabled), [tabindex]:not([tabindex="-1"])')];
+    if (focusable.length) {
+      const first = focusable[0], last = focusable[focusable.length - 1];
+      if (ev.shiftKey && document.activeElement === first) { ev.preventDefault(); last.focus(); }
+      else if (!ev.shiftKey && document.activeElement === last) { ev.preventDefault(); first.focus(); }
+    }
+    return;
+  }
+  const target = ev.target.closest && ev.target.closest('[data-action]');
+  if (!target || /^(INPUT|TEXTAREA|SELECT|A)$/.test(target.tagName)) return;
+  if (ev.key === 'Enter' || ev.key === ' ') {
+    ev.preventDefault();
+    handleAction(target.dataset.action, target.dataset.arg);
+  }
 });
 
 // ===== 部品 =====
 function statusBar() {
   const dg = currentDungeon();
-  return `<div class="statusbar">
+  return `<div class="statusbar" aria-label="夜行の状態">
     <span>${dg.emoji} ${R.depth}/${dg.length}</span>
     <span>❤️ ${R.hp}/${R.maxHp}</span>
     <span>🧧 札×${R.fuda}</span>
@@ -340,10 +516,11 @@ function unitCard(u, opts) {
   const cls = ['unit'];
   if (o.selected) cls.push('selected');
   if (o.inDeck) cls.push('indeck');
-  const action = o.action ? `data-action="${o.action}" data-arg="${u.uid}"` : '';
+  if (o.action) cls.push('selectable');
+  const selectButton = o.action ? `<button class="unit-select-hit" type="button" data-action="${o.action}" data-arg="${u.uid}" aria-label="${esc(s.name)}を${o.selected ? '選択解除' : '選択'}"></button>` : '';
   const itemMark = u.item && ITEMS[u.item] ? ` ${ITEMS[u.item].emoji}` : '';
   const badge = o.badge || (o.selected ? (o.selectedLabel || '選択中') : '');
-  return `<div class="${cls.join(' ')}" ${action}>
+  return `<div class="${cls.join(' ')}">${selectButton}
     <div class="unit-top"><button class="unit-art-btn" type="button" data-action="unit-detail" data-arg="${u.uid}" aria-label="${esc(s.name)}のイラストを拡大"><span class="unit-emoji">${artHtml(s.id, s.emoji)}</span><span class="zoom-mark" aria-hidden="true">＋</span></button>${elemChip(s.element)}<span class="cost">◆${effCost(u)}</span></div>
     <div class="unit-name">${esc(s.name)}${starText(u)}</div>
     <div class="unit-lv">Lv${unitLevel(u)} ${s.role}${itemMark}</div>
@@ -358,7 +535,7 @@ function unitDetailHtml() {
   const s = SPECIES[u.sp];
   const item = u.item && ITEMS[u.item];
   return `<div class="unit-detail-overlay" data-detail-backdrop role="presentation">
-    <section class="unit-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="unit-detail-title">
+    <section class="unit-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="unit-detail-title" tabindex="-1">
       <button class="unit-detail-close" type="button" data-action="unit-detail-close" aria-label="閉じる">×</button>
       <div class="unit-detail-art">${artHtml(s.id, s.emoji)}</div>
       <h2 id="unit-detail-title">${esc(s.name)}${starText(u)}</h2>
@@ -376,7 +553,22 @@ function unitDetailHtml() {
   </div>`;
 }
 
-function toastHtml() { return toast ? `<div class="toast">${esc(toast)}</div>` : ''; }
+function screenHeader(kicker, title, subtitle, meta) {
+  return `<header class="screen-header">
+    <div class="screen-heading"><p>${esc(kicker)}</p><h1>${esc(title)}</h1>${subtitle ? `<span>${esc(subtitle)}</span>` : ''}</div>
+    ${meta ? `<div class="screen-meta">${meta}</div>` : ''}
+  </header>`;
+}
+
+function sectionHeader(title, meta, description) {
+  return `<div class="section-header"><div><h2>${esc(title)}</h2>${description ? `<p>${esc(description)}</p>` : ''}</div>${meta ? `<strong>${meta}</strong>` : ''}</div>`;
+}
+
+function backActions(action, label, extra) {
+  return `<div class="screen-actions">${extra || ''}<button class="btn btn-primary" type="button" data-action="${action}">${esc(label)}</button></div>`;
+}
+
+function toastHtml() { return toast ? `<div class="toast" role="status" aria-live="polite">${esc(toast)}</div>` : ''; }
 
 function timeContextHtml(context) {
   return `<button class="time-context" type="button" data-action="time-help-open" aria-haspopup="dialog" aria-label="現在の時間帯と月相。タップして出現の変化を見る">
@@ -406,7 +598,7 @@ function timeHelpHtml() {
   const loreHtml = conditioned.map(s => `<li><strong>${esc(encounterConditionText(s))}：${esc(s.name)}</strong><span>${esc(s.encounter.hint)}</span></li>`).join('');
 
   return `<div class="unit-detail-overlay time-help-overlay" data-time-help-backdrop role="presentation">
-    <section class="unit-detail-dialog time-help-dialog" role="dialog" aria-modal="true" aria-labelledby="time-help-title">
+    <section class="unit-detail-dialog time-help-dialog" role="dialog" aria-modal="true" aria-labelledby="time-help-title" tabindex="-1">
       <button class="unit-detail-close" type="button" data-action="time-help-close" aria-label="閉じる">×</button>
       <div class="time-help-heading"><span aria-hidden="true">${context.moonPhase.icon}</span><div><small>現在の空模様</small><h2 id="time-help-title">${esc(context.timeBand.name)}・${esc(context.moonPhase.name)}</h2></div></div>
       <p class="time-help-lead">時間帯と月相によって、夜行で出会う妖怪の傾向が変わる。</p>
@@ -456,12 +648,15 @@ function renderTitle() {
   const pendingRun = peekRun();
   const st = G.stats;
   const hasProgress = st.runs > 0 || st.clears > 0 || st.captures > 0 || st.fusions > 0;
-  const buttonText = pendingRun ? '🌙 夜行を再開' : (hasProgress ? '記録から続ける' : '調伏の夜をはじめる');
+  const isNew = !G.ui.onboardingSeen && !hasProgress;
+  const buttonText = pendingRun ? '🌙 夜行を再開' : (isNew ? 'はじめる' : '続きから');
   const buttonSub = pendingRun
     ? `${DUNGEONS[pendingRun.r.dungeon].name} ${pendingRun.r.depth}/${DUNGEONS[pendingRun.r.dungeon].length}歩`
-    : (hasProgress ? `図鑑 ${dexOwnedCount()}/${Object.keys(SPECIES).length}　踏破 ${st.clears}` : '最初の夜行は「宵の小径」から');
-  app.innerHTML = `<main class="title-screen time-${time.timeBand.id}" data-time-band="${time.timeBand.id}">
+    : (isNew ? '百鬼を率いる最初の夜へ' : `図鑑 ${dexOwnedCount()}/${Object.keys(SPECIES).length}　踏破 ${st.clears}`);
+  const stateLabel = pendingRun ? '夜行の途中' : (isNew ? '新しい記録' : `位階「${currentProgressionRank(G).name}」`);
+  app.innerHTML = `<main class="title-screen time-${time.timeBand.id}" data-screen="title" data-time-band="${time.timeBand.id}">
     <div class="title-moon" aria-hidden="true"></div>
+    <div class="title-stars" aria-hidden="true"></div>
     <div class="title-art" aria-hidden="true">
       <span class="title-art-side">${artHtml('karakasa', '☂️')}</span>
       <span class="title-art-main">${artHtml('onibi', '🔥')}</span>
@@ -469,7 +664,7 @@ function renderTitle() {
     </div>
     <section class="title-copy" aria-labelledby="game-title">
       <p class="title-kicker">妖怪デッキ構築ローグライト</p>
-      <h1 id="game-title">百鬼調伏録</h1>
+      <div class="title-logo"><span aria-hidden="true">百</span><h1 id="game-title">百鬼調伏録</h1></div>
       <p class="title-reading">ひゃっきちょうぶくろく</p>
       <p class="title-tagline">倒すか、従えるか。百鬼を率いて夜を往け。</p>
     </section>
@@ -479,12 +674,88 @@ function renderTitle() {
       <div><span>🔮</span><strong>集めて憑合</strong><small>組み合わせから新たな妖怪へ</small></div>
     </div>
     <div class="title-actions">
+      <p class="title-state">${stateLabel}</p>
       <button class="title-enter-btn" type="button" data-action="title-enter">
         <span>${buttonText}</span><small>${buttonSub}</small>
       </button>
-      <p>自動保存・完全オフライン対応予定</p>
+      <nav class="title-menu" aria-label="タイトルメニュー">
+        <button type="button" data-action="title-guide">遊び方</button>
+        <button type="button" data-action="title-record">記録</button>
+        <button type="button" data-action="title-settings">設定</button>
+      </nav>
+      <p class="title-autosave">自動保存・インストール対応 ・ v${APP_VERSION}</p>
     </div>
   </main>`;
+}
+
+function renderTutorial() {
+  const slides = [
+    {
+      mark: '一', title: '百鬼と歩む夜へ', lead: 'あなたは、荒ぶる妖怪を鎮めて仲間にする調伏師。',
+      body: '手持ち妖怪の札で夜道を進み、出会った百鬼を率いて図鑑を埋めよう。',
+      art: `<div class="tutorial-party" aria-hidden="true"><span>${artHtml('karakasa', '☂️')}</span><span>${artHtml('onibi', '🔥')}</span><span>${artHtml('tanuki', '🦝')}</span></div>`,
+    },
+    {
+      mark: '二', title: '弱らせて調伏', lead: '敵のHPを30%以下まで減らすと、調伏の好機。',
+      body: '「調伏札」を選び、黄色く光る妖怪をタップしよう。倒してしまう前の見極めが肝心。',
+      art: `<div class="tutorial-capture" aria-hidden="true"><span>${artHtml('chochin', '🏮')}</span><div><b>HP 3 / 12</b><i><em></em></i><strong>🧧 調伏可 83%</strong></div></div>`,
+    },
+    {
+      mark: '三', title: '憑合で新たな妖怪へ', lead: '仲間が増えたら、拠点の「憑合」で二体を組み合わせよう。',
+      body: '同じ妖怪は★が上がり、異なる妖怪からは新種が生まれる。組み合わせも図鑑に残る。',
+      art: `<div class="tutorial-fusion" aria-hidden="true"><span>${artHtml('onibi', '🔥')}</span><b>×</b><span>${artHtml('tanuki', '🦝')}</span><b>→</b><span>${artHtml('kyubi', '🦊')}</span></div>`,
+    },
+  ];
+  const slide = slides[tutorialStep] || slides[0];
+  const last = tutorialStep === slides.length - 1;
+  app.innerHTML = `<main class="tutorial-screen">
+    <section class="tutorial-panel" aria-labelledby="tutorial-title">
+      <div class="tutorial-progress" aria-label="全${slides.length}頁中${tutorialStep + 1}頁">
+        ${slides.map((_, i) => `<span class="${i === tutorialStep ? 'active' : ''}">${i + 1}</span>`).join('')}
+      </div>
+      <p class="tutorial-mark">其ノ${slide.mark}</p>
+      <h1 id="tutorial-title">${slide.title}</h1>
+      ${slide.art}
+      <p class="tutorial-lead">${slide.lead}</p>
+      <p class="tutorial-body">${slide.body}</p>
+      <div class="tutorial-actions">
+        <button class="btn" type="button" data-action="tutorial-skip">${tutorialExit === 'guide' ? '遊び方へ戻る' : 'スキップ'}</button>
+        <button class="btn btn-primary" type="button" data-action="tutorial-next">${last ? (tutorialExit === 'guide' ? '確認を終える' : '拠点へ向かう') : '次へ'}</button>
+      </div>
+    </section>
+  </main>`;
+}
+
+function renderGuide() {
+  app.innerHTML = `<main class="utility-screen"><div class="screen utility-content">
+    <p class="utility-kicker">調伏師の手引き</p>
+    <h1 class="h2">遊び方</h1>
+    <div class="guide-grid">
+      <article><span>🌙</span><div><strong>夜行へ出る</strong><p>分かれ道を選び、戦闘や茶屋を経て10歩目の主を目指す。</p></div></article>
+      <article><span>🧧</span><div><strong>弱らせて調伏</strong><p>敵HP30%以下で調伏可能。黄色の「調伏可」が目印。</p></div></article>
+      <article><span>🔮</span><div><strong>仲間を憑合</strong><p>同種は★上昇、異種は新種へ。完成予定Lvを確認して実行する。</p></div></article>
+    </div>
+    <section class="first-night-route" aria-labelledby="first-night-title">
+      <h2 id="first-night-title">最初の一夜</h2>
+      <ol><li>拠点で「夜行に出る」</li><li>「宵の小径」を選ぶ</li><li>戦闘で敵をHP30%以下へ</li><li>調伏札を選び、敵をタップ</li></ol>
+    </section>
+    <div class="btn-row"><button class="btn" type="button" data-action="tutorial-replay">3画面の導入を再確認</button></div>
+    <div class="btn-row"><button class="btn btn-primary" type="button" data-action="utility-back">${utilityReturn === 'title' ? 'タイトルへ戻る' : '拠点へ戻る'}</button></div>
+  </div></main>`;
+}
+
+function renderSettings() {
+  const reduced = !!G.ui.reducedMotion;
+  app.innerHTML = `<main class="utility-screen"><div class="screen utility-content">
+    <p class="utility-kicker">環境設定</p>
+    <h1 class="h2">設定</h1>
+    <section class="setting-card">
+      <div><strong>画面の演出</strong><p>光の呼吸やボタンの動きを抑える。端末の「視差効果を減らす」設定も自動で尊重する。</p></div>
+      <button class="btn ${reduced ? 'btn-active' : ''}" type="button" data-action="setting-motion" aria-pressed="${reduced ? 'true' : 'false'}">${reduced ? '✓ 演出を減らす' : '標準の演出'}</button>
+    </section>
+    <section class="setting-card"><div><strong>保存について</strong><p>操作の節目でこの端末へ自動保存する。端末を移る場合は「記録」の引継ぎコードを利用する。</p></div></section>
+    <div class="btn-row"><button class="btn btn-primary" type="button" data-action="utility-back">${utilityReturn === 'title' ? 'タイトルへ戻る' : '拠点へ戻る'}</button></div>
+  </div></main>`;
 }
 
 function renderHome() {
@@ -495,38 +766,50 @@ function renderHome() {
   const unclaimedCount = unclaimedAchievementRewardIds(G).length;
   const rank = currentProgressionRank(G);
   const ending = finalTrialCleared(G);
+  const firstNight = st.runs === 0;
   const rosterHtml = G.roster.map(u => unitCard(u, { inDeck: G.deck.includes(u.uid) })).join('');
   app.innerHTML = `<main class="home-time-shell time-${time.timeBand.id} ${ending ? 'ending-unlocked' : ''}" data-time-band="${time.timeBand.id}"><div class="screen home">
-    <h1 class="title">${ending ? '百鬼調伏録・暁' : '百鬼調伏録'}</h1>
-    <p class="subtitle">${ending ? '大調伏師として、明けた夜をさらに歩め' : '妖怪を調伏し、百鬼の図鑑を埋めよ'}</p>
+    <header class="home-hero"><p>調伏師の拠点</p><h1>${ending ? '百鬼調伏録・暁' : '百鬼調伏録'}</h1><span>${ending ? '大調伏師として、明けた夜をさらに歩め' : '妖怪を調伏し、百鬼の図鑑を埋めよ'}</span></header>
     ${ending ? '<div class="ending-home-banner">🌅 百鬼の試練 踏破済み — 称号「大調伏師」</div>' : ''}
     ${timeContextHtml(time)}
-    <div class="stats-line">位階 ${rank.value}/${rank.max}「${rank.name}」 | 図鑑 ${dexOwnedCount()}/${Object.keys(SPECIES).length} | 出撃${st.runs} / 踏破${st.clears} / 調伏${st.captures} / 憑合${st.fusions}</div>
-    ${progressionGoalHtml()}
-    <div class="btn-row">
-      <button class="btn btn-primary btn-big" data-action="start-run">🌙 夜行に出る</button>
-    </div>
-    <div class="btn-row">
-      <button class="btn" data-action="nav-deck">編成 (${G.deck.length}/${DECK_MAX})</button>
-      <button class="btn" data-action="nav-fusion">憑合</button>
-      <button class="btn" data-action="nav-items">呪具 (${itemTotal()})</button>
-      <button class="btn" data-action="nav-dex">図鑑</button>
-      <button class="btn achievement-home-btn" data-action="nav-achievements">🏆 実績 ${achievementCount}/${ACHIEVEMENTS.length}${unseenCount ? `<span class="achievement-new">NEW ${unseenCount}</span>` : ''}${unclaimedCount ? `<span class="achievement-claimable">受取 ${unclaimedCount}</span>` : ''}</button>
-      <button class="btn" data-action="nav-ranks">🎖️ 位階 ${rank.value}/${rank.max}</button>
-      <button class="btn" data-action="nav-save">記録</button>
-    </div>
-    <h2 class="h2">手持ち妖怪 (${G.roster.length})</h2>
+    <div class="home-summary" aria-label="進行状況"><span><small>位階</small><strong>${rank.name}</strong><b>${rank.value}/${rank.max}</b></span><span><small>図鑑</small><strong>${dexOwnedCount()}/${Object.keys(SPECIES).length}</strong><b>使役</b></span><span><small>夜行</small><strong>${st.clears}</strong><b>踏破</b></span><span><small>調伏</small><strong>${st.captures}</strong><b>体</b></span></div>
+    <section class="home-primary-panel">
+      ${progressionGoalHtml()}
+      ${firstNight ? '<aside class="first-night-callout"><span>一</span><div><strong>まずは最初の夜行へ</strong><p>準備は整っている。「宵の小径」で調伏を一度試してみよう。</p></div></aside>' : ''}
+      <div class="btn-row">
+      <button class="btn btn-primary btn-big ${firstNight ? 'first-night-action' : ''}" data-action="start-run">🌙 ${firstNight ? '最初の夜行へ' : '夜行に出る'}</button>
+      </div>
+    </section>
+    ${sectionHeader('支度と記録', '', '夜行前の準備や集めた記録を確認')}
+    <nav class="dashboard-grid" aria-label="拠点メニュー">
+      <button data-action="nav-deck"><span>🎴</span><strong>編成</strong><small>${G.deck.length}/${DECK_MAX}枚</small></button>
+      <button data-action="nav-fusion"><span>🔮</span><strong>憑合</strong><small>新種・重ね</small></button>
+      <button data-action="nav-items"><span>🧿</span><strong>呪具</strong><small>所持${itemTotal()}</small></button>
+      <button data-action="nav-dex"><span>📖</span><strong>図鑑</strong><small>${dexOwnedCount()}/${Object.keys(SPECIES).length}</small></button>
+      <button class="achievement-home-btn" data-action="nav-achievements"><span>🏆</span><strong>実績</strong><small>${achievementCount}/${ACHIEVEMENTS.length}${unseenCount ? `・NEW ${unseenCount}` : ''}${unclaimedCount ? `・受取 ${unclaimedCount}` : ''}</small></button>
+      <button data-action="nav-ranks"><span>🎖️</span><strong>位階</strong><small>${rank.value}/${rank.max}</small></button>
+      <button data-action="nav-guide"><span>📜</span><strong>遊び方</strong><small>手引き</small></button>
+      <button data-action="nav-settings"><span>⚙️</span><strong>設定</strong><small>演出</small></button>
+      <button data-action="nav-save"><span>💾</span><strong>記録</strong><small>引継ぎ</small></button>
+    </nav>
+    ${sectionHeader('手持ち妖怪', `${G.roster.length}体`, 'イラストをタップすると詳細を表示')}
     <div class="grid">${rosterHtml}</div>
     ${toastHtml()}
   </div></main>`;
 }
 
 function renderDungeon() {
+  const firstNight = G.stats.runs === 0;
   const cards = DUNGEON_ORDER.map(id => {
     const dg = DUNGEONS[id];
     const unlocked = dungeonUnlocked(id);
     const clears = G.dungeonClears[id] || 0;
-    return `<div class="node-card ${unlocked ? '' : 'locked'}" data-action="choose-dungeon" data-arg="${id}" aria-disabled="${unlocked ? 'false' : 'true'}">
+    const recommended = firstNight && id === 'd1';
+    const classes = ['node-card'];
+    if (!unlocked) classes.push('locked');
+    if (recommended) classes.push('recommended');
+    return `<div class="${classes.join(' ')}" data-action="choose-dungeon" data-arg="${id}" role="button" tabindex="${unlocked ? '0' : '-1'}" aria-label="${esc(dg.name)}${unlocked ? 'へ出撃' : '、未解放'}" aria-disabled="${unlocked ? 'false' : 'true'}">
+      ${recommended ? '<div class="recommended-label">最初はここ</div>' : ''}
       <div class="node-emoji">${unlocked ? dg.emoji : '🔒'}</div>
       <div class="node-name">${unlocked ? dg.name : '???'}</div>
       <div class="node-desc">${unlocked
@@ -534,12 +817,12 @@ function renderDungeon() {
         : `${DUNGEONS[dg.unlock].name}を踏破すると開通`}</div>
     </div>`;
   }).join('');
-  app.innerHTML = `<div class="screen">
-    <h2 class="h2">夜行 — 行き先を選ぶ</h2>
-    <p class="hint">術士の最大HP: ${runMaxHp()}(ダンジョン踏破ごとに+15)</p>
-    ${progressionGoalHtml('dungeon', true)}
+  app.innerHTML = `<div class="screen screen-shell dungeon-screen" data-screen="dungeon">
+    ${screenHeader('夜行', '行き先を選ぶ', 'ダンジョン踏破ごとに+15、次の道も解放', `<span>❤️ 最大${runMaxHp()}</span>`)}
+    <section class="content-panel goal-panel">${progressionGoalHtml('dungeon', true)}</section>
+    ${sectionHeader('夜路', `${DUNGEON_ORDER.filter(dungeonUnlocked).length}/${DUNGEON_ORDER.length}開通`, '挑む場所を選択')}
     <div class="node-row dungeon-row">${cards}</div>
-    <div class="btn-row"><button class="btn" data-action="nav-home">拠点へ戻る</button></div>
+    ${backActions('nav-home', '拠点へ戻る')}
     ${toastHtml()}
   </div>`;
 }
@@ -550,11 +833,12 @@ function renderDeck() {
     selected: G.deck.includes(u.uid),
     badge: G.deck.includes(u.uid) ? '出撃' : '',
   })).join('');
-  app.innerHTML = `<div class="screen">
-    <h2 class="h2">編成 — ${G.deck.length}/${DECK_MAX}枚(最低${deckMinSize()}枚)</h2>
-    <p class="hint">タップでデッキに出し入れ</p>
+  app.innerHTML = `<div class="screen screen-shell deck-screen" data-screen="deck">
+    ${screenHeader('夜行支度', '編成', '妖怪をタップして出撃札を入れ替える', `<span>${G.deck.length}/${DECK_MAX}枚</span>`)}
+    <section class="content-panel deck-summary"><div><strong>出撃 ${G.deck.length}枚</strong><span>最低${deckMinSize()}枚・最大${DECK_MAX}枚</span></div><div class="deck-meter" role="progressbar" aria-label="編成枚数" aria-valuemin="${deckMinSize()}" aria-valuemax="${DECK_MAX}" aria-valuenow="${G.deck.length}"><span style="width:${Math.round(G.deck.length / DECK_MAX * 100)}%"></span></div></section>
+    ${sectionHeader('手持ちから選ぶ', '「出撃」が編成中', 'イラストの＋は詳細、カード本体は編成切替')}
     <div class="grid">${rosterHtml}</div>
-    <div class="btn-row"><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
+    ${backActions('nav-home', '編成を終える')}
     ${toastHtml()}
   </div>`;
 }
@@ -608,13 +892,14 @@ function renderFusion() {
     const rs = SPECIES[r.result];
     return `<li>${a.emoji}${a.name} × ${b.emoji}${b.name} → ${known ? rs.emoji + rs.name : '???'}</li>`;
   }).join('');
-  app.innerHTML = `<div class="screen">
-    <h2 class="h2">憑合(ひょうごう)</h2>
-    ${progressionGoalHtml('fusion', true)}
-    ${preview}
+  app.innerHTML = `<div class="screen screen-shell fusion-screen" data-screen="fusion">
+    ${screenHeader('妖怪の組み合わせ', '憑合', '2体を選び、新種または★上昇へ', `<span>${fusionSel.length}/2体選択</span>`)}
+    <section class="content-panel goal-panel">${progressionGoalHtml('fusion', true)}</section>
+    <section class="fusion-workbench" aria-live="polite">${preview}</section>
+    ${sectionHeader('素材を選ぶ', `${fusionSel.length}/2`, '選択中の妖怪には金の表示')}
     <div class="grid">${rosterHtml}</div>
     <details class="recipes"><summary>言い伝え(レシピヒント)</summary><ul>${hints}</ul></details>
-    <div class="btn-row"><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
+    ${backActions('nav-home', '憑合を終える')}
     ${toastHtml()}
   </div>`;
 }
@@ -636,13 +921,14 @@ function renderItems() {
     selected: !!u.item,
     selectedLabel: '装備中',
   })).join('');
-  app.innerHTML = `<div class="screen">
-    <h2 class="h2">呪具 — 妖怪1体に1つ装備</h2>
-    <p class="hint">呪具をタップ→妖怪をタップで装備。装備中の妖怪をそのままタップではずす。強戦闘・ボス・宝で手に入る</p>
+  app.innerHTML = `<div class="screen screen-shell items-screen" data-screen="items">
+    ${screenHeader('夜行支度', '呪具', '妖怪1体につき1つ装備', `<span>袋 ${itemTotal()}個</span>`)}
+    <section class="content-panel instruction-panel"><strong>装備手順</strong><p>① 呪具を選ぶ　② 妖怪を選ぶ。装備中の妖怪を選ぶとはずせる。</p></section>
+    ${sectionHeader('呪具袋', `${itemTotal()}個`, '強戦闘・ボス・宝で入手')}
     <div class="grid">${inv}</div>
-    <h2 class="h2">手持ち妖怪</h2>
+    ${sectionHeader('装備する妖怪', `${G.roster.filter(u => u.item).length}体が装備中`, itemSel && ITEMS[itemSel] ? `${ITEMS[itemSel].name}の装備先を選択` : '先に呪具を選択')}
     <div class="grid">${rosterHtml}</div>
-    <div class="btn-row"><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
+    ${backActions('nav-home', '装備を終える')}
     ${toastHtml()}
   </div>`;
 }
@@ -678,12 +964,14 @@ function renderDex() {
       ${conditionHint}
     </div>`;
   }).join('');
-  app.innerHTML = `<div class="screen">
-    <h2 class="h2">図鑑 — 使役 ${dexOwnedCount()}/${Object.keys(SPECIES).length}</h2>
-    <p class="hint">🏮宵の小径 🌫️深山の霧道 ⛩️百鬼の御堂</p>
-    ${progressionGoalHtml('dex', true)}
+  const seenCount = Object.values(G.dex).filter(v => v >= 1).length;
+  app.innerHTML = `<div class="screen screen-shell dex-screen" data-screen="dex">
+    ${screenHeader('百鬼の記録', '妖怪図鑑', '出会いと使役の記録', `<span>使役 ${dexOwnedCount()}/${Object.keys(SPECIES).length}</span>`)}
+    <div class="collection-summary"><span><small>使役</small><strong>${dexOwnedCount()}</strong></span><span><small>目撃以上</small><strong>${seenCount}</strong></span><span><small>全妖怪</small><strong>${Object.keys(SPECIES).length}</strong></span></div>
+    <section class="content-panel goal-panel">${progressionGoalHtml('dex', true)}</section>
+    ${sectionHeader('妖怪一覧', '', '🏮宵の小径　🌫️深山の霧道　⛩️百鬼の御堂')}
     <div class="grid">${items}</div>
-    <div class="btn-row"><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
+    ${backActions('nav-home', '図鑑を閉じる')}
     ${toastHtml()}
   </div>`;
 }
@@ -707,12 +995,13 @@ function renderAchievements() {
       <div class="achievement-card-foot">${rewardHtml}</div>
     </article>`;
   }).join('');
-  app.innerHTML = `<div class="screen achievements-screen">
-    <h2 class="h2">🏆 実績</h2>
-    <p class="hint">達成 ${unlockedCount}/${ACHIEVEMENTS.length}　報酬 ${claimedCount}/${rewardCount}受取済み</p>
-    <p class="achievement-guide">実績と報酬は最初からすべて確認できる。図鑑の節目報酬は、受け取った次の夜行から調伏札へ反映される。</p>
+  app.innerHTML = `<div class="screen screen-shell achievements-screen" data-screen="achievements">
+    ${screenHeader('調伏師の歩み', '実績', '達成条件と恒久報酬', `<span>${unlockedCount}/${ACHIEVEMENTS.length}達成</span>`)}
+    <div class="collection-summary"><span><small>達成</small><strong>${unlockedCount}</strong></span><span><small>未達成</small><strong>${ACHIEVEMENTS.length - unlockedCount}</strong></span><span><small>報酬受取</small><strong>${claimedCount}/${rewardCount}</strong></span></div>
+    <p class="achievement-guide">実績と報酬は最初から確認可能。図鑑の節目報酬は、受け取った次の夜行から調伏札へ反映される。</p>
+    ${sectionHeader('実績一覧', '', '条件、進捗、報酬を確認')}
     <div class="achievement-list">${items}</div>
-    <div class="btn-row"><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
+    ${backActions('nav-home', '実績を閉じる')}
     ${toastHtml()}
   </div>`;
 }
@@ -731,29 +1020,27 @@ function renderRanks() {
       <span class="rank-number">${status.done ? '✓' : index + 1}</span><div><strong>${esc(status.name)}</strong><p>${esc(status.description)}</p><small>解放: ${esc(status.reward)}</small>${choiceHtml}</div>
     </article>`;
   }).join('');
-  app.innerHTML = `<div class="screen ranks-screen">
-    <h2 class="h2">🎖️ 調伏師位階</h2>
+  app.innerHTML = `<div class="screen screen-shell ranks-screen" data-screen="ranks">
+    ${screenHeader('調伏師の歩み', '調伏師位階', '節目ごとの解放と報酬', `<span>${rank.value}/${rank.max}節目</span>`)}
     <div class="rank-current"><small>現在の位階</small><strong>${rank.name}</strong><span>${rank.value}/${rank.max}節目</span></div>
-    ${progressionGoalHtml(null, true)}
+    <section class="content-panel goal-panel">${progressionGoalHtml(null, true)}</section>
     <p class="achievement-guide">既存のHP成長、ダンジョン・式神代行・図鑑報酬もここで振り返れる。節目は異なる順で達成しても失われない。</p>
+    ${sectionHeader('位階の節目', '', '達成順にかかわらず記録される')}
     <div class="rank-list">${rows}</div>
-    <div class="btn-row"><button class="btn" data-action="nav-achievements">実績と報酬</button><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
+    ${backActions('nav-home', '位階を閉じる', '<button class="btn" data-action="nav-achievements">実績と報酬</button>')}
     ${toastHtml()}
   </div>`;
 }
 
 function renderSave() {
-  app.innerHTML = `<div class="screen">
-    <h2 class="h2">記録(セーブ引継ぎ)</h2>
-    <p class="hint">iPhoneのSafariは長期間開かないとデータが消えることがある。引継ぎコードを控えておくと安心。</p>
-    <h3 class="h3">書き出し</h3>
-    <textarea id="export-text" class="save-text" readonly>${exportSave()}</textarea>
-    <div class="btn-row"><button class="btn btn-small" data-action="save-select">全選択(コピーして保管)</button></div>
-    <h3 class="h3">読み込み</h3>
-    <textarea id="import-text" class="save-text" placeholder="引継ぎコードを貼り付け"></textarea>
-    <div class="btn-row"><button class="btn btn-primary" data-action="save-import">引継ぎコードを読み込む</button></div>
-    <div class="footer"><button class="btn btn-danger btn-small" data-action="reset-save">データ初期化</button></div>
-    <div class="btn-row"><button class="btn btn-primary" data-action="nav-home">拠点へ戻る</button></div>
+  const backLabel = utilityReturn === 'title' ? 'タイトルへ戻る' : '拠点へ戻る';
+  app.innerHTML = `<div class="screen screen-shell save-screen" data-screen="save">
+    ${screenHeader('端末の記録', 'セーブ・引継ぎ', '進行は操作の節目で自動保存', '<span>HYAKKI1</span>')}
+    <section class="content-panel save-note"><strong>大切な記録を控える</strong><p>iPhoneのSafariは長期間開かないとデータが消えることがある。引継ぎコードを別の場所へ保管すると安心。</p></section>
+    <section class="save-card"><div><span>1</span><h2>書き出し</h2><p>現在の手持ちと進行をコードにする</p></div><textarea id="export-text" class="save-text" readonly aria-label="書き出し用引継ぎコード">${exportSave()}</textarea><button class="btn" data-action="save-select">全選択してコピー用にする</button></section>
+    <section class="save-card"><div><span>2</span><h2>読み込み</h2><p>別端末で控えたコードを復元する</p></div><textarea id="import-text" class="save-text" placeholder="引継ぎコードを貼り付け" aria-label="読み込む引継ぎコード"></textarea><button class="btn btn-primary" data-action="save-import">引継ぎコードを読み込む</button></section>
+    <section class="danger-zone"><div><strong>最初からやり直す</strong><p>手持ち、図鑑、実績をすべて初期状態へ戻す。</p></div><button class="btn btn-danger" data-action="reset-save">データを初期化</button></section>
+    ${backActions('utility-back', backLabel)}
     ${toastHtml()}
   </div>`;
 }
@@ -761,18 +1048,19 @@ function renderSave() {
 function renderNode() {
   const opts = nodeOpts.map((o, i) => {
     const info = NODE_INFO[o.type];
-    return `<div class="node-card" data-action="choose-node" data-arg="${i}">
+    return `<div class="node-card route-card" data-action="choose-node" data-arg="${i}" role="button" tabindex="0">
+      <div class="route-number">道 ${i + 1}</div>
       <div class="node-emoji">${info.emoji}</div>
       <div class="node-name">${info.name}</div>
       <div class="node-desc">${info.desc}</div>
     </div>`;
   }).join('');
-  app.innerHTML = `<div class="screen">
+  app.innerHTML = `<div class="screen screen-shell node-screen" data-screen="node">
     ${statusBar()}
-    <h2 class="h2">${currentDungeon().name} — ${R.depth + 1}歩目</h2>
-    <p class="hint">進む道を選べ</p>
+    ${screenHeader('夜行の分かれ道', currentDungeon().name, `${R.depth + 1}歩目 / 全${currentDungeon().length}歩`, '<span>道を1つ選択</span>')}
+    ${sectionHeader('進む道', '', '選んだ先へ進むと戻れない')}
     <div class="node-row">${opts}</div>
-    <div class="btn-row"><button class="btn btn-danger btn-small" data-action="abandon-run">夜行を諦める</button></div>
+    <div class="run-danger-action"><button class="btn btn-danger" data-action="abandon-run">夜行を諦めて帰る</button></div>
     ${toastHtml()}
   </div>`;
 }
@@ -797,7 +1085,7 @@ function renderEvent() {
       <p>${esc(E.msg)}</p>
       <div class="btn-row"><button class="btn btn-primary" data-action="event-continue">先へ進む</button></div>`;
   }
-  app.innerHTML = `<div class="screen center">${statusBar()}${body}${toastHtml()}</div>`;
+  app.innerHTML = `<div class="screen screen-shell event-screen" data-screen="event">${statusBar()}${screenHeader('夜行の出来事', E.kind === 'rest' ? '茶屋' : '道中の発見', '選択して夜行を続ける', '')}<section class="event-card">${body}</section>${toastHtml()}</div>`;
 }
 
 function enemyHtml(e, idx) {
@@ -814,7 +1102,8 @@ function enemyHtml(e, idx) {
     e.weak > 0 ? `<span class="weakened">弱${e.weak}</span>` : '',
     e.rage > 0 ? `<span class="rage">怒×${e.rage}</span>` : '',
   ].filter(Boolean).join(' ');
-  return `<div class="${cls.join(' ')}" data-action="target-enemy" data-arg="${idx}">
+  const actionLabel = dead ? `${e.name}、${e.state === 'captured' ? '調伏済み' : '討伐済み'}` : `${e.name}、HP${e.hp}/${e.maxHp}${capturable ? `、調伏可能${captureRate(e)}パーセント` : ''}`;
+  return `<div class="${cls.join(' ')}" data-action="target-enemy" data-arg="${idx}" role="button" tabindex="${dead ? '-1' : '0'}" aria-disabled="${dead ? 'true' : 'false'}" aria-label="${esc(actionLabel)}">
     <div class="enemy-emoji">${artHtml(e.art, e.emoji)}</div>
     <div class="enemy-name">${esc(e.name)} ${elemChip(e.element)}</div>
     ${dead
@@ -829,13 +1118,15 @@ function enemyHtml(e, idx) {
 
 function renderBattle() {
   const enemies = B.enemies.map((e, i) => enemyHtml(e, i)).join('');
+  const firstCaptureGuide = G.stats.captures === 0 && !B.boss;
+  const captureReady = B.enemies.some(e => canCapture(e));
   const hand = B.hand.map(uid => {
     const u = getUnit(uid);
     if (!u) return '';
     const s = SPECIES[u.sp];
     const playable = B.energy >= effCost(u);
     const itemMark = u.item && ITEMS[u.item] ? ITEMS[u.item].emoji : '';
-    return `<div class="hand-card ${selCard === uid ? 'selected' : ''} ${playable ? '' : 'disabled'}" aria-pressed="${selCard === uid ? 'true' : 'false'}"
+    return `<div class="hand-card ${selCard === uid ? 'selected' : ''} ${playable ? '' : 'disabled'}" role="button" tabindex="0" aria-pressed="${selCard === uid ? 'true' : 'false'}" aria-label="${esc(s.name)}の札、霊力${effCost(u)}、${esc(effectText(u))}${playable ? '' : '、霊力不足'}"
       data-action="play-card" data-arg="${uid}">
       <div class="unit-top"><span class="cost">◆${effCost(u)}</span>${elemChip(s.element)}</div>
       <div class="unit-emoji">${artHtml(s.id, s.emoji)}</div>
@@ -852,9 +1143,10 @@ function renderBattle() {
     const caps = B.captured.map(u => `<li>${SPECIES[u.sp].emoji}${SPECIES[u.sp].name} を調伏!</li>`).join('');
     const drop = B.itemDrop && ITEMS[B.itemDrop]
       ? `<p class="drop-line">呪具「${ITEMS[B.itemDrop].emoji}${ITEMS[B.itemDrop].name}」を手に入れた!</p>` : '';
-    overlay = `<div class="overlay" role="presentation"><section class="overlay-box" role="dialog" aria-modal="true" aria-labelledby="battle-result-title">
+    overlay = `<div class="overlay" role="presentation"><section class="overlay-box battle-result-card ${win ? 'win' : 'lose'}" role="dialog" aria-modal="true" aria-labelledby="battle-result-title" tabindex="-1">
+      <div class="result-mark" aria-hidden="true">${win ? '勝' : '敗'}</div>
       <h2 id="battle-result-title">${win ? (B.boss ? '🌅 夜行の主を討った!' : '⭐ 勝利') : '💤 力尽きた…'}</h2>
-      ${win ? `<p>EXP +${B.expGained}(デッキ全員)</p>` : '<p>調伏した妖怪は持ち帰れる。</p>'}
+      ${win ? `<div class="result-summary"><span><small>獲得EXP</small><strong>+${B.expGained}</strong></span><span><small>調伏</small><strong>${B.captured.length}体</strong></span></div>` : '<p class="result-message">調伏した妖怪は持ち帰れる。</p>'}
       ${drop}
       ${caps ? `<ul>${caps}</ul>` : ''}
       ${lvups ? `<ul>${lvups}</ul>` : ''}
@@ -862,15 +1154,19 @@ function renderBattle() {
     </section></div>`;
   }
 
-  app.innerHTML = `<div class="screen battle-screen">
+  app.innerHTML = `<div class="screen battle-screen" data-screen="battle">
     ${statusBar()}
+    ${firstCaptureGuide ? `<aside class="battle-beginner-hint ${captureReady ? 'ready' : ''}"><strong>${captureReady ? '🧧 今が調伏の好機' : '最初の調伏を狙おう'}</strong><span>${captureReady ? '「調伏札」を選び、黄色く光る敵をタップ' : '札で敵のHPを30%以下まで減らす'}</span></aside>` : ''}
     <div class="battle-layout">
       <div class="battle-main">
+        <div class="battle-section-label"><strong>敵妖怪</strong><span>${aliveEnemies().length}体</span></div>
         <div class="enemy-row">${enemies}</div>
-        <div class="log">${B.log.map(l => `<div>${esc(l)}</div>`).join('')}</div>
+        <div class="log" role="log" aria-live="polite" aria-label="戦闘記録"><strong>戦況</strong>${B.log.map(l => `<div>${esc(l)}</div>`).join('')}</div>
       </div>
       <div class="battle-side">
+        <div class="battle-section-label"><strong>手札</strong><span>霊力内で選択</span></div>
         <div class="hand-row">${hand}</div>
+        <div class="battle-section-label action-label"><strong>行動</strong><span>札またはターン終了</span></div>
         <div class="btn-row battle-actions">
           <button class="btn ${captureMode ? 'btn-active' : ''}" data-action="toggle-capture" aria-pressed="${captureMode ? 'true' : 'false'}">${captureMode ? '✓ ' : ''}🧧 調伏札(残${R.fuda})</button>
           ${mercyAvailable() ? `<button class="btn ${B.mercy ? 'btn-active mercy-on' : ''}" data-action="toggle-mercy" aria-pressed="${B.mercy ? 'true' : 'false'}" ${B.boss ? 'disabled' : ''}>🪶 手加減 ${B.boss ? '無効' : (B.mercy ? 'ON' : 'OFF')}</button>` : ''}
@@ -889,30 +1185,35 @@ function renderResume() {
   if (!d) { screen = 'home'; renderHome(); return; }
   const dg = DUNGEONS[d.r.dungeon];
   const inBattle = !!(d.b && !d.b.over);
-  app.innerHTML = `<div class="screen center">
-    <h2 class="h2">🌙 進行中の夜行がある</h2>
-    <p>${dg.emoji} ${dg.name} — ${d.r.depth}/${dg.length}歩 / ❤️ ${d.r.hp}/${d.r.maxHp} / 🧧 札×${d.r.fuda}${inBattle ? '(戦闘中)' : ''}</p>
-    <p class="hint">再開すると${inBattle ? 'そのターンの頭から戦闘の' : '分かれ道から'}続きが遊べる。諦めても調伏済みの妖怪は手元に残る。</p>
-    <div class="btn-row"><button class="btn btn-primary btn-big" data-action="resume-run">夜行を再開する</button></div>
-    <div class="btn-row"><button class="btn btn-danger" data-action="resume-discard">諦めて拠点へ</button></div>
+  app.innerHTML = `<div class="screen result-screen resume-screen" data-screen="resume">
+    <section class="result-page-card"><div class="result-page-icon">🌙</div><p class="utility-kicker">保存された夜行</p><h1>進行中の夜行がある</h1>
+    <div class="run-summary"><strong>${dg.emoji} ${dg.name}</strong><span>${d.r.depth}/${dg.length}歩</span><span>❤️ ${d.r.hp}/${d.r.maxHp}</span><span>🧧 ${d.r.fuda}枚${inBattle ? '・戦闘中' : ''}</span></div>
+    <p class="result-message">再開すると${inBattle ? 'そのターンの頭から戦闘の' : '分かれ道から'}続きが遊べる。諦めても調伏済みの妖怪は手元に残る。</p>
+    <div class="result-actions"><button class="btn btn-primary btn-big" data-action="resume-run">夜行を再開する</button><button class="btn btn-danger" data-action="resume-discard">諦めて拠点へ</button></div></section>
   </div>`;
 }
 
 function renderRunEnd() {
   const caps = R.captured.map(u => `<li>${SPECIES[u.sp].emoji}${SPECIES[u.sp].name}(仲間になった)</li>`).join('');
   const ending = R.clear && R.dungeon === 'trial';
-  app.innerHTML = `<div class="screen center">
-    <h2 class="h2">${ending ? '🌅 百鬼調伏録・結' : (R.clear ? '🌅 夜行踏破!' : '🌙 夜行終了')}</h2>
-    <p>${ending ? '三たび立ちはだかった夜行の主を越え、百鬼を率いる者として本当の夜明けを迎えた。' : (R.clear ? `${currentDungeon().name}の主を討ち、夜が明けた。` : '今宵はここまで。')}</p>
+  app.innerHTML = `<div class="screen result-screen runend-screen" data-screen="runend"><section class="result-page-card ${R.clear ? 'clear' : ''}">
+    <div class="result-page-icon">${ending || R.clear ? '🌅' : '🌙'}</div><p class="utility-kicker">夜行の記録</p>
+    <h1>${ending ? '百鬼調伏録・結' : (R.clear ? '夜行踏破!' : '夜行終了')}</h1>
+    <p class="result-message">${ending ? '三たび立ちはだかった夜行の主を越え、百鬼を率いる者として本当の夜明けを迎えた。' : (R.clear ? `${currentDungeon().name}の主を討ち、夜が明けた。` : '今宵はここまで。')}</p>
     ${ending ? '<div class="ending-title">特別称号「大調伏師」</div><p class="hint">物語の区切り。図鑑や編成、任意の周回はこの先も続けられる。</p>' : ''}
-    ${caps ? `<h3>今宵の調伏</h3><ul class="center-list">${caps}</ul>` : '<p class="hint">今宵の調伏はなし</p>'}
-    <div class="btn-row"><button class="btn btn-primary btn-big" data-action="run-close">拠点へ帰る</button></div>
-  </div>`;
+    <section class="capture-summary"><h2>今宵の調伏</h2>${caps ? `<ul class="center-list">${caps}</ul>` : '<p class="hint">今宵の調伏はなし</p>'}</section>
+    <div class="result-actions"><button class="btn btn-primary btn-big" data-action="run-close">拠点へ帰る</button></div>
+  </section></div>`;
 }
 
 function render() {
+  applyUiSettings();
+  const screenChanged = screen !== lastRenderedScreen;
   switch (screen) {
     case 'title': renderTitle(); break;
+    case 'tutorial': renderTutorial(); break;
+    case 'guide': renderGuide(); break;
+    case 'settings': renderSettings(); break;
     case 'home': renderHome(); break;
     case 'dungeon': renderDungeon(); break;
     case 'deck': renderDeck(); break;
@@ -930,8 +1231,11 @@ function render() {
   }
   if (detailUid !== null) app.innerHTML += unitDetailHtml();
   if (timeHelpOpen) app.innerHTML += timeHelpHtml();
-  if (screen !== 'title') app.innerHTML += achievementNoticeHtml();
-  if (screen !== 'title') app.innerHTML += progressionNoticeHtml();
+  if (!['title', 'tutorial', 'guide', 'settings'].includes(screen)) app.innerHTML += achievementNoticeHtml();
+  if (!['title', 'tutorial', 'guide', 'settings'].includes(screen)) app.innerHTML += progressionNoticeHtml();
+  app.innerHTML += celebrationHtml();
+  applyPostRenderAccessibility(screenChanged);
+  lastRenderedScreen = screen;
 }
 
 load();

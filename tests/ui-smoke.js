@@ -17,7 +17,7 @@ globalThis.document = { getElementById(id) { return id === 'app' ? globalThis.ap
 globalThis.confirm = () => true;
 globalThis.styleCss = fs.readFileSync(path.join(ROOT, 'css/style.css'), 'utf8');
 
-const code = ['js/time.js', 'js/data.js', 'js/art.js', 'js/achievements.js', 'js/progression.js', 'js/state.js', 'js/run.js', 'js/battle.js', 'js/main.js']
+const code = ['js/version.js', 'js/time.js', 'js/data.js', 'js/art.js', 'js/achievements.js', 'js/progression.js', 'js/state.js', 'js/run.js', 'js/battle.js', 'js/main.js']
   .map(f => fs.readFileSync(path.join(ROOT, f), 'utf8')).join('\n');
 
 const testBody = `
@@ -31,12 +31,29 @@ check('boot: title', () => {
   if (screen !== 'title') throw new Error('起動時にタイトルではない: ' + screen);
   render();
   if (!appStub.innerHTML.includes('百鬼調伏録')) throw new Error('タイトル名がない');
-  if (!appStub.innerHTML.includes('調伏の夜をはじめる')) throw new Error('新規開始ボタンがない');
+  if (!appStub.innerHTML.includes('>はじめる<')) throw new Error('新規開始ボタンがない');
+  if (!['title-guide', 'title-record', 'title-settings'].every(action => appStub.innerHTML.includes('data-action="' + action + '"'))) throw new Error('タイトルの補助導線が不足');
+});
+check('M5-B: 初回導入3画面とスキップ', () => {
+  if (G.ui.onboardingSeen) throw new Error('新規セーブが導入済みになっている');
+  handleAction('title-enter'); render();
+  if (screen !== 'tutorial' || !appStub.innerHTML.includes('百鬼と歩む夜へ')) throw new Error('導入1画面目へ進めない');
+  handleAction('tutorial-next'); render();
+  if (!appStub.innerHTML.includes('弱らせて調伏') || !appStub.innerHTML.includes('HP 3 / 12')) throw new Error('調伏説明がない');
+  handleAction('tutorial-next'); render();
+  if (!appStub.innerHTML.includes('憑合で新たな妖怪へ')) throw new Error('憑合説明がない');
+  handleAction('tutorial-next'); render();
+  if (screen !== 'home' || !G.ui.onboardingSeen) throw new Error('導入完了後に拠点へ進めない');
+  G.ui.onboardingSeen = false; screen = 'title';
+  handleAction('title-enter'); handleAction('tutorial-skip'); render();
+  if (screen !== 'home' || !G.ui.onboardingSeen) throw new Error('導入をスキップできない');
 });
 check('home', () => { screen = 'home'; render(); });
 check('home(次の目標・位階導線)', () => {
   screen = 'home'; render();
   if (!appStub.innerHTML.includes('次の目標') || !appStub.innerHTML.includes('data-action="nav-ranks"')) throw new Error('次目標または位階導線がない');
+  if (!appStub.innerHTML.includes('まずは最初の夜行へ') || !appStub.innerHTML.includes('最初の夜行へ')) throw new Error('初夜行の強調導線がない');
+  if (!appStub.innerHTML.includes('dashboard-grid') || !appStub.innerHTML.includes('home-summary')) throw new Error('拠点の情報階層がM5-C共通構造でない');
 });
 check('home(イラスト差し替え)', () => {
   if (!ART.includes('onibi')) throw new Error('サンプルアートが未登録');
@@ -89,7 +106,7 @@ check('時間バナーの説明導線', () => {
   gameTimeProvider = currentGameTime;
 });
 check('reduced-motion対応CSS', () => {
-  if (!styleCss.includes('@media (prefers-reduced-motion: reduce)') || !styleCss.includes('.title-moon { animation: none; }')) throw new Error('reduced-motion指定がない');
+  if (!styleCss.includes('@media (prefers-reduced-motion: reduce)') || !styleCss.includes('animation: none !important') || !styleCss.includes('body.motion-reduced *')) throw new Error('reduced-motion指定がない');
   appStub.innerHTML = '<span>CSS検査済み</span>';
 });
 check('M5-A UI基盤トークン・共通状態', () => {
@@ -98,11 +115,32 @@ check('M5-A UI基盤トークン・共通状態', () => {
   if (!styleCss.includes('min-height: var(--tap-min)') || !styleCss.includes(':focus-visible') || !styleCss.includes('.btn:disabled')) throw new Error('タップ領域・フォーカス・無効状態の共通指定が不足');
   appStub.innerHTML = '<span>UI基盤CSS検査済み</span>';
 });
+check('M5-C: 共通画面ヘッダー・戻る操作', () => {
+  const screens = ['deck', 'fusion', 'items', 'dex', 'achievements', 'ranks', 'save', 'dungeon'];
+  for (const name of screens) {
+    screen = name; render();
+    if (!appStub.innerHTML.includes('screen-header') || !appStub.innerHTML.includes('screen-actions')) throw new Error(name + 'の共通構造が不足');
+  }
+  if (!styleCss.includes('.screen-actions {') || !styleCss.includes('.screen-header {') || !styleCss.includes('.dashboard-grid {')) throw new Error('M5-C共通CSSが不足');
+});
+check('M5-D: 専用演出・読み上げ・動きの抑制', () => {
+  celebrationQueue = [];
+  queueCelebration('capture', '調伏成功', '提灯お化け', '新たな仲間が百鬼へ加わった', '🧧', 'chochin');
+  screen = 'home'; render();
+  if (!appStub.innerHTML.includes('celebration-card') || !appStub.innerHTML.includes('aria-describedby="celebration-detail"')) throw new Error('専用演出のdialogがない');
+  handleAction('celebration-dismiss');
+  if (celebrationQueue.length) throw new Error('専用演出を閉じられない');
+  if (!styleCss.includes('@keyframes celebration-enter') || !styleCss.includes('.screen-enter') || !styleCss.includes('.enemy.capture-target { animation:')) throw new Error('節目・画面・調伏可能の演出が不足');
+  if (!styleCss.includes('body.motion-reduced *') || !styleCss.includes('animation: none !important')) throw new Error('設定による演出抑制が不足');
+  screen = 'fusion'; fusionSel = []; render();
+  if (!appStub.innerHTML.includes('class="unit-select-hit"') || !appStub.innerHTML.includes('aria-label="鬼火を選択"')) throw new Error('選択カードの独立したキーボード操作が不足');
+});
 check('deck', () => { screen = 'deck'; render(); });
 check('dungeon(d2ロック中)', () => {
   screen = 'dungeon'; render();
   if (!appStub.innerHTML.includes('踏破ごとに+15')) throw new Error('最大HP成長の表示が仕様と違う');
   if (!appStub.innerHTML.includes('class="node-card locked"') || !appStub.innerHTML.includes('aria-disabled="true"')) throw new Error('ロック状態が明示されない');
+  if (!appStub.innerHTML.includes('最初はここ') || !appStub.innerHTML.includes('node-card recommended')) throw new Error('宵の小径が初回推奨になっていない');
 });
 check('dungeon(全解放)', () => {
   G.dungeonClears.d1 = 1; G.dungeonClears.d2 = 1; G.dungeonClears.d3 = 1; render();
@@ -172,7 +210,10 @@ check('fusion(異種・不一致)', () => {
 });
 
 startRun('d1');
-check('node', () => { gotoNodeScreen(); render(); });
+check('node', () => {
+  gotoNodeScreen(); render();
+  if (!appStub.innerHTML.includes('route-card') || !appStub.innerHTML.includes('role="button"')) throw new Error('分かれ道の選択構造が不足');
+});
 check('event(宝)', () => { E = { kind: 'treasure', msg: 'テスト' }; screen = 'event'; render(); });
 check('event(宝の2択)', () => {
   E = { kind: 'treasure-choice', options: [{ kind: 'fuda', extra: 2 }, { kind: 'item', id: 'juzu' }] };
@@ -186,6 +227,9 @@ startBattle(makeGroup('battle'), { expMult: 1 });
 check('battle(通常・未踏破は手加減なし)', () => {
   screen = 'battle'; render();
   if (appStub.innerHTML.includes('data-action="toggle-mercy"')) throw new Error('未踏破で手加減ボタンが出ている');
+  if (!appStub.innerHTML.includes('最初の調伏を狙おう')) throw new Error('初調伏の戦闘ヒントがない');
+  if (!appStub.innerHTML.includes('battle-section-label') || !appStub.innerHTML.includes('role="log"') || !appStub.innerHTML.includes('aria-live="polite"')) throw new Error('戦闘の情報階層・読み上げが不足');
+  if (!appStub.innerHTML.includes('class="hand-card') || !appStub.innerHTML.includes('role="button" tabindex="0"')) throw new Error('戦闘カードのキーボード操作が不足');
 });
 check('battle(オート・手加減解放/切替)', () => {
   G.dungeonClears.d1 = 1; render();
@@ -213,7 +257,10 @@ check('battle(勝利オーバーレイ)', () => {
   checkWin(); render();
   if (!appStub.innerHTML.includes('role="dialog"') || !appStub.innerHTML.includes('aria-modal="true"')) throw new Error('勝敗モーダルの役割がない');
 });
-check('runend(通常)', () => { screen = 'runend'; render(); });
+check('runend(通常)', () => {
+  screen = 'runend'; render();
+  if (!appStub.innerHTML.includes('result-page-card') || !appStub.innerHTML.includes('capture-summary')) throw new Error('夜行結果の共通カードがない');
+});
 check('runend(踏破)', () => { R.clear = true; render(); });
 check('runend(百鬼の試練エンディング)', () => {
   R.dungeon = 'trial'; R.clear = true; G.dungeonClears.trial = 1; screen = 'runend'; render();
@@ -223,7 +270,29 @@ check('runend(百鬼の試練エンディング)', () => {
 
 // アクションを一通り叩く
 check('action: nav遷移', () => {
-  ['nav-deck','nav-fusion','nav-items','nav-dex','nav-achievements','nav-ranks','nav-save','nav-home'].forEach(a => handleAction(a));
+  ['nav-deck','nav-fusion','nav-items','nav-dex','nav-achievements','nav-ranks','nav-guide','nav-settings','nav-save','nav-home'].forEach(a => handleAction(a));
+});
+check('M5-B: タイトルの遊び方・設定・記録', () => {
+  clearRun(); R = null; B = null;
+  screen = 'title'; render();
+  if (!appStub.innerHTML.includes('>続きから<')) throw new Error('既存記録の続きから表示がない');
+  handleAction('title-guide'); render();
+  if (screen !== 'guide' || !appStub.innerHTML.includes('最初の一夜')) throw new Error('遊び方を開けない');
+  handleAction('tutorial-replay'); render();
+  if (screen !== 'tutorial') throw new Error('導入を再確認できない');
+  handleAction('tutorial-skip'); render();
+  if (screen !== 'guide') throw new Error('再確認後に遊び方へ戻らない');
+  handleAction('utility-back');
+  handleAction('title-settings'); render();
+  const beforeMotion = G.ui.reducedMotion;
+  handleAction('setting-motion'); render();
+  if (G.ui.reducedMotion === beforeMotion || !appStub.innerHTML.includes('aria-pressed="true"')) throw new Error('演出設定を切り替えられない');
+  handleAction('setting-motion');
+  handleAction('utility-back');
+  handleAction('title-record'); render();
+  if (screen !== 'save' || !appStub.innerHTML.includes('タイトルへ戻る')) throw new Error('タイトルから記録を開けない');
+  handleAction('utility-back');
+  if (screen !== 'title') throw new Error('記録からタイトルへ戻れない');
 });
 check('action: タイトルから拠点へ', () => {
   clearRun(); R = null; B = null; screen = 'title';
@@ -263,6 +332,7 @@ check('action: ロック中ダンジョン拒否', () => {
 });
 check('action: 重ねフロー', () => {
   screen = 'fusion';
+  celebrationQueue = [];
   const pair = G.roster.filter(u => u.sp === 'onibi');
   if (pair.length >= 2) {
     handleAction('fusion-select', String(pair[0].uid));
@@ -270,6 +340,7 @@ check('action: 重ねフロー', () => {
     handleAction('fusion-exec');
     const merged = G.roster.find(u => u.sp === 'onibi' && u.star === 1);
     if (!merged) throw new Error('重ね結果がない');
+    if (!celebrationQueue.some(c => c.kind === 'star')) throw new Error('★上昇の専用演出がない');
   } else render();
 });
 check('action: 引継ぎ読み込み(不正)', () => {

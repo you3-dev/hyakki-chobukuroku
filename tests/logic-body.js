@@ -41,6 +41,7 @@ ok(dexOwnedCount() === 5, '初期図鑑5種(鬼火重複)');
 ok(G.achievements && G.achievements.unlocked.length === 0, '初期実績は未達成');
 ok(G.achievements.seen.length === 0, '初期実績の確認済み記録は空');
 ok(G.achievementRewards && G.achievementRewards.claimed.length === 0, '初期の実績報酬は未受取');
+ok(G.ui && !G.ui.onboardingSeen && !G.ui.reducedMotion, 'M5-B新規開始: 初回導入は未確認・演出は標準');
 
 // --- M4-A: 実績データ・達成判定 ---
 {
@@ -516,6 +517,7 @@ ok(dungeonUnlocked('d2'), 'd2解放');
   ok(G.dex.onibi === 2, '旧セーブ: 図鑑を所持から復元');
   ok(['first_capture', 'first_fusion', 'clear_d1', 'dex_10'].every(id => G.achievements.unlocked.includes(id)), '旧セーブ: 実績を既存記録から補完');
   ok(G.achievementRewards.claimed.length === 0, '旧セーブ: 報酬受取状態を未受取で補完');
+  ok(G.ui.onboardingSeen && !G.ui.reducedMotion, 'M5-B旧セーブ: 導入済みとして設定を補完');
 
   ok(claimReward('dex_10').ok, 'M4-D旧セーブ: 補完した実績報酬を一度受取');
   const migratedCode = exportSave();

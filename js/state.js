@@ -34,6 +34,7 @@ function newGame() {
     achievements: { unlocked: [], seen: [] },
     achievementRewards: { claimed: [] },
     progression: { unlocked: [], seen: [], choices: {} },
+    ui: { onboardingSeen: false, reducedMotion: false },
   };
   ['onibi', 'onibi', 'karakasa', 'tanuki', 'kamaitachi', 'kodama'].forEach(sp => addUnit(sp, 0));
   save();
@@ -55,6 +56,7 @@ function load() {
 }
 
 function sanitize() {
+  const hadUiState = !!G.ui;
   G.roster = (G.roster || []).filter(u => SPECIES[u.sp]);
   G.found = G.found || [];
   G.dex = G.dex || {};
@@ -62,6 +64,9 @@ function sanitize() {
   // 検証版セーブからの移行: クリア数はd1のものとみなす
   G.dungeonClears = Object.assign({ d1: G.stats.clears || 0, d2: 0, d3: 0, trial: 0 }, G.dungeonClears || {});
   G.items = G.items || {};
+  G.ui = Object.assign({ onboardingSeen: hadUiState ? false : true, reducedMotion: false }, G.ui || {});
+  G.ui.onboardingSeen = !!G.ui.onboardingSeen;
+  G.ui.reducedMotion = !!G.ui.reducedMotion;
   Object.keys(G.items).forEach(k => { if (!ITEMS[k]) delete G.items[k]; });
   G.roster.forEach(u => {
     if (u.star == null) u.star = 0;
