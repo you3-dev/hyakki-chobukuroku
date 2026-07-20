@@ -1,0 +1,584 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>拠点メニュー構成モック | 百鬼調伏録</title>
+</head>
+<body>
+<style>
+  :root {
+    --pg-bg: #f0eef4;
+    --pg-surface: #ffffff;
+    --pg-surface2: #e9e6f0;
+    --pg-text: #26232e;
+    --pg-muted: #6a6577;
+    --pg-line: #d8d5e2;
+    --pg-accent: #8a6b1d;
+    --pg-accent-soft: rgba(138, 107, 29, .12);
+    --pg-bad: #b0403a;
+    --pg-good: #2e7d4f;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --pg-bg: #141318;
+      --pg-surface: #1d1b24;
+      --pg-surface2: #262330;
+      --pg-text: #eae7f0;
+      --pg-muted: #9a94a8;
+      --pg-line: #2e2b3a;
+      --pg-accent: #e0b64e;
+      --pg-accent-soft: rgba(224, 182, 78, .12);
+      --pg-bad: #e2726c;
+      --pg-good: #6cc490;
+    }
+  }
+  :root[data-theme="light"] {
+    --pg-bg: #f0eef4; --pg-surface: #ffffff; --pg-surface2: #e9e6f0; --pg-text: #26232e;
+    --pg-muted: #6a6577; --pg-line: #d8d5e2; --pg-accent: #8a6b1d;
+    --pg-accent-soft: rgba(138, 107, 29, .12); --pg-bad: #b0403a; --pg-good: #2e7d4f;
+  }
+  :root[data-theme="dark"] {
+    --pg-bg: #141318; --pg-surface: #1d1b24; --pg-surface2: #262330; --pg-text: #eae7f0;
+    --pg-muted: #9a94a8; --pg-line: #2e2b3a; --pg-accent: #e0b64e;
+    --pg-accent-soft: rgba(224, 182, 78, .12); --pg-bad: #e2726c; --pg-good: #6cc490;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--pg-bg); color: var(--pg-text);
+    font-family: "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+    font-size: 15px; line-height: 1.65;
+  }
+  .pg-serif { font-family: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif; }
+
+  .pg-header {
+    position: sticky; top: 0; z-index: 50;
+    display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap;
+    padding: 14px 22px; border-bottom: 1px solid var(--pg-line);
+    background: color-mix(in srgb, var(--pg-bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+  }
+  .pg-header h1 { margin: 0; font-size: 1.15rem; letter-spacing: .06em; }
+  .pg-header h1 em { font-style: normal; color: var(--pg-accent); }
+  .pg-header p { margin: 0; color: var(--pg-muted); font-size: .78rem; }
+
+  .pg-wrap { max-width: 1900px; margin: 0 auto; padding: 26px 22px 60px; }
+  .pg-section-title { margin: 34px 0 6px; font-size: 1.02rem; letter-spacing: .08em; color: var(--pg-accent); }
+  .pg-section-sub { margin: 0 0 16px; color: var(--pg-muted); font-size: .8rem; }
+
+  /* 定石カード */
+  .pg-notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+  .pg-note {
+    padding: 13px 15px; border: 1px solid var(--pg-line); border-radius: 12px;
+    background: var(--pg-surface);
+  }
+  .pg-note strong { display: block; font-size: .85rem; margin-bottom: 3px; }
+  .pg-note p { margin: 0; font-size: .76rem; color: var(--pg-muted); }
+  .pg-note p b { color: var(--pg-text); font-weight: 600; }
+  .pg-note .pg-src { display: block; margin-top: 6px; font-size: .68rem; color: var(--pg-muted); opacity: .85; }
+
+  /* フレーム比較列 */
+  .pg-gallery { overflow-x: auto; padding: 8px 2px 18px; }
+  .pg-row { display: flex; gap: 26px; align-items: flex-start; width: max-content; }
+  .pg-col { width: 375px; flex: none; display: flex; flex-direction: column; gap: 14px; }
+  .pg-col-label { display: flex; align-items: baseline; gap: 10px; }
+  .pg-col-label h3 { margin: 0; font-size: .98rem; }
+  .pg-col-label span {
+    font-size: .68rem; padding: 2px 9px; border-radius: 99px;
+    background: var(--pg-accent-soft); color: var(--pg-accent); letter-spacing: .05em;
+  }
+  .pg-verdict {
+    padding: 13px 15px; border: 1px solid var(--pg-line); border-radius: 12px;
+    background: var(--pg-surface); font-size: .78rem;
+  }
+  .pg-verdict h4 { margin: 0 0 4px; font-size: .78rem; letter-spacing: .05em; }
+  .pg-verdict ul { margin: 4px 0 10px; padding-left: 18px; }
+  .pg-verdict li { margin: 2px 0; }
+  .pg-verdict .good h4 { color: var(--pg-good); }
+  .pg-verdict .bad h4 { color: var(--pg-bad); }
+  .pg-verdict p.fit { margin: 0; padding-top: 8px; border-top: 1px dashed var(--pg-line); color: var(--pg-muted); }
+  .pg-verdict p.fit b { color: var(--pg-text); }
+
+  /* 課題注記(現行フレーム用) */
+  .pg-issue { position: absolute; z-index: 5; display: grid; place-items: center; width: 21px; height: 21px; border-radius: 50%; background: var(--pg-bad); color: #fff; font-size: .7rem; font-weight: 700; box-shadow: 0 2px 8px rgba(0,0,0,.5); }
+  .pg-verdict li.issue-key b { color: var(--pg-bad); }
+
+  /* おすすめ */
+  .pg-final {
+    margin-top: 10px; padding: 18px 20px; border: 1px solid var(--pg-accent);
+    border-radius: 14px; background: var(--pg-accent-soft);
+  }
+  .pg-final h3 { margin: 0 0 8px; font-size: .95rem; color: var(--pg-accent); }
+  .pg-final p { margin: 6px 0; font-size: .82rem; }
+  .pg-final ol { margin: 6px 0; padding-left: 20px; font-size: .82rem; }
+  .pg-final li { margin: 4px 0; }
+
+  /* ============ スマホフレーム(ゲーム再現・ダーク固定) ============ */
+  .phone {
+    position: relative; width: 375px; height: 724px; flex: none;
+    border: 10px solid #08070d; border-radius: 34px; overflow: hidden;
+    background: #151226; box-shadow: 0 22px 60px rgba(0, 0, 0, .38);
+  }
+  .ph-screen {
+    height: 100%; overflow-y: auto; overscroll-behavior: contain;
+    background: linear-gradient(180deg, #151226, #241d3d 55%, #241d3d);
+    color: #f0ebf8; font-size: 14px; line-height: 1.5;
+  }
+  .ph-screen::-webkit-scrollbar { width: 0; }
+  .ph-pad { padding: 14px 13px 20px; }
+
+  /* ゲーム部品 */
+  .g-hero { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 8px 2px 9px; margin-bottom: 9px; border-bottom: 1px solid #4a3f7a; }
+  .g-hero h2 { margin: 0; color: #e0b64e; font-size: 1.02rem; letter-spacing: .08em; text-shadow: 0 0 14px rgba(224,182,78,.24); font-weight: 700; }
+  .g-hero span { color: #aaa0cb; font-size: .64rem; text-align: right; }
+
+  .g-time { display: flex; align-items: center; justify-content: center; gap: 8px; width: fit-content; margin: 0 auto 11px; padding: 5px 14px; border: 1px solid #6e5eaa; border-radius: 99px; background: rgba(24,20,42,.72); }
+  .g-time .moon { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(90deg, #f2e7c4 50%, #3a3357 50%); font-size: .6rem; }
+  .g-time div strong { display: block; color: #f2d685; font-size: .7rem; line-height: 1.3; }
+  .g-time div small { color: #aaa0cb; font-size: .58rem; }
+  .g-time .q { display: grid; place-items: center; width: 19px; height: 19px; border: 1px solid #4a3f7a; border-radius: 50%; color: #aaa0cb; font-size: .6rem; }
+
+  .g-stats4 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .g-stats4 span { display: flex; flex-direction: column; align-items: center; padding: 9px 6px; border: 1px solid #4a3f7a; border-radius: 8px; background: rgba(24,20,42,.72); }
+  .g-stats4 small, .g-stats4 b { color: #aaa0cb; font-size: .6rem; font-weight: normal; }
+  .g-stats4 strong { color: #f0e9ff; font-size: .84rem; font-variant-numeric: tabular-nums; }
+
+  .g-statline { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-bottom: 12px; }
+  .g-statline span { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border: 1px solid #4a3f7a; border-radius: 99px; background: rgba(24,20,42,.72); color: #aaa0cb; font-size: .62rem; }
+  .g-statline b { color: #f0e9ff; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .g-panel { position: relative; margin-bottom: 14px; padding: 11px; border: 1px solid rgba(122,104,201,.65); border-radius: 16px; background: rgba(31,25,54,.7); box-shadow: 0 6px 18px rgba(7,5,15,.2); }
+
+  .g-goal { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; gap: 8px; align-items: center; padding: 9px 10px; border: 1px solid #e0b64e; border-radius: 11px; background: rgba(224,182,78,.08); }
+  .g-goal .ico { font-size: 1.15rem; }
+  .g-goal small { display: block; color: #e0b64e; font-size: .58rem; letter-spacing: .1em; }
+  .g-goal strong { display: block; color: #f2d685; font-size: .8rem; }
+  .g-goal p { margin: 1px 0 0; color: #aaa0cb; font-size: .62rem; }
+  .g-goal .g-minor { align-self: center; }
+
+  .g-callout { display: grid; grid-template-columns: 30px minmax(0,1fr); gap: 8px; align-items: center; margin-top: 9px; padding: 9px 10px; border: 1px solid #e0b64e; border-radius: 11px; background: rgba(224,182,78,.1); }
+  .g-callout .one { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; background: #e0b64e; color: #201a10; font-family: "Hiragino Mincho ProN","Yu Mincho",serif; font-weight: 700; }
+  .g-callout strong { color: #f2d685; font-size: .76rem; }
+  .g-callout p { margin: 0; color: #aaa0cb; font-size: .62rem; }
+
+  .g-cta { display: block; width: 76%; margin: 11px auto 2px; padding: 12px 10px; border: 1px solid #8d7ade; border-radius: 13px; background: linear-gradient(180deg, #7a68c9, #5b4aa8); color: #fff; font: inherit; font-size: .95rem; font-weight: 700; letter-spacing: .04em; cursor: pointer; box-shadow: 0 0 0 3px rgba(224,182,78,.15), 0 8px 24px rgba(35,24,72,.45); }
+  .g-cta:active { transform: scale(.98); }
+  .g-cta small { display: block; margin-top: 1px; color: #d5cdef; font-size: .6rem; font-weight: normal; }
+
+  .g-sec { display: flex; align-items: baseline; justify-content: space-between; margin: 16px 2px 3px; }
+  .g-sec strong { color: #e0b64e; font-size: .88rem; letter-spacing: .06em; }
+  .g-sec small { color: #aaa0cb; font-size: .6rem; }
+  .g-sec-sub { margin: 0 2px 9px; color: #aaa0cb; font-size: .62rem; }
+
+  .g-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .g-menu button, .g-big3 button, .g-mini3 button {
+    appearance: none; cursor: pointer; font: inherit; color: #f0ebf8; text-align: left;
+    border: 1px solid #4a3f7a; border-radius: 12px;
+    background: linear-gradient(180deg, #362d59, #2b2447); box-shadow: 0 6px 18px rgba(7,5,15,.2);
+  }
+  .g-menu button { min-height: 62px; padding: 8px 9px; display: grid; grid-template-columns: 27px minmax(0,1fr); grid-template-rows: auto auto; align-items: center; column-gap: 7px; }
+  .g-menu button > span { grid-row: 1/3; font-size: 1.2rem; text-align: center; }
+  .g-menu button strong { align-self: end; color: #f2d685; font-size: .74rem; }
+  .g-menu button small { align-self: start; color: #aaa0cb; font-size: .58rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .g-menu button:active { transform: scale(.98); }
+
+  .g-big3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .g-big3 button { min-height: 84px; padding: 10px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+  .g-big3 button > span { font-size: 1.45rem; }
+  .g-big3 button strong { color: #f2d685; font-size: .8rem; }
+  .g-big3 button small { color: #aaa0cb; font-size: .58rem; }
+  .g-big3 button:active { transform: scale(.98); }
+
+  .g-mini3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .g-mini3 button { min-height: 46px; padding: 6px 8px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .g-mini3 button > span { font-size: 1rem; }
+  .g-mini3 button strong { color: #f2d685; font-size: .7rem; font-weight: 600; }
+  .g-mini3 button small { color: #aaa0cb; font-size: .58rem; }
+  .g-mini3 button:active { transform: scale(.98); }
+
+  .g-utils { display: flex; justify-content: center; gap: 4px; margin-top: 10px; }
+  .g-utils button { appearance: none; cursor: pointer; font: inherit; padding: 7px 12px; min-height: 34px; color: #aaa0cb; font-size: .68rem; background: none; border: none; border-radius: 8px; }
+  .g-utils button:active { color: #f0ebf8; }
+  .g-utils span { color: #4a3f7a; align-self: center; }
+
+  .g-roster { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .g-unit { padding: 7px 6px 0; border: 1px solid #4a3f7a; border-radius: 11px; background: linear-gradient(180deg, #362d59, #2b2447); text-align: center; overflow: hidden; }
+  .g-unit .top { display: flex; align-items: center; justify-content: space-between; gap: 3px; }
+  .g-unit .art { font-size: 1.5rem; line-height: 1.2; }
+  .g-unit .cost { color: #e0b64e; font-size: .62rem; font-weight: 700; }
+  .g-unit .name { margin-top: 1px; color: #f0ebf8; font-size: .66rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .g-unit .lv { color: #aaa0cb; font-size: .56rem; }
+  .g-unit .fx { margin: 4px -6px 0; padding: 3px 4px; background: rgba(15,12,28,.55); color: #d5cdef; font-size: .56rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .g-elem { display: inline-grid; place-items: center; width: 15px; height: 15px; border-radius: 4px; font-size: .56rem; font-weight: 700; color: #1d1728; }
+  .e-fire { background: #d86458; } .e-water { background: #5b8fd0; } .e-earth { background: #c9a23f; }
+  .e-metal { background: #b9b9c4; } .e-wood { background: #5eb87a; }
+
+  .g-minor { appearance: none; cursor: pointer; font: inherit; padding: 7px 11px; color: #f0ebf8; font-size: .68rem; border: 1px solid #6e5eaa; border-radius: 9px; background: rgba(24,20,42,.72); }
+  .g-minor:active { transform: scale(.97); }
+
+  /* 下部タブバー(案1) */
+  .g-navbar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(5, 1fr); padding: 5px 6px calc(7px + 4px); border-top: 1px solid #4a3f7a; background: rgba(18,15,33,.97); }
+  .g-navbar button { appearance: none; cursor: pointer; font: inherit; display: flex; flex-direction: column; align-items: center; gap: 1px; min-height: 46px; padding: 4px 2px; color: #aaa0cb; background: none; border: none; border-radius: 9px; font-size: .58rem; }
+  .g-navbar button .nico { font-size: 1.12rem; line-height: 1.25; filter: grayscale(.55) brightness(.85); }
+  .g-navbar button.on { color: #f2d685; }
+  .g-navbar button.on .nico { filter: none; }
+  .g-navbar button.on::after { content: ""; width: 16px; height: 2px; margin-top: 1px; border-radius: 2px; background: #e0b64e; }
+  .g-navbar button:active { transform: scale(.95); }
+
+  /* タブ切替ペイン */
+  .g-pane { display: none; }
+  .g-pane.on { display: block; }
+  .g-ghost { margin-bottom: 8px; padding: 12px; border: 1px dashed #4a3f7a; border-radius: 12px; color: #aaa0cb; font-size: .68rem; text-align: center; }
+  .g-ghost b { display: block; color: #f2d685; font-size: .8rem; margin-bottom: 2px; }
+
+  /* ボトムシート(案1・案3) */
+  .g-sheet-veil { position: absolute; inset: 0; z-index: 20; display: none; background: rgba(8,6,16,.6); }
+  .g-sheet-veil.on { display: block; }
+  .g-sheet { position: absolute; left: 0; right: 0; bottom: 0; z-index: 21; display: none; padding: 13px 13px 18px; border: 1px solid #6e5eaa; border-bottom: none; border-radius: 18px 18px 0 0; background: #241d3d; box-shadow: 0 -14px 50px rgba(0,0,0,.55); }
+  .g-sheet.on { display: block; }
+  .g-sheet .grab { width: 38px; height: 4px; margin: 0 auto 10px; border-radius: 3px; background: #4a3f7a; }
+  .g-sheet h4 { margin: 0 0 9px; color: #e0b64e; font-size: .8rem; letter-spacing: .06em; }
+  .g-sheet .close { position: absolute; top: 9px; right: 11px; appearance: none; cursor: pointer; font: inherit; width: 27px; height: 27px; color: #aaa0cb; background: none; border: 1px solid #4a3f7a; border-radius: 50%; }
+
+  /* 親指ドック(案3) */
+  .g-dock { position: absolute; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; padding: 9px 10px 13px; border-top: 1px solid #4a3f7a; background: rgba(18,15,33,.97); }
+  .g-dock .side { appearance: none; cursor: pointer; font: inherit; display: flex; flex-direction: column; align-items: center; gap: 0; min-height: 48px; padding: 5px 2px; color: #f0ebf8; border: 1px solid #4a3f7a; border-radius: 11px; background: linear-gradient(180deg, #362d59, #2b2447); font-size: .6rem; }
+  .g-dock .side .nico { font-size: 1.1rem; }
+  .g-dock .side strong { color: #f2d685; font-size: .64rem; }
+  .g-dock .go { appearance: none; cursor: pointer; font: inherit; min-width: 148px; min-height: 54px; padding: 8px 16px; color: #fff; font-weight: 700; font-size: .92rem; border: 1px solid #8d7ade; border-radius: 15px; background: linear-gradient(180deg, #7a68c9, #5b4aa8); box-shadow: 0 0 0 3px rgba(224,182,78,.15), 0 8px 24px rgba(35,24,72,.45); }
+  .g-dock .go small { display: block; color: #d5cdef; font-size: .58rem; font-weight: normal; }
+  .g-dock button:active { transform: scale(.97); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<header class="pg-header">
+  <h1 class="pg-serif"><em>百鬼調伏録</em> 拠点メニュー構成の検討モック</h1>
+  <p>初回起動時の拠点画面を対象に、現行+改善3案を比較 / 検証用モック(本体未反映) / 2026-07</p>
+</header>
+
+<div class="pg-wrap">
+
+  <h2 class="pg-section-title">1. 調査で得た縦画面ゲームUIの定石</h2>
+  <p class="pg-section-sub">縦画面スマホゲームのホーム/ダッシュボード構成のリサーチ要約。詳細は本文の報告を参照。</p>
+  <div class="pg-notes" id="pg-notes">
+    <div class="pg-note"><strong>下部ナビは3〜5項目まで</strong><p>タブバーは<b>4〜5項目が上限</b>でそれ以上はスケールしない。ゲームでも Home/編成/ショップ等 3〜5個の明快なアイコンが標準形。</p><span class="pg-src">NN/g Mobile Navigation Patterns / Appnality</span></div>
+    <div class="pg-note"><strong>サムゾーン: 操作は下半分へ</strong><p>片手持ちの親指が届くのは<b>下部中央〜下部側面</b>。主CTAと高頻度ボタンは下半分、タップ領域は44px以上。Marvel Snap開発陣も「操作要素を画面下半分に寄せた」と明言。</p><span class="pg-src">Parachute Design Thumb Zone / ArtStation SNAPPY U.I.</span></div>
+    <div class="pg-note"><strong>和製ソシャゲの標準3分割</strong><p>上=リソース・プレイヤー情報 / 中央=キャラ・お知らせ / <b>下=メニュー</b>。「メニューボタンは画面下以外に配置しない」が鉄則とされる。</p><span class="pg-src">スマホゲームUI解説記事(neeichi 他)</span></div>
+    <div class="pg-note"><strong>タブ型 vs ハブ&スポーク型</strong><p>タブ型は「毎日使う少数タスクが支配的」な場合。ハブ型は「1セッション1目的」の独立機能群向けで、<b>移動が毎回ホーム経由になるコスト</b>を払う。</p><span class="pg-src">NN/g / Interaction Design Foundation</span></div>
+    <div class="pg-note"><strong>低頻度項目は「その他」へ退避</strong><p>設定・引継ぎ等は「その他」タブやシートに格納してよい。ただし「見えない=忘れられる」ので<b>重要機能を入れてはいけない</b>。FGOは設定をマイルーム内へ二段格納。</p><span class="pg-src">Appnality / FGO メニュー構成</span></div>
+    <div class="pg-note"><strong>段階開放(プログレッシブ開示)</strong><p>機能は必要になった時点で開放する。タスク完了時間<b>20〜40%短縮</b>の報告。Balatroは初期メニュー実質3項目+未解放要素のチラ見せでメタ進行へ牽引。</p><span class="pg-src">Celia Hodent GDC講演 / Balatro Wiki</span></div>
+    <div class="pg-note"><strong>ナビはアイコン+ラベル必須</strong><p>Marvel Snapのアイコンのみタブは「押すまで何か分からない」とUX批判の定番。文字ラベルを常に添える。</p><span class="pg-src">Marvel Snap UI/UX Case Study</span></div>
+    <div class="pg-note"><strong>周回型の実例: CTA一点集中</strong><p>FGOは展開式ドック6項目+中央のクエスト群、Marvel Snapは5タブ中央に大Playボタン、Balatroは中央PLAY一択。<b>周回型は「次のラン開始」を最強調</b>するのが共通解。</p><span class="pg-src">FGO / Marvel Snap / Balatro 各画面構成</span></div>
+  </div>
+
+  <h2 class="pg-section-title">2. 構成パターン比較</h2>
+  <p class="pg-section-sub">フレーム内は実際に上下スクロールできます。案1はタブとシート、案3はドックが操作可能。</p>
+
+  <div class="pg-gallery"><div class="pg-row">
+
+    <!-- ============ 現行 ============ -->
+    <div class="pg-col">
+      <div class="pg-col-label"><h3>現行</h3><span>v1.0.0-rc.4 再現</span></div>
+      <div class="phone"><div class="ph-screen"><div class="ph-pad">
+        <div class="g-hero"><h2>調伏師の拠点</h2><span>妖怪を調伏し、百鬼の図鑑を埋めよ</span></div>
+        <div class="g-time"><span class="moon"></span><div><strong>夜・上弦</strong><small>百鬼が夜道を歩きはじめる</small></div><span class="q">?</span></div>
+        <div class="g-stats4" style="position:relative;">
+          <span class="pg-issue" style="top:-9px; left:-7px;">1</span>
+          <span><small>位階</small><strong>見習い</strong><b>0/11</b></span>
+          <span><small>図鑑</small><strong>5/55</strong><b>使役</b></span>
+          <span><small>夜行</small><strong>0</strong><b>踏破</b></span>
+          <span><small>調伏</small><strong>0</strong><b>体</b></span>
+        </div>
+        <div class="g-panel">
+          <span class="pg-issue" style="bottom:14px; left:26px;">2</span>
+          <div class="g-goal"><span class="ico">🧭</span><div><small>次の目標</small><strong>初めての調伏</strong><p>妖怪を1体調伏する → 位階昇格と調伏師の歩みを記録</p></div><button class="g-minor" type="button">位階を見る</button></div>
+          <div class="g-callout"><span class="one">一</span><div><strong>まずは最初の夜行へ</strong><p>準備は整っている。「宵の小径」で調伏を一度試してみよう。</p></div></div>
+          <button class="g-cta" type="button">🌙 最初の夜行へ</button>
+        </div>
+        <div class="g-sec"><strong>支度と記録</strong></div>
+        <p class="g-sec-sub">夜行前の準備や集めた記録を確認</p>
+        <nav class="g-menu" style="position:relative;">
+          <span class="pg-issue" style="top:-9px; right:-7px;">3</span>
+          <span class="pg-issue" style="top:117px; right:-7px;">4</span>
+          <button type="button"><span>🎴</span><strong>編成</strong><small>6/20枚</small></button>
+          <button type="button"><span>🔮</span><strong>憑合</strong><small>新種・重ね</small></button>
+          <button type="button"><span>🧿</span><strong>呪具</strong><small>所持0</small></button>
+          <button type="button"><span>📖</span><strong>図鑑</strong><small>5/55</small></button>
+          <button type="button"><span>🏆</span><strong>実績</strong><small>0/11</small></button>
+          <button type="button"><span>🎖️</span><strong>位階</strong><small>0/11</small></button>
+          <button type="button"><span>📜</span><strong>遊び方</strong><small>手引き</small></button>
+          <button type="button"><span>⚙️</span><strong>設定</strong><small>演出</small></button>
+          <button type="button"><span>💾</span><strong>記録</strong><small>引継ぎ</small></button>
+        </nav>
+        <div class="g-sec"><strong>手持ち妖怪</strong><small>6体</small></div>
+        <p class="g-sec-sub">イラストをタップすると詳細を表示</p>
+        <div class="g-roster">
+          <div class="g-unit"><div class="top"><span class="g-elem e-fire">火</span><span class="cost">◆1</span></div><div class="art">🔥</div><div class="name">鬼火</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に4</div></div>
+          <div class="g-unit"><div class="top"><span class="g-elem e-fire">火</span><span class="cost">◆1</span></div><div class="art">🔥</div><div class="name">鬼火</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に4</div></div>
+          <div class="g-unit"><div class="top"><span class="g-elem e-water">水</span><span class="cost">◆1</span></div><div class="art">☂️</div><div class="name">唐傘お化け</div><div class="lv">Lv1 守</div><div class="fx">防御+5</div></div>
+          <div class="g-unit"><div class="top"><span class="g-elem e-earth">土</span><span class="cost">◆1</span></div><div class="art">🦝</div><div class="name">化け狸</div><div class="lv">Lv1 妙</div><div class="fx">2枚引く</div></div>
+          <div class="g-unit"><div class="top"><span class="g-elem e-metal">金</span><span class="cost">◆1</span></div><div class="art">🕷️</div><div class="name">鎌鼬</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に5</div></div>
+          <div class="g-unit"><div class="top"><span class="g-elem e-wood">木</span><span class="cost">◆1</span></div><div class="art">🌲</div><div class="name">木霊</div><div class="lv">Lv1 妙</div><div class="fx">HP回復4</div></div>
+        </div>
+      </div></div></div>
+      <div class="pg-verdict">
+        <div class="bad"><h4>課題(丸数字はフレーム内の位置)</h4>
+          <ul>
+            <li class="issue-key"><b>1</b> 初回はほぼゼロの実績4枠が最上部を占有。新規プレイヤーに価値のない情報が一等地にある</li>
+            <li class="issue-key"><b>2</b> 唯一の主行動「夜行へ」がパネル内3段目。目標カードと導入カードに埋もれる</li>
+            <li class="issue-key"><b>3</b> 9項目が同格の2列グリッド。毎回使う「編成・憑合」と、月1の「設定・記録」が同じ重さ</li>
+            <li class="issue-key"><b>4</b> 図鑑・位階は実績サマリー/目標カードと重複掲載。9項目中3つが冗長</li>
+          </ul>
+        </div>
+        <p class="fit">ハブ&スポーク自体は少画面PWAに妥当。<b>問題は項目の「数」ではなく「重み付けの欠如」</b>。</p>
+      </div>
+    </div>
+
+    <!-- ============ 案1: 下部タブナビ ============ -->
+    <div class="pg-col">
+      <div class="pg-col-label"><h3>案1 下部タブナビ型</h3><span>操作可能: タブ・その他シート</span></div>
+      <div class="phone" id="f1">
+        <div class="ph-screen" style="padding-bottom:64px;">
+          <div class="g-pane on" data-pane="home"><div class="ph-pad">
+            <div class="g-hero"><h2>調伏師の拠点</h2><span>夜・上弦 🌓</span></div>
+            <div class="g-panel">
+              <div class="g-goal"><span class="ico">🧭</span><div><small>次の目標</small><strong>初めての調伏</strong><p>「宵の小径」で調伏を一度試してみよう</p></div></div>
+              <button class="g-cta" type="button">🌙 最初の夜行へ<small>宵の小径 / 全10歩</small></button>
+            </div>
+            <div class="g-statline">
+              <span>位階 <b>見習い</b></span><span>図鑑 <b>5/55</b></span><span>踏破 <b>0</b></span><span>調伏 <b>0</b></span>
+            </div>
+            <div class="g-sec"><strong>手持ち妖怪</strong><small>6体</small></div>
+            <p class="g-sec-sub">タップで詳細。編成はタブから</p>
+            <div class="g-roster">
+              <div class="g-unit"><div class="top"><span class="g-elem e-fire">火</span><span class="cost">◆1</span></div><div class="art">🔥</div><div class="name">鬼火</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に4</div></div>
+              <div class="g-unit"><div class="top"><span class="g-elem e-fire">火</span><span class="cost">◆1</span></div><div class="art">🔥</div><div class="name">鬼火</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に4</div></div>
+              <div class="g-unit"><div class="top"><span class="g-elem e-water">水</span><span class="cost">◆1</span></div><div class="art">☂️</div><div class="name">唐傘お化け</div><div class="lv">Lv1 守</div><div class="fx">防御+5</div></div>
+              <div class="g-unit"><div class="top"><span class="g-elem e-earth">土</span><span class="cost">◆1</span></div><div class="art">🦝</div><div class="name">化け狸</div><div class="lv">Lv1 妙</div><div class="fx">2枚引く</div></div>
+              <div class="g-unit"><div class="top"><span class="g-elem e-metal">金</span><span class="cost">◆1</span></div><div class="art">🕷️</div><div class="name">鎌鼬</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に5</div></div>
+              <div class="g-unit"><div class="top"><span class="g-elem e-wood">木</span><span class="cost">◆1</span></div><div class="art">🌲</div><div class="name">木霊</div><div class="lv">Lv1 妙</div><div class="fx">HP回復4</div></div>
+            </div>
+          </div></div>
+          <div class="g-pane" data-pane="deck"><div class="ph-pad">
+            <div class="g-hero"><h2>編成</h2><span>出撃デッキ 6/20枚</span></div>
+            <div class="g-ghost"><b>編成画面(遷移イメージ)</b>現行の編成画面がタブ配下に入る。呪具の装備もここへ統合</div>
+          </div></div>
+          <div class="g-pane" data-pane="fusion"><div class="ph-pad">
+            <div class="g-hero"><h2>憑合</h2><span>新種・重ね</span></div>
+            <div class="g-ghost"><b>憑合画面(遷移イメージ)</b>現行の憑合画面がタブ配下に入る</div>
+          </div></div>
+          <div class="g-pane" data-pane="dex"><div class="ph-pad">
+            <div class="g-hero"><h2>図鑑</h2><span>使役 5/55</span></div>
+            <div class="g-ghost"><b>図鑑画面(遷移イメージ)</b>図鑑・実績・位階を「集める」系としてタブ内サブ切替に統合する案も</div>
+          </div></div>
+        </div>
+        <div class="g-sheet-veil" data-close="1"></div>
+        <div class="g-sheet">
+          <button class="close" type="button" data-close="1">×</button>
+          <div class="grab"></div>
+          <h4>その他</h4>
+          <div class="g-menu">
+            <button type="button"><span>🧿</span><strong>呪具</strong><small>所持0</small></button>
+            <button type="button"><span>🏆</span><strong>実績</strong><small>0/11</small></button>
+            <button type="button"><span>🎖️</span><strong>位階</strong><small>0/11</small></button>
+            <button type="button"><span>💾</span><strong>記録</strong><small>引継ぎ・保存</small></button>
+            <button type="button"><span>📜</span><strong>遊び方</strong><small>手引き</small></button>
+            <button type="button"><span>⚙️</span><strong>設定</strong><small>演出</small></button>
+          </div>
+        </div>
+        <nav class="g-navbar">
+          <button type="button" class="on" data-tab="home"><span class="nico">⛩️</span>拠点</button>
+          <button type="button" data-tab="deck"><span class="nico">🎴</span>編成</button>
+          <button type="button" data-tab="fusion"><span class="nico">🔮</span>憑合</button>
+          <button type="button" data-tab="dex"><span class="nico">📖</span>図鑑</button>
+          <button type="button" data-tab="__more"><span class="nico">☰</span>その他</button>
+        </nav>
+      </div>
+      <div class="pg-verdict">
+        <div class="good"><h4>長所</h4><ul>
+          <li>主要4画面へ常時1タップ。拠点経由の往復が消える</li>
+          <li>親指ゾーンに常設ナビ。片手操作の定石通り</li>
+          <li>低頻度6項目をシートに退避し、ホームは「出撃+目標+手持ち」だけに集中</li>
+          <li>画面が増えても「その他」が受け皿になり拡張に強い</li>
+        </ul></div>
+        <div class="bad"><h4>短所</h4><ul>
+          <li>全画面にナビ常設が必要で改修規模が最大(画面シェル再設計)</li>
+          <li>戦闘・夜行中はナビを隠す例外設計が要る</li>
+          <li>縦の表示領域が約56px減る</li>
+          <li>調査注: 運営型ソシャゲの型なので、買い切りローグライトでは「ソシャゲ感」が世界観を損ねる恐れ</li>
+        </ul></div>
+        <p class="fit"><b>向く状況:</b> 毎日入る画面が4つ以上あるとき(NN/g基準)。機能拡張が続くなら1.0以降の本命</p>
+      </div>
+    </div>
+
+    <!-- ============ 案2: 出撃ファースト改良ハブ ============ -->
+    <div class="pg-col">
+      <div class="pg-col-label"><h3>案2 出撃ファースト改良ハブ</h3><span>最小改修・構造は現行のまま</span></div>
+      <div class="phone"><div class="ph-screen"><div class="ph-pad">
+        <div class="g-hero"><h2>調伏師の拠点</h2><span>妖怪を調伏し、百鬼の図鑑を埋めよ</span></div>
+        <div class="g-time"><span class="moon"></span><div><strong>夜・上弦</strong><small>百鬼が夜道を歩きはじめる</small></div><span class="q">?</span></div>
+        <div class="g-panel">
+          <button class="g-cta" type="button" style="margin-top:2px;">🌙 最初の夜行へ<small>宵の小径 / 全10歩</small></button>
+          <div class="g-goal" style="margin-top:10px;"><span class="ico">🧭</span><div><small>次の目標</small><strong>初めての調伏</strong><p>「宵の小径」で妖怪を1体調伏する</p></div><button class="g-minor" type="button">位階</button></div>
+        </div>
+        <div class="g-statline">
+          <span>位階 <b>見習い</b></span><span>図鑑 <b>5/55</b></span><span>踏破 <b>0</b></span><span>調伏 <b>0</b></span>
+        </div>
+        <div class="g-sec"><strong>支度</strong></div>
+        <p class="g-sec-sub">夜行前の準備。毎回使うものだけ</p>
+        <nav class="g-big3">
+          <button type="button"><span>🎴</span><strong>編成</strong><small>6/20枚</small></button>
+          <button type="button"><span>🔮</span><strong>憑合</strong><small>新種・重ね</small></button>
+          <button type="button"><span>🧿</span><strong>呪具</strong><small>所持0</small></button>
+        </nav>
+        <div class="g-sec" style="margin-top:13px;"><strong>記録</strong></div>
+        <p class="g-sec-sub">集めた成果を確認</p>
+        <nav class="g-mini3">
+          <button type="button"><span>📖</span><strong>図鑑</strong><small>5/55</small></button>
+          <button type="button"><span>🏆</span><strong>実績</strong><small>0/11</small></button>
+          <button type="button"><span>🎖️</span><strong>位階</strong><small>0/11</small></button>
+        </nav>
+        <div class="g-utils">
+          <button type="button">📜 遊び方</button><span>·</span>
+          <button type="button">⚙️ 設定</button><span>·</span>
+          <button type="button">💾 引継ぎ</button>
+        </div>
+        <div class="g-sec"><strong>手持ち妖怪</strong><small>6体</small></div>
+        <p class="g-sec-sub">イラストをタップすると詳細を表示</p>
+        <div class="g-roster">
+          <div class="g-unit"><div class="top"><span class="g-elem e-fire">火</span><span class="cost">◆1</span></div><div class="art">🔥</div><div class="name">鬼火</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に4</div></div>
+          <div class="g-unit"><div class="top"><span class="g-elem e-fire">火</span><span class="cost">◆1</span></div><div class="art">🔥</div><div class="name">鬼火</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に4</div></div>
+          <div class="g-unit"><div class="top"><span class="g-elem e-water">水</span><span class="cost">◆1</span></div><div class="art">☂️</div><div class="name">唐傘お化け</div><div class="lv">Lv1 守</div><div class="fx">防御+5</div></div>
+          <div class="g-unit"><div class="top"><span class="g-elem e-earth">土</span><span class="cost">◆1</span></div><div class="art">🦝</div><div class="name">化け狸</div><div class="lv">Lv1 妙</div><div class="fx">2枚引く</div></div>
+          <div class="g-unit"><div class="top"><span class="g-elem e-metal">金</span><span class="cost">◆1</span></div><div class="art">🕷️</div><div class="name">鎌鼬</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に5</div></div>
+          <div class="g-unit"><div class="top"><span class="g-elem e-wood">木</span><span class="cost">◆1</span></div><div class="art">🌲</div><div class="name">木霊</div><div class="lv">Lv1 妙</div><div class="fx">HP回復4</div></div>
+        </div>
+      </div></div></div>
+      <div class="pg-verdict">
+        <div class="good"><h4>長所</h4><ul>
+          <li>CTAが最上段へ。開いた瞬間「次にすること」が1つに定まる</li>
+          <li>9項目を 3(支度)+3(記録)+3(隅) に分解。頻度=視覚的な重さが一致</li>
+          <li>実績4枠→1行チップで初回のゼロ行列が消え、1画面の情報量が半減</li>
+          <li>ナビ構造は現行のまま。CSSとHTML組み替えだけで実現可能</li>
+        </ul></div>
+        <div class="bad"><h4>短所</h4><ul>
+          <li>画面間の往復は引き続き拠点経由</li>
+          <li>ミニボタン3種と文字リンク3種はタップ面が小さめ(44px確保は必要)</li>
+        </ul></div>
+        <p class="fit"><b>向く状況:</b> 現リリース候補への即時改善。RC期の低リスク改修</p>
+      </div>
+    </div>
+
+    <!-- ============ 案3: 親指ドック ============ -->
+    <div class="pg-col">
+      <div class="pg-col-label"><h3>案3 親指ドック型</h3><span>操作可能: ⋯シート</span></div>
+      <div class="phone" id="f3">
+        <div class="ph-screen" style="padding-bottom:86px;"><div class="ph-pad">
+          <div class="g-hero"><h2>調伏師の拠点</h2><span>夜・上弦 🌓</span></div>
+          <div class="g-goal"><span class="ico">🧭</span><div><small>次の目標</small><strong>初めての調伏</strong><p>「宵の小径」で妖怪を1体調伏する</p></div></div>
+          <div class="g-statline" style="margin-top:11px;">
+            <span>位階 <b>見習い</b></span><span>図鑑 <b>5/55</b></span><span>踏破 <b>0</b></span><span>調伏 <b>0</b></span>
+          </div>
+          <div class="g-sec"><strong>手持ち妖怪</strong><small>6体</small></div>
+          <p class="g-sec-sub">イラストをタップすると詳細を表示</p>
+          <div class="g-roster">
+            <div class="g-unit"><div class="top"><span class="g-elem e-fire">火</span><span class="cost">◆1</span></div><div class="art">🔥</div><div class="name">鬼火</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に4</div></div>
+            <div class="g-unit"><div class="top"><span class="g-elem e-fire">火</span><span class="cost">◆1</span></div><div class="art">🔥</div><div class="name">鬼火</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に4</div></div>
+            <div class="g-unit"><div class="top"><span class="g-elem e-water">水</span><span class="cost">◆1</span></div><div class="art">☂️</div><div class="name">唐傘お化け</div><div class="lv">Lv1 守</div><div class="fx">防御+5</div></div>
+            <div class="g-unit"><div class="top"><span class="g-elem e-earth">土</span><span class="cost">◆1</span></div><div class="art">🦝</div><div class="name">化け狸</div><div class="lv">Lv1 妙</div><div class="fx">2枚引く</div></div>
+            <div class="g-unit"><div class="top"><span class="g-elem e-metal">金</span><span class="cost">◆1</span></div><div class="art">🕷️</div><div class="name">鎌鼬</div><div class="lv">Lv1 攻</div><div class="fx">敵1体に5</div></div>
+            <div class="g-unit"><div class="top"><span class="g-elem e-wood">木</span><span class="cost">◆1</span></div><div class="art">🌲</div><div class="name">木霊</div><div class="lv">Lv1 妙</div><div class="fx">HP回復4</div></div>
+          </div>
+        </div></div>
+        <div class="g-sheet-veil" data-close="1"></div>
+        <div class="g-sheet">
+          <button class="close" type="button" data-close="1">×</button>
+          <div class="grab"></div>
+          <h4>そのほかの支度と記録</h4>
+          <div class="g-menu">
+            <button type="button"><span>🧿</span><strong>呪具</strong><small>所持0</small></button>
+            <button type="button"><span>📖</span><strong>図鑑</strong><small>5/55</small></button>
+            <button type="button"><span>🏆</span><strong>実績</strong><small>0/11</small></button>
+            <button type="button"><span>🎖️</span><strong>位階</strong><small>0/11</small></button>
+            <button type="button"><span>💾</span><strong>記録</strong><small>引継ぎ・保存</small></button>
+            <button type="button"><span>📜</span><strong>遊び方</strong><small>手引き</small></button>
+            <button type="button"><span>⚙️</span><strong>設定</strong><small>演出</small></button>
+          </div>
+        </div>
+        <div class="g-dock">
+          <button class="side" type="button"><span class="nico">🎴</span><strong>編成</strong></button>
+          <button class="go" type="button">🌙 最初の夜行へ<small>宵の小径 / 全10歩</small></button>
+          <button class="side" type="button" data-more="1"><span class="nico">🔮</span><strong>憑合 / ⋯</strong></button>
+        </div>
+      </div>
+      <div class="pg-verdict">
+        <div class="good"><h4>長所</h4><ul>
+          <li>出撃CTAが常に親指の真下。スクロール位置に関係なく即出撃できる</li>
+          <li>「編成→出撃」の主要動線が物理的に隣接</li>
+          <li>ホーム本文が手持ち妖怪の閲覧に専念できる</li>
+        </ul></div>
+        <div class="bad"><h4>短所</h4><ul>
+          <li>直接到達できるのは3項目のみ。残り7項目がシート内2タップで発見性が下がる</li>
+          <li>ドックは拠点画面専用になりがちで、他画面との一貫性が出しにくい</li>
+          <li>シートの存在を初回に教えるオンボーディングが必要</li>
+        </ul></div>
+        <p class="fit"><b>向く状況:</b> FGO型(大CTA+展開ドック)の縮約。調査では周回型デッキ構築と最も相性が良い型とされ、サムゾーン的には本命候補</p>
+      </div>
+    </div>
+
+  </div></div>
+
+  <h2 class="pg-section-title">3. 推奨</h2>
+  <div class="pg-final" id="pg-final">
+    <h3>推奨: 二段階で移行する — まず案2、様子を見て案3(または案1)</h3>
+    <p><b>① RC期のいま: 案2「出撃ファースト改良ハブ」。</b>現行の4課題(ゼロ実績の一等地占有 / CTA埋没 / 9項目同格 / 重複掲載)をナビ構造を変えずに解消できる。HTML/CSSの組み替えだけで済み、既存のUIガイド規則(共通部品・44px・読み上げ)とも矛盾しない。</p>
+    <p><b>② 1.0以降・利用実態が見えたら:</b> 「拠点以外に毎日入る画面が4つ以上あるか」で分岐(NN/g基準)。編成・憑合・図鑑を毎回巡回するプレイが主なら<b>案1(下部タブ)</b>、「開いたら即出撃」が主なら<b>案3(親指ドック)</b>。調査上、周回型デッキ構築の共通解は「次のラン開始を最強調」であり、本作は案3寄りと見る。</p>
+    <p><b>③ どの案とも併用可: 段階開放(Balatro/モンスト式)。</b>呪具は所持0の間は非表示、実績・位階は初調伏後に出現、記録(引継ぎ)は設定内へ——とすれば初回の menu は実質4項目まで減り、初見の認知負荷が定石どおり下がる。isNew判定は実装済みなので載せ替えは小さい。</p>
+    <ol>
+      <li>案2を適用(文言・グリッド構成の変更のみ、ロジック不変)</li>
+      <li>段階開放を重ねる(isNew・所持数による表示条件)</li>
+      <li>1.0後にプレイ頻度を見て案3/案1を判断(画面シェルの再設計を伴うためマイルストーン扱い)</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var f1 = document.getElementById('f1');
+    if (f1) {
+      var tabs = f1.querySelectorAll('.g-navbar [data-tab]');
+      var panes = f1.querySelectorAll('.g-pane');
+      var sheet = f1.querySelector('.g-sheet');
+      var veil = f1.querySelector('.g-sheet-veil');
+      function closeSheet() { sheet.classList.remove('on'); veil.classList.remove('on'); }
+      tabs.forEach(function (t) {
+        t.addEventListener('click', function () {
+          var id = t.getAttribute('data-tab');
+          if (id === '__more') { sheet.classList.add('on'); veil.classList.add('on'); return; }
+          closeSheet();
+          tabs.forEach(function (x) { x.classList.toggle('on', x === t); });
+          panes.forEach(function (p) { p.classList.toggle('on', p.getAttribute('data-pane') === id); });
+          f1.querySelector('.ph-screen').scrollTop = 0;
+        });
+      });
+      f1.querySelectorAll('[data-close]').forEach(function (c) { c.addEventListener('click', closeSheet); });
+    }
+    var f3 = document.getElementById('f3');
+    if (f3) {
+      var sheet3 = f3.querySelector('.g-sheet');
+      var veil3 = f3.querySelector('.g-sheet-veil');
+      f3.querySelector('[data-more]').addEventListener('click', function () {
+        sheet3.classList.add('on'); veil3.classList.add('on');
+      });
+      f3.querySelectorAll('[data-close]').forEach(function (c) {
+        c.addEventListener('click', function () { sheet3.classList.remove('on'); veil3.classList.remove('on'); });
+      });
+    }
+  })();
+</script>
+</body>
+</html>
