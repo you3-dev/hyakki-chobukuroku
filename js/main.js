@@ -54,6 +54,60 @@ function effectText(u) {
 
 function setToast(m) { toast = m || ''; }
 
+function backupFileName() {
+  const d = new Date();
+  const pad = value => String(value).padStart(2, '0');
+  return `hyakki-save-${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}.json`;
+}
+
+function downloadBackupFile(file) {
+  const url = URL.createObjectURL(file);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = file.name;
+  link.hidden = true;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+async function saveJsonBackup() {
+  try {
+    // text/plainはiOSの共有先が扱いやすく、拡張子はJSONのまま維持する。
+    const file = new File([exportSaveJson()], backupFileName(), { type: 'text/plain' });
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: '百鬼調伏録 セーブデータ' });
+        setToast('JSONバックアップを共有した');
+      } catch (shareError) {
+        if (shareError && shareError.name === 'AbortError') {
+          setToast('保存をキャンセルした');
+        } else {
+          downloadBackupFile(file);
+          setToast('共有できないためJSONを保存した');
+        }
+      }
+    } else {
+      downloadBackupFile(file);
+      setToast('JSONバックアップを保存した');
+    }
+  } catch (error) {
+    setToast(error && error.name === 'AbortError' ? '保存をキャンセルした' : 'JSONバックアップを保存できなかった');
+  }
+  render();
+}
+
+function finishSaveImport(text, successMessage) {
+  if (importSave(text)) {
+    clearRun(); R = null; B = null;
+    setToast(successMessage);
+    return true;
+  }
+  setToast('セーブデータが正しくない');
+  return false;
+}
+
 function queueCelebration(kind, kicker, title, detail, icon, art) {
   celebrationQueue.push({ kind, kicker, title, detail, icon, art: art || '' });
 }
@@ -415,10 +469,12 @@ function handleAction(action, arg) {
     case 'save-import': {
       const ta = document.getElementById('import-text');
       const val = ta ? ta.value : importText;
-      if (importSave(val)) { clearRun(); R = null; B = null; setToast('引継ぎ完了!'); }
-      else setToast('引継ぎコードが正しくない');
+      finishSaveImport(val, '引継ぎ完了!');
       break;
     }
+    case 'save-json':
+      saveJsonBackup();
+      return; // 共有シートをユーザー操作中に直接開くため、完了後に再描画する
     case 'save-select': {
       const ta = document.getElementById('export-text');
       if (ta) { ta.focus(); ta.select(); }
@@ -472,6 +528,18 @@ app.addEventListener('click', (ev) => {
   if (t.dataset.action === 'unit-detail') focusReturnSelector = `[data-action="unit-detail"][data-arg="${t.dataset.arg}"]`;
   else if (t.dataset.action === 'time-help-open') focusReturnSelector = '[data-action="time-help-open"]';
   handleAction(t.dataset.action, t.dataset.arg);
+});
+
+app.addEventListener('change', async (ev) => {
+  if (!ev.target.matches || !ev.target.matches('#save-file-input')) return;
+  const file = ev.target.files && ev.target.files[0];
+  if (!file) return;
+  try {
+    finishSaveImport(await file.text(), 'JSONバックアップを復元した');
+  } catch (error) {
+    setToast('JSONファイルを読み込めなかった');
+  }
+  render();
 });
 
 app.addEventListener('keydown', (ev) => {
@@ -769,7 +837,7 @@ function renderHome() {
   const firstNight = st.runs === 0;
   const rosterHtml = G.roster.map(u => unitCard(u, { inDeck: G.deck.includes(u.uid) })).join('');
   app.innerHTML = `<main class="home-time-shell time-${time.timeBand.id} ${ending ? 'ending-unlocked' : ''}" data-time-band="${time.timeBand.id}"><div class="screen home">
-    <header class="home-hero"><p>調伏師の拠点</p><h1>${ending ? '百鬼調伏録・暁' : '百鬼調伏録'}</h1><span>${ending ? '大調伏師として、明けた夜をさらに歩め' : '妖怪を調伏し、百鬼の図鑑を埋めよ'}</span></header>
+    <header class="home-hero"><h1>調伏師の拠点</h1><span>${ending ? '大調伏師として、明けた夜をさらに歩め' : '妖怪を調伏し、百鬼の図鑑を埋めよ'}</span></header>
     ${ending ? '<div class="ending-home-banner">🌅 百鬼の試練 踏破済み — 称号「大調伏師」</div>' : ''}
     ${timeContextHtml(time)}
     <div class="home-summary" aria-label="進行状況"><span><small>位階</small><strong>${rank.name}</strong><b>${rank.value}/${rank.max}</b></span><span><small>図鑑</small><strong>${dexOwnedCount()}/${Object.keys(SPECIES).length}</strong><b>使役</b></span><span><small>夜行</small><strong>${st.clears}</strong><b>踏破</b></span><span><small>調伏</small><strong>${st.captures}</strong><b>体</b></span></div>
@@ -1035,10 +1103,11 @@ function renderRanks() {
 function renderSave() {
   const backLabel = utilityReturn === 'title' ? 'タイトルへ戻る' : '拠点へ戻る';
   app.innerHTML = `<div class="screen screen-shell save-screen" data-screen="save">
-    ${screenHeader('端末の記録', 'セーブ・引継ぎ', '進行は操作の節目で自動保存', '<span>HYAKKI1</span>')}
-    <section class="content-panel save-note"><strong>大切な記録を控える</strong><p>iPhoneのSafariは長期間開かないとデータが消えることがある。引継ぎコードを別の場所へ保管すると安心。</p></section>
-    <section class="save-card"><div><span>1</span><h2>書き出し</h2><p>現在の手持ちと進行をコードにする</p></div><textarea id="export-text" class="save-text" readonly aria-label="書き出し用引継ぎコード">${exportSave()}</textarea><button class="btn" data-action="save-select">全選択してコピー用にする</button></section>
-    <section class="save-card"><div><span>2</span><h2>読み込み</h2><p>別端末で控えたコードを復元する</p></div><textarea id="import-text" class="save-text" placeholder="引継ぎコードを貼り付け" aria-label="読み込む引継ぎコード"></textarea><button class="btn btn-primary" data-action="save-import">引継ぎコードを読み込む</button></section>
+    ${screenHeader('端末の記録', 'セーブ・バックアップ', '進行は操作の節目で自動保存', `<span>v${APP_VERSION}</span>`)}
+    <section class="content-panel save-note"><strong>大切な記録を端末外にも控える</strong><p>ホーム画面版はSafariの7日制限の対象外だが、端末変更やブラウザデータ削除に備えてJSONを「ファイル」やクラウドへ保存すると安心。</p></section>
+    <section class="save-card save-file-card"><div><span>1</span><h2>JSONバックアップ</h2><p>手持ち・図鑑・実績などをファイルで保存／復元する。進行中の夜行は含まれない</p></div><div class="save-file-actions"><button class="btn btn-primary" type="button" data-action="save-json">JSONを共有・保存</button><label class="btn file-input-label" for="save-file-input">JSONから復元<input id="save-file-input" class="visually-hidden" type="file" accept="application/json,text/plain,.json"></label></div></section>
+    <section class="save-card"><div><span>2</span><h2>引継ぎコードを書き出す</h2><p>従来形式。現在の手持ちと進行を文字列にする</p></div><textarea id="export-text" class="save-text" readonly aria-label="書き出し用引継ぎコード">${exportSave()}</textarea><button class="btn" data-action="save-select">全選択してコピー用にする</button></section>
+    <section class="save-card"><div><span>3</span><h2>引継ぎコードを読み込む</h2><p>別端末で控えたコードを復元する</p></div><textarea id="import-text" class="save-text" placeholder="引継ぎコードを貼り付け" aria-label="読み込む引継ぎコード"></textarea><button class="btn" data-action="save-import">引継ぎコードを読み込む</button></section>
     <section class="danger-zone"><div><strong>最初からやり直す</strong><p>手持ち、図鑑、実績をすべて初期状態へ戻す。</p></div><button class="btn btn-danger" data-action="reset-save">データを初期化</button></section>
     ${backActions('utility-back', backLabel)}
     ${toastHtml()}

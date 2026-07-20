@@ -17,7 +17,7 @@ const PROGRESSION_MILESTONES = Object.freeze([
   { id: 'clear_d3', name: '百鬼の御堂踏破', description: '百鬼の御堂を初めて踏破する', achievement: 'clear_d3', area: 'dungeon', reward: '百鬼の試練・術士HP+15・御堂の式神代行/手加減' },
   { id: 'four_gods', name: '四神制覇', description: '玄武・白虎・青龍・朱雀を使役する', achievement: 'four_gods', area: 'fusion', reward: '特別称号「四神使い」' },
   { id: 'nurarihyon', name: '総大将誕生', description: 'ぬらりひょんを使役する', achievement: 'nurarihyon', area: 'fusion', reward: '特別称号「妖怪総大将」' },
-  { id: 'dex_50', name: '百鬼図鑑', description: '図鑑50種をすべて使役する', achievement: 'dex_50', area: 'dex', reward: '初期調伏札+1・百鬼蒐集家の証' },
+  { id: 'dex_50', name: '百鬼図鑑', description: '図鑑で50種を使役する', achievement: 'dex_50', area: 'dex', reward: '初期調伏札+1・百鬼蒐集家の証' },
   { id: 'final_trial', name: '百鬼の試練踏破', description: '最終夜行「百鬼の試練」を踏破する', dungeon: 'trial', area: 'dungeon', reward: 'エンディング・称号「大調伏師」・拠点の変化・試練の手加減' },
 ].map(Object.freeze));
 

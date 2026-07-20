@@ -2,7 +2,7 @@
 
 // M5-E: この値を変更すると新しいキャッシュへ原子的に切り替わる。
 const CACHE_PREFIX = 'hyakki-chobukuroku-';
-const CACHE_VERSION = '1.0.0-rc.1';
+const CACHE_VERSION = '1.0.0-rc.4';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 
 const APP_ASSETS = [
@@ -33,6 +33,7 @@ const APP_ASSETS = [
   './assets/art/daitengu.svg',
   './assets/art/dokuga.svg',
   './assets/art/dorotabo.svg',
+  './assets/art/furi.svg',
   './assets/art/gaikotsu.svg',
   './assets/art/gashadokuro.svg',
   './assets/art/genbu.svg',
@@ -40,6 +41,7 @@ const APP_ASSETS = [
   './assets/art/hitotsume.svg',
   './assets/art/hyakume.svg',
   './assets/art/itsumade.svg',
+  './assets/art/isonade.svg',
   './assets/art/iwakabuto.svg',
   './assets/art/juzu.svg',
   './assets/art/kamaitachi.svg',
@@ -56,6 +58,7 @@ const APP_ASSETS = [
   './assets/art/muramasa.svg',
   './assets/art/nekomata.svg',
   './assets/art/nue.svg',
+  './assets/art/nurikabe.svg',
   './assets/art/nurarihyon.svg',
   './assets/art/nureonna.svg',
   './assets/art/oboroguruma.svg',
@@ -77,10 +80,12 @@ const APP_ASSETS = [
   './assets/art/tamamo.svg',
   './assets/art/tanuki.svg',
   './assets/art/tatarigami.svg',
+  './assets/art/tesso.svg',
   './assets/art/tengugeta.svg',
   './assets/art/tsuchigumo.svg',
   './assets/art/tsukumogami.svg',
   './assets/art/umibozu.svg',
+  './assets/art/wanyudo.svg',
   './assets/art/yamanba.svg',
   './assets/art/yamawaro.svg',
   './assets/art/yatagarasu.svg',

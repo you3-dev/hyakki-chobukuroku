@@ -18,7 +18,7 @@ function elementMult(atk, def) {
   return 1;
 }
 
-// ===== 妖怪(50種) =====
+// ===== 妖怪(55種) =====
 // tier: 1=雑魚 2=上位種(調伏率-10%) 0=憑合限定(野生出現なし)
 // effect: dmg(単体) dmgAll(全体) block heal draw poison(単体) weaken(単体) fuda(調伏札+N)
 // 成長: dmg/dmgAll/block/heal +1/Lv +2/★、poison +1/★、draw ★2以上で+1、weaken/fuda 固定
@@ -59,7 +59,7 @@ const SPECIES = {
   satori:     { id: 'satori', name: '覚', emoji: '🧠', element: 'earth', cost: 2, role: '妙', effect: { draw: 2, weaken: 1 }, tier: 2, enemy: { hp: 20, atk: 5 }, encounter: { moonPhases: ['full'], weight: 4, offWeight: 1, hint: '満月の光の下では心の声を隠せないらしい' }, desc: '心を読む山の怪。敵の手の内はすべてお見通し。' },
   umibozu:    { id: 'umibozu', name: '海坊主', emoji: '🌊', element: 'water', cost: 3, role: '攻', effect: { dmgAll: 6 }, tier: 2, enemy: { hp: 26, atk: 6 }, desc: '夜の海に立つ巨影。大波が全てを呑み込む。' },
   oboroguruma: { id: 'oboroguruma', name: '朧車', emoji: '🛞', element: 'earth', cost: 2, role: '攻', effect: { dmg: 6, block: 3 }, tier: 2, enemy: { hp: 24, atk: 6 }, desc: '恨みを乗せた牛車。轢かれても轢いても堅い。' },
-  // --- 憑合限定(17種) ---
+  // --- 憑合限定(22種) ---
   daitengu:   { id: 'daitengu', name: '大天狗', emoji: '👺', element: 'wood', cost: 2, role: '攻', effect: { dmgAll: 5 }, tier: 0, desc: '山嵐を起こし、敵陣をまとめて薙ぎ払う。' },
   kyubi:      { id: 'kyubi', name: '九尾の狐', emoji: '🦊', element: 'fire', cost: 2, role: '攻', effect: { dmg: 8, heal: 3 }, tier: 0, desc: '妖艶なる大妖。喰らった精気を主に分け与える。' },
   yoroi:      { id: 'yoroi', name: '鎧武者', emoji: '🛡️', element: 'metal', cost: 2, role: '守', effect: { block: 9 }, tier: 0, desc: '骸の鎧に宿る武人の魂。鉄壁。' },
@@ -77,6 +77,11 @@ const SPECIES = {
   seiryu:     { id: 'seiryu', name: '青龍', emoji: '🐲', element: 'wood', cost: 3, role: '攻', effect: { dmgAll: 7, block: 5 }, tier: 0, desc: '東方を守る四神。風雨を纏い攻防一体。' },
   suzaku:     { id: 'suzaku', name: '朱雀', emoji: '🐦‍🔥', element: 'fire', cost: 3, role: '攻', effect: { dmgAll: 9, heal: 4 }, tier: 0, desc: '南方を守る四神。焔の翼は死してなお蘇る。' },
   nurarihyon: { id: 'nurarihyon', name: 'ぬらりひょん', emoji: '🌚', element: 'earth', cost: 3, role: '妙', effect: { dmgAll: 7, heal: 5 }, tier: 0, desc: '妖怪の総大将。気づけば上座に座っている。' },
+  furi:       { id: 'furi', name: '風狸', emoji: '🍃', element: 'wood', cost: 2, role: '妙', effect: { dmg: 6, draw: 1 }, tier: 0, desc: '風に乗り木々を渡る古狸。疾風の一撃から次の手へつなぐ。' },
+  wanyudo:    { id: 'wanyudo', name: '輪入道', emoji: '☸️', element: 'fire', cost: 3, role: '攻', effect: { dmgAll: 7, poison: 2 }, tier: 0, desc: '炎に包まれた車輪の怪。地を焼きながら敵陣を轢き進む。' },
+  nurikabe:   { id: 'nurikabe', name: '塗壁', emoji: '🧱', element: 'earth', cost: 2, role: '守', effect: { block: 12 }, tier: 0, desc: '夜道を塞ぐ見えない壁。味方の前では揺るがぬ盾となる。' },
+  tesso:      { id: 'tesso', name: '鉄鼠', emoji: '🐀', element: 'metal', cost: 2, role: '妙', effect: { dmg: 7, draw: 1 }, tier: 0, desc: '鉄の牙を持つ大鼠。鋭く噛みつき、宝物から次の策を探す。' },
+  isonade:    { id: 'isonade', name: '磯撫', emoji: '🦈', element: 'water', cost: 3, role: '攻', effect: { dmg: 9, weaken: 2 }, tier: 0, desc: '海面を撫でる尾だけを見せる怪魚。深みから獲物の力を奪う。' },
 };
 
 // ===== 呪具(装備品) =====
@@ -139,41 +144,63 @@ const DUNGEONS = {
 const STORY_DUNGEON_ORDER = ['d1', 'd2', 'd3'];
 const DUNGEON_ORDER = [...STORY_DUNGEON_ORDER, 'trial'];
 
-// ===== 憑合レシピ(異種・順不同・32通り) =====
+// ===== 憑合レシピ(異種・順不同・54通り) =====
 // 同種×同種は「重ね」(★+1)としてレシピ不要で常に成立
 const RECIPES = [
   { pair: ['yamawaro', 'kamaitachi'], result: 'daitengu' },
-  { pair: ['kodama', 'kamaitachi'], result: 'daitengu' },
+  { pair: ['itsumade', 'yamawaro'], result: 'daitengu' },
+  { pair: ['nue', 'itsumade'], result: 'daitengu' },
   { pair: ['onibi', 'tanuki'], result: 'kyubi' },
+  { pair: ['nekomata', 'kudagitsune'], result: 'kyubi' },
   { pair: ['kappa', 'karakasa'], result: 'ryujin' },
   { pair: ['kappa', 'kodama'], result: 'ryujin' },
   { pair: ['yukionna', 'ogama'], result: 'ryujin' },
+  { pair: ['kawauso', 'amefuri'], result: 'ryujin' },
   { pair: ['chochin', 'kamaitachi'], result: 'yoroi' },
-  { pair: ['karakasa', 'kamaitachi'], result: 'yoroi' },
+  { pair: ['gaikotsu', 'onyudo'], result: 'yoroi' },
   { pair: ['tsuchigumo', 'onibi'], result: 'omukade' },
   { pair: ['tsuchigumo', 'tanuki'], result: 'omukade' },
   { pair: ['ogama', 'tsuchigumo'], result: 'omukade' },
   { pair: ['karasutengu', 'onibi'], result: 'yatagarasu' },
   { pair: ['karasutengu', 'shiranui'], result: 'yatagarasu' },
+  { pair: ['hitotsume', 'shiranui'], result: 'yatagarasu' },
   { pair: ['gaikotsu', 'kamaitachi'], result: 'muramasa' },
   { pair: ['yoroi', 'gaikotsu'], result: 'muramasa' },
-  { pair: ['tsukumogami', 'kamaitachi'], result: 'muramasa' },
+  { pair: ['oboroguruma', 'tsukumogami'], result: 'muramasa' },
   { pair: ['chochin', 'karakasa'], result: 'tsukumogami' },
+  { pair: ['onyudo', 'oboroguruma'], result: 'tsukumogami' },
   { pair: ['kyubi', 'yukionna'], result: 'tamamo' },
   { pair: ['kyubi', 'hyakume'], result: 'tamamo' },
+  { pair: ['nureonna', 'kyubi'], result: 'tamamo' },
   { pair: ['daitengu', 'yamanba'], result: 'kirin' },
-  { pair: ['daitengu', 'kodama'], result: 'kirin' },
+  { pair: ['zashiki', 'yamanba'], result: 'kirin' },
   { pair: ['satori', 'kodama'], result: 'hakutaku' },
   { pair: ['hyakume', 'kodama'], result: 'hakutaku' },
+  { pair: ['satori', 'hyakume'], result: 'hakutaku' },
   { pair: ['omukade', 'kasha'], result: 'tatarigami' },
+  { pair: ['amanojaku', 'dorotabo'], result: 'tatarigami' },
   { pair: ['ogama', 'kappa'], result: 'genbu' },
   { pair: ['ryujin', 'ogama'], result: 'genbu' },
+  { pair: ['umibozu', 'karakasa'], result: 'genbu' },
+  { pair: ['nureonna', 'umibozu'], result: 'genbu' },
   { pair: ['muramasa', 'okuriinu'], result: 'byakko' },
   { pair: ['nue', 'kamaitachi'], result: 'byakko' },
+  { pair: ['okuriinu', 'nekomata'], result: 'byakko' },
   { pair: ['ryujin', 'karasutengu'], result: 'seiryu' },
   { pair: ['ryujin', 'kodama'], result: 'seiryu' },
   { pair: ['yatagarasu', 'tamamo'], result: 'suzaku' },
+  { pair: ['kasha', 'shiranui'], result: 'suzaku' },
   { pair: ['kyubi', 'ryujin'], result: 'nurarihyon' },
+  { pair: ['tanuki', 'itsumade'], result: 'furi' },
+  { pair: ['yamawaro', 'kawauso'], result: 'furi' },
+  { pair: ['onibi', 'oboroguruma'], result: 'wanyudo' },
+  { pair: ['hitotsume', 'kasha'], result: 'wanyudo' },
+  { pair: ['dorotabo', 'onyudo'], result: 'nurikabe' },
+  { pair: ['amanojaku', 'zashiki'], result: 'nurikabe' },
+  { pair: ['kudagitsune', 'gaikotsu'], result: 'tesso' },
+  { pair: ['nekomata', 'tsukumogami'], result: 'tesso' },
+  { pair: ['kawauso', 'nureonna'], result: 'isonade' },
+  { pair: ['amefuri', 'umibozu'], result: 'isonade' },
 ];
 
 const EXP_BY_TIER = { 1: 2, 2: 4 };

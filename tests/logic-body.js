@@ -188,15 +188,32 @@ ok(elementMult('fire', null) === 1, '無属性=1.0');
 }
 
 // --- データ整合 ---
-ok(Object.keys(SPECIES).length === 50, '妖怪50種');
-ok(RECIPES.length === 32, 'レシピ32通り');
+ok(Object.keys(SPECIES).length === 55, 'M6-B: 妖怪55種');
+ok(RECIPES.length === 54, 'M6-B: レシピ54通り');
 ok(RECIPES.every(r => SPECIES[r.result] && SPECIES[r.pair[0]] && SPECIES[r.pair[1]]), 'レシピ参照整合');
+{
+  const pairKeys = RECIPES.map(r => r.pair.slice().sort().join('+'));
+  const materialCounts = Object.fromEntries(Object.keys(SPECIES).map(id => [id, 0]));
+  RECIPES.forEach(r => r.pair.forEach(id => { materialCounts[id]++; }));
+  const wild = Object.values(SPECIES).filter(s => s.tier > 0);
+  ok(new Set(pairKeys).size === pairKeys.length, 'M6-A: 素材ペアに重複なし');
+  ok(wild.every(s => materialCounts[s.id] >= 1), 'M6-A: 野生33種すべてが憑合素材になる');
+  ok(Math.max(...wild.map(s => materialCounts[s.id])) <= 4, 'M6-A: 野生素材の使用頻度は最大4レシピ');
+  ok(findRecipe('nekomata', 'kudagitsune').result === 'kyubi'
+    && findRecipe('amanojaku', 'dorotabo').result === 'tatarigami'
+    && findRecipe('kasha', 'shiranui').result === 'suzaku', 'M6-A: 新しい序盤・中盤・終盤レシピ');
+  ok(findRecipe('tanuki', 'itsumade').result === 'furi'
+    && findRecipe('hitotsume', 'kasha').result === 'wanyudo'
+    && findRecipe('amefuri', 'umibozu').result === 'isonade', 'M6-B: 五行追加妖怪の代表レシピ');
+  ok(['furi', 'wanyudo', 'nurikabe', 'tesso', 'isonade'].every(id =>
+    RECIPES.filter(r => r.result === id).length === 2), 'M6-B: 追加5種に各2通りの憑合経路');
+}
 ok(DUNGEON_ORDER.every(d => {
   const dg = DUNGEONS[d];
   return dg.pools.t1.every(s => SPECIES[s] && SPECIES[s].tier === 1) &&
          dg.pools.t2.every(s => SPECIES[s] && SPECIES[s].tier === 2);
 }), 'ダンジョン出現テーブルのtier整合');
-ok(Object.values(SPECIES).filter(s => s.tier === 0).length === 17, '憑合限定17種');
+ok(Object.values(SPECIES).filter(s => s.tier === 0).length === 22, '憑合限定22種');
 ok(Object.values(SPECIES).every(s => s.tier === 0 || (s.enemy && s.enemy.hp > 0)), '野生種は敵ステータスを持つ');
 ok(Object.keys(ITEMS).length === 8, '呪具8種');
 const conditionedSpecies = Object.values(SPECIES).filter(s => s.encounter);
@@ -490,6 +507,14 @@ ok(dungeonUnlocked('d2'), 'd2解放');
   ok(importSave(code), '引継ぎコード読み込み成功');
   ok(JSON.stringify(G) === snapshot, '読み込みで状態復元');
   ok(!importSave('でたらめ'), '不正コードは拒否');
+
+  const json = exportSaveJson();
+  const backup = JSON.parse(json);
+  ok(backup.format === 'HYAKKI_SAVE' && backup.version === 1 && backup.appVersion === APP_VERSION && backup.exportedAt, 'M5-G: JSONバックアップ形式');
+  G.stats.runs = 998;
+  ok(importSave(json), 'M5-G: JSONバックアップ読み込み成功');
+  ok(JSON.stringify(G) === snapshot, 'M5-G: JSONバックアップで状態復元');
+  ok(!importSave('{"format":"HYAKKI_SAVE","version":99,"data":{}}'), 'M5-G: 未対応JSON版を拒否');
 }
 
 // --- セーブ/ロード往復 ---
@@ -695,7 +720,7 @@ ok(dungeonUnlocked('d2'), 'd2解放');
   ok(!peekRun() && !loadRun(), 'clearRunで保存が消える');
 }
 
-// --- M3-D: 全時間帯×代表月相の敵編成・全50種到達性 ---
+// --- M3-D/M6-B: 全時間帯×代表月相の敵編成・全55種到達性 ---
 {
   const representativePhases = ['new', 'first-quarter', 'full', 'last-quarter'];
   const contexts = TIME_BANDS.flatMap(band => representativePhases.map(moonPhase => ({ timeBand: band.id, moonPhase })));
@@ -760,7 +785,7 @@ ok(dungeonUnlocked('d2'), 'd2解放');
     }
   }
   const unreachable = Object.keys(SPECIES).filter(id => !reachable.has(id));
-  ok(reachable.size === 50 && unreachable.length === 0, `妖怪50種すべてに到達経路あり ${unreachable.join(',')}`);
+  ok(reachable.size === 55 && unreachable.length === 0, `妖怪55種すべてに到達経路あり ${unreachable.join(',')}`);
 
   const allowedConditionKeys = new Set(['timeBands', 'moonPhases', 'weight', 'offWeight', 'hint']);
   ok(conditionedSpecies.every(s => Object.keys(s.encounter).every(key => allowedConditionKeys.has(key))), '長期固定の暦日・季節条件なし');

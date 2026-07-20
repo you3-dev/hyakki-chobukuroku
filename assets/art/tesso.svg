@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs><radialGradient id="tesso-a"><stop offset="0" stop-color="#aab2c0" stop-opacity=".35"/><stop offset="1" stop-color="#aab2c0" stop-opacity="0"/></radialGradient></defs>
+  <circle cx="64" cy="65" r="55" fill="url(#tesso-a)"/>
+  <path d="M34 43 C21 32 23 18 35 16 C46 15 51 27 47 40 M94 43 C107 32 105 18 93 16 C82 15 77 27 81 40" fill="#aab2c0" stroke="#2a1f3d" stroke-width="5"/>
+  <path d="M39 36 C29 38 23 49 24 67 C25 91 43 106 64 106 C85 106 103 91 104 67 C105 49 99 38 89 36 C78 29 50 29 39 36 Z" fill="#747d8c" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M33 58 C42 48 52 46 61 53 M95 58 C86 48 76 46 67 53" fill="none" stroke="#2a1f3d" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="48" cy="61" r="4" fill="#ffc25e"/><circle cx="80" cy="61" r="4" fill="#ffc25e"/>
+  <path d="M48 76 Q64 66 80 76 L74 94 Q64 102 54 94 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="4"/>
+  <path d="M58 77 l4 13 l-9-4 M70 77 l-4 13 l9-4" fill="#fff" stroke="#2a1f3d" stroke-width="3" stroke-linejoin="round"/>
+  <circle cx="64" cy="75" r="4" fill="#2a1f3d"/>
+  <g stroke="#aab2c0" stroke-width="3" stroke-linecap="round"><path d="M45 76L18 70M45 82L16 85M83 76l27-6M83 82l29 3"/></g>
+  <path d="M97 93 C117 90 119 106 108 110 C100 113 94 106 100 102" fill="none" stroke="#747d8c" stroke-width="7" stroke-linecap="round"/>
+</svg>

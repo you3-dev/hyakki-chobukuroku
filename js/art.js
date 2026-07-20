@@ -18,6 +18,8 @@ const ART = [
   'yatagarasu', 'muramasa', 'tsukumogami', 'tamamo',
   'kirin', 'hakutaku', 'tatarigami', 'genbu',
   'byakko', 'seiryu', 'suzaku', 'nurarihyon',
+  // M6-B 憑合限定
+  'furi', 'wanyudo', 'nurikabe', 'tesso', 'isonade',
   // ボス
   'gashadokuro', 'shutendoji', 'orochi',
   // 呪具

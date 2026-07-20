@@ -102,20 +102,35 @@ function claimRankChoice(id, itemId) {
   return result;
 }
 
-// ===== セーブの書き出し/読み込み(iOSの7日削除対策) =====
+// ===== セーブの書き出し/読み込み =====
 function exportSave() {
   return 'HYAKKI1.' + btoa(unescape(encodeURIComponent(JSON.stringify(G))));
+}
+function exportSaveJson() {
+  return JSON.stringify({
+    format: 'HYAKKI_SAVE',
+    version: 1,
+    appVersion: typeof APP_VERSION === 'string' ? APP_VERSION : '',
+    exportedAt: new Date().toISOString(),
+    data: G,
+  }, null, 2);
+}
+function applyImportedSave(data) {
+  if (!data || !Array.isArray(data.roster) || !data.nextUid) return false;
+  G = data;
+  sanitize();
+  save();
+  return true;
 }
 function importSave(str) {
   try {
     const s = String(str).trim();
-    if (!s.startsWith('HYAKKI1.')) return false;
-    const data = JSON.parse(decodeURIComponent(escape(atob(s.slice(8)))));
-    if (!data || !Array.isArray(data.roster) || !data.nextUid) return false;
-    G = data;
-    sanitize();
-    save();
-    return true;
+    if (s.startsWith('HYAKKI1.')) {
+      return applyImportedSave(JSON.parse(decodeURIComponent(escape(atob(s.slice(8))))));
+    }
+    const backup = JSON.parse(s);
+    if (!backup || backup.format !== 'HYAKKI_SAVE' || backup.version !== 1) return false;
+    return applyImportedSave(backup.data);
   } catch (e) { return false; }
 }
 

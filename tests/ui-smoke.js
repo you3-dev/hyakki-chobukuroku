@@ -49,6 +49,12 @@ check('M5-B: 初回導入3画面とスキップ', () => {
   if (screen !== 'home' || !G.ui.onboardingSeen) throw new Error('導入をスキップできない');
 });
 check('home', () => { screen = 'home'; render(); });
+check('M5-G: 拠点見出しをコンパクト化', () => {
+  screen = 'home'; render();
+  if (!appStub.innerHTML.includes('<h1>調伏師の拠点</h1>')) throw new Error('拠点見出しがない');
+  if (appStub.innerHTML.includes('<h1>百鬼調伏録</h1>')) throw new Error('ゲームタイトルが拠点に重複している');
+  if (!styleCss.includes('.home-hero h1 {') || !styleCss.includes('font-size: 1.08rem')) throw new Error('拠点見出しが縮小されていない');
+});
 check('home(次の目標・位階導線)', () => {
   screen = 'home'; render();
   if (!appStub.innerHTML.includes('次の目標') || !appStub.innerHTML.includes('data-action="nav-ranks"')) throw new Error('次目標または位階導線がない');
@@ -351,6 +357,16 @@ check('action: 引継ぎ読み込み(不正)', () => {
 check('action: 引継ぎ読み込み(正常)', () => {
   globalThis.taStub.value = exportSave();
   handleAction('save-import');
+});
+check('M5-G: JSONバックアップUIと復元', () => {
+  screen = 'save'; render();
+  if (!appStub.innerHTML.includes('data-action="save-json"') || !appStub.innerHTML.includes('id="save-file-input"')) throw new Error('JSON保存・復元導線がない');
+  if (!appStub.innerHTML.includes('ホーム画面版はSafariの7日制限の対象外')) throw new Error('PWA保存説明が不正確');
+  const snapshot = JSON.stringify(G);
+  const json = exportSaveJson();
+  G.stats.runs = 997;
+  if (!finishSaveImport(json, '復元済み')) throw new Error('JSONをUI経由で復元できない');
+  if (JSON.stringify(G) !== snapshot || toast !== '復元済み') throw new Error('JSON復元結果が一致しない');
 });
 
 // M1: ラン途中セーブ

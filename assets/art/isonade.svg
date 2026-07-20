@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs><radialGradient id="isonade-a"><stop offset="0" stop-color="#5b8dd9" stop-opacity=".4"/><stop offset="1" stop-color="#5b8dd9" stop-opacity="0"/></radialGradient></defs>
+  <circle cx="64" cy="66" r="56" fill="url(#isonade-a)"/>
+  <path d="M15 82 C31 76 35 62 49 51 C63 40 82 41 98 52 L115 41 L109 63 L119 76 L98 77 C83 93 55 100 31 90 Z" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M56 48 L69 27 L79 48" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M45 88 L58 105 L67 93" fill="#5b8dd9" stroke="#2a1f3d" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M28 80 C43 75 58 76 74 80 C61 93 43 95 29 89 Z" fill="#f5f0e6" stroke="#2a1f3d" stroke-width="4"/>
+  <circle cx="51" cy="61" r="5" fill="#fff6cf" stroke="#2a1f3d" stroke-width="3"/><circle cx="52" cy="62" r="2" fill="#2a1f3d"/>
+  <path d="M27 79 Q38 68 49 76" fill="none" stroke="#2a1f3d" stroke-width="4" stroke-linecap="round"/>
+  <path d="M92 52 C87 43 87 32 93 22 C101 34 107 40 115 43" fill="#c9a24b" stroke="#2a1f3d" stroke-width="4" stroke-linejoin="round"/>
+  <g fill="none" stroke="#fff6cf" stroke-width="3" stroke-linecap="round" opacity=".8"><path d="M18 31 q8-8 16 0 q8 8 16 0"/><path d="M77 110 q8-8 16 0 q8 8 16 0"/></g>
+</svg>
