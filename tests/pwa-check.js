@@ -27,6 +27,7 @@ for (const asset of assets.filter(value => value !== './')) {
 const artFiles = fs.readdirSync(path.join(ROOT, 'assets/art')).filter(name => name.endsWith('.svg'));
 ok(artFiles.every(name => assets.includes(`./assets/art/${name}`)), `妖怪・呪具SVG ${artFiles.length}枚を全てキャッシュ`);
 for (const icon of manifest.icons || []) ok(assets.includes(`./${icon.src}`), `manifestアイコンをキャッシュ: ${icon.src}`);
+ok(assets.includes('./assets/title/title-keyart.webp'), '採用したタイトル看板アートをキャッシュ');
 
 ok(/CACHE_PREFIX/.test(sw) && /CACHE_VERSION/.test(sw), 'キャッシュ名を版管理');
 ok(/addEventListener\('install'/.test(sw) && /cache\.addAll\(APP_ASSETS\)/.test(sw) && /skipWaiting/.test(sw), 'installで全資産を保存');

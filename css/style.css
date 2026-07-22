@@ -206,7 +206,7 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 .title-screen {
   position: relative; min-height: 100vh; min-height: 100svh; overflow-x: hidden; overflow-y: auto;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 12px; padding: max(22px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(22px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  gap: 9px; padding: max(18px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(18px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
   text-align: center;
   background:
     radial-gradient(circle at 50% 28%, var(--sky-glow), transparent 28%),
@@ -219,12 +219,6 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 }
 .title-screen::before { top: -190px; left: -125px; }
 .title-screen::after { right: -150px; bottom: -185px; }
-.title-moon {
-  position: absolute; top: max(26px, env(safe-area-inset-top)); left: 50%; width: 190px; height: 190px;
-  transform: translateX(-50%); border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle, rgba(246, 223, 158, .18), rgba(224, 182, 78, .05) 58%, transparent 70%);
-  animation: moon-breathe 8s ease-in-out infinite;
-}
 .title-stars {
   position: absolute; inset: 0; pointer-events: none; opacity: .55;
   background:
@@ -233,26 +227,32 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
     radial-gradient(circle at 72% 48%, #fff 0 1px, transparent 1.5px),
     radial-gradient(circle at 28% 62%, #c9baf2 0 1px, transparent 1.5px);
 }
-.title-art { z-index: 1; display: flex; align-items: flex-end; justify-content: center; gap: 2px; height: 156px; }
-.title-art span { display: block; }
-.title-art .sprite { display: block; vertical-align: 0; }
-.title-art-main .sprite { width: 150px; height: 150px; filter: drop-shadow(0 10px 22px rgba(226, 87, 76, .25)); }
-.title-art-side { opacity: .72; transform: translateY(14px); }
-.title-art-side .sprite { width: 72px; height: 72px; filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .35)); }
-.title-copy { z-index: 1; }
-.title-logo { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 3px; }
+.title-keyart {
+  position: relative; z-index: 1; width: min(74vw, 330px); aspect-ratio: 720 / 689; flex: none;
+  overflow: hidden;
+  -webkit-mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 62%, transparent 100%);
+}
+.title-keyart img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.title-copy { z-index: 1; width: min(100%, 440px); }
+.title-logo { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 1px; }
+.title-logo::before, .title-logo::after {
+  content: ''; width: clamp(10px, 4vw, 24px); height: 1px; flex: none;
+  background: linear-gradient(90deg, transparent, rgba(216, 100, 88, .8));
+}
+.title-logo::after { transform: scaleX(-1); }
 .title-logo > span {
   display: grid; place-items: center; width: 34px; height: 34px; flex: none;
-  color: #2a1720; background: #d86458; border: 1px solid #f19a80; border-radius: 5px;
-  font-family: serif; font-size: 1.25rem; font-weight: bold; transform: rotate(-3deg);
+  color: #f2bd74; background: #a83938; border: 1px solid #e87361; border-radius: 5px;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: 1.08rem; font-weight: bold; transform: rotate(-3deg);
   box-shadow: 0 5px 16px rgba(173, 52, 50, .28);
 }
 .title-copy h1 {
-  color: var(--gold); font-size: clamp(2rem, 10vw, 3rem); letter-spacing: .16em;
-  text-shadow: 0 0 22px rgba(224, 182, 78, .32);
+  color: #efc35b; font: 700 clamp(2rem, 8.7vw, 2.7rem)/1.08 "Yu Mincho", "Hiragino Mincho ProN", "YuMincho", serif;
+  letter-spacing: .055em; white-space: nowrap; font-feature-settings: "palt" 1;
+  text-shadow: 0 2px 0 rgba(91, 45, 34, .8), 0 0 22px rgba(224, 182, 78, .25);
 }
-.title-reading { color: var(--dim); font-size: .7rem; letter-spacing: .16em; }
-.title-tagline { margin-top: 8px; color: var(--text); font-size: .86rem; }
+.title-tagline { margin-top: 7px; color: var(--text); font-family: "Yu Mincho", "Hiragino Mincho ProN", serif; font-size: .84rem; letter-spacing: .03em; }
 .title-guide {
   z-index: 1; width: min(100%, 430px); display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
 }
@@ -349,11 +349,6 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
   .tutorial-fusion span:last-child .sprite { width: 82px; height: 82px; }
 }
 
-@keyframes moon-breathe {
-  0%, 100% { opacity: .72; transform: translateX(-50%) scale(.97); }
-  50% { opacity: 1; transform: translateX(-50%) scale(1.03); }
-}
-
 @keyframes screen-enter {
   from { opacity: 0; transform: translateY(7px); }
   to { opacity: 1; transform: translateY(0); }
@@ -390,9 +385,7 @@ body.motion-reduced .unit-art-btn:active, body.motion-reduced .node-card:active 
 
 @media (max-height: 680px) {
   .title-screen { gap: 7px; padding-top: max(10px, env(safe-area-inset-top)); padding-bottom: max(10px, env(safe-area-inset-bottom)); }
-  .title-art { height: 102px; }
-  .title-art-main .sprite { width: 100px; height: 100px; }
-  .title-art-side .sprite { width: 54px; height: 54px; }
+  .title-keyart { width: min(52vw, 220px); }
   .title-copy h1 { font-size: 2rem; }
   .title-tagline { margin-top: 4px; }
   .title-version { display: none; }
@@ -405,12 +398,8 @@ body.motion-reduced .unit-art-btn:active, body.motion-reduced .node-card:active 
 
 @media (orientation: landscape) and (max-height: 500px) {
   .title-screen { gap: 4px; padding: max(4px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(4px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); }
-  .title-art { height: 72px; }
-  .title-art-main .sprite { width: 72px; height: 72px; }
-  .title-art-side { transform: translateY(7px); }
-  .title-art-side .sprite { width: 42px; height: 42px; }
+  .title-keyart { width: 138px; }
   .title-copy h1 { margin-top: 0; font-size: 1.65rem; }
-  .title-reading { font-size: .62rem; }
   .title-tagline { margin-top: 2px; font-size: .72rem; }
   .title-screen .time-context { padding: 3px 10px; }
   .title-guide { display: none; }

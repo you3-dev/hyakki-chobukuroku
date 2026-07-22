@@ -31,6 +31,12 @@ check('boot: title', () => {
   if (screen !== 'title') throw new Error('起動時にタイトルではない: ' + screen);
   render();
   if (!appStub.innerHTML.includes('百鬼調伏録')) throw new Error('タイトル名がない');
+  if (!appStub.innerHTML.includes('title-keyart.webp') || !appStub.innerHTML.includes('class="title-keyart"')) throw new Error('採用した切り絵タイトルアートがない');
+  if (!styleCss.includes('font-feature-settings: "palt" 1') || !styleCss.includes('"Yu Mincho"')) throw new Error('採用した怪異明朝ロゴがない');
+  if (!(appStub.innerHTML.indexOf('class="title-keyart"') < appStub.innerHTML.indexOf('class="title-copy"') && appStub.innerHTML.indexOf('class="title-copy"') < appStub.innerHTML.indexOf('class="time-context"') && appStub.innerHTML.indexOf('class="time-context"') < appStub.innerHTML.indexOf('class="title-actions"'))) throw new Error('タイトルのアート・ロゴ・時間・操作が通常フロー順でない');
+  const keyartRuleStart = styleCss.indexOf('.title-keyart {');
+  const keyartRule = styleCss.slice(keyartRuleStart, styleCss.indexOf('}', keyartRuleStart));
+  if (!keyartRule.includes('position: relative') || keyartRule.includes('position: absolute')) throw new Error('タイトル看板アートが重なり配置になっている');
   if (!appStub.innerHTML.includes('>はじめる<')) throw new Error('新規開始ボタンがない');
   if (!['title-guide', 'title-record', 'title-settings'].every(action => appStub.innerHTML.includes('data-action="' + action + '"'))) throw new Error('タイトルの補助導線が不足');
 });
