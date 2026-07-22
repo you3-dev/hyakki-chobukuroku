@@ -58,8 +58,18 @@ check('M5-G: 拠点見出しをコンパクト化', () => {
 check('home(次の目標・位階導線)', () => {
   screen = 'home'; render();
   if (!appStub.innerHTML.includes('次の目標') || !appStub.innerHTML.includes('data-action="nav-ranks"')) throw new Error('次目標または位階導線がない');
-  if (!appStub.innerHTML.includes('まずは最初の夜行へ') || !appStub.innerHTML.includes('最初の夜行へ')) throw new Error('初夜行の強調導線がない');
-  if (!appStub.innerHTML.includes('dashboard-grid') || !appStub.innerHTML.includes('home-summary')) throw new Error('拠点の情報階層がM5-C共通構造でない');
+  if (!appStub.innerHTML.includes('最初の夜行へ') || !appStub.innerHTML.includes('宵の小径 / 全10歩')) throw new Error('初夜行の強調導線がない');
+  if (!appStub.innerHTML.includes('home-prep-menu') || !appStub.innerHTML.includes('home-summary')) throw new Error('拠点の情報階層が共通構造でない');
+});
+check('RC5: 出撃ファースト改良ハブ', () => {
+  screen = 'home'; render();
+  const html = appStub.innerHTML;
+  if (!(html.indexOf('home-run-action') < html.indexOf('progression-goal') && html.indexOf('progression-goal') < html.indexOf('home-summary'))) throw new Error('出撃・目標・進捗の優先順が違う');
+  if (!html.includes('home-prep-menu') || !html.includes('aria-label="夜行の支度"')) throw new Error('支度3項目がない');
+  if (!html.includes('home-record-menu') || !html.includes('aria-label="成果の記録"')) throw new Error('記録3項目がない');
+  if (!html.includes('home-utility-menu') || !html.includes('📜 遊び方') || !html.includes('💾 引継ぎ')) throw new Error('補助3項目がない');
+  if (html.includes('first-night-callout')) throw new Error('初夜行の重複案内が残っている');
+  if (!styleCss.includes('.home-utility-menu button {') || !styleCss.includes('min-height: var(--tap-min)')) throw new Error('補助操作の44px領域がない');
 });
 check('home(イラスト差し替え)', () => {
   if (!ART.includes('onibi')) throw new Error('サンプルアートが未登録');
@@ -127,7 +137,7 @@ check('M5-C: 共通画面ヘッダー・戻る操作', () => {
     screen = name; render();
     if (!appStub.innerHTML.includes('screen-header') || !appStub.innerHTML.includes('screen-actions')) throw new Error(name + 'の共通構造が不足');
   }
-  if (!styleCss.includes('.screen-actions {') || !styleCss.includes('.screen-header {') || !styleCss.includes('.dashboard-grid {')) throw new Error('M5-C共通CSSが不足');
+  if (!styleCss.includes('.screen-actions {') || !styleCss.includes('.screen-header {') || !styleCss.includes('.home-prep-menu')) throw new Error('M5-C共通CSSが不足');
 });
 check('M5-D: 専用演出・読み上げ・動きの抑制', () => {
   celebrationQueue = [];

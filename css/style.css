@@ -123,22 +123,34 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 .home-hero { margin: max(10px, env(safe-area-inset-top)) 0 10px; padding: 10px 12px; display: flex; align-items: baseline; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); }
 .home-hero h1 { color: var(--gold); font-size: 1.08rem; letter-spacing: .08em; text-shadow: 0 0 14px rgba(224, 182, 78, .24); }
 .home-hero > span { color: var(--dim); font-size: .68rem; text-align: right; }
-.home-summary, .collection-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); margin: 12px auto; }
-.home-summary span, .collection-summary span { min-width: 0; padding: 9px 6px; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--line); border-radius: var(--radius-sm); background: rgba(24, 20, 42, .72); text-align: center; }
+.home-summary { width: fit-content; max-width: 100%; margin: 10px auto 14px; padding: 6px 10px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 3px 12px; border: 1px solid var(--line); border-radius: 999px; background: rgba(24, 20, 42, .72); }
+.home-summary span { min-width: 0; display: inline-flex; align-items: baseline; gap: 4px; white-space: nowrap; }
+.collection-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); margin: 12px auto; }
+.collection-summary span { min-width: 0; padding: 9px 6px; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--line); border-radius: var(--radius-sm); background: rgba(24, 20, 42, .72); text-align: center; }
 .home-summary small, .collection-summary small { color: var(--dim); font-size: .62rem; }
 .home-summary strong, .collection-summary strong { overflow: hidden; max-width: 100%; color: #f0e9ff; font-size: .85rem; text-overflow: ellipsis; white-space: nowrap; }
-.home-summary b { color: var(--dim); font-size: .62rem; font-weight: normal; }
 .home-primary-panel { width: min(100%, 620px); margin: 0 auto; padding: var(--space-3); border: 1px solid rgba(122, 104, 201, .65); border-radius: var(--radius-lg); background: rgba(31, 25, 54, .7); box-shadow: var(--shadow-card); }
-.dashboard-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
-.dashboard-grid button {
+.home-run-action { width: 100%; min-height: 62px; display: flex; flex-direction: column; gap: 2px; }
+.home-run-action small { color: #d5cdef; font-size: .64rem; font-weight: normal; }
+.home-primary-panel .progression-goal { margin: 10px 0 0; }
+.home-prep-menu, .home-record-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-2); }
+.home-prep-menu button, .home-record-menu button {
   appearance: none; min-height: 78px; padding: 9px 7px; cursor: pointer;
   display: grid; grid-template-columns: 30px minmax(0, 1fr); grid-template-rows: auto auto; align-items: center; column-gap: 7px;
   color: var(--text); border: 1px solid var(--line); border-radius: var(--radius-md); background: linear-gradient(180deg, var(--panel2), var(--panel)); text-align: left; box-shadow: var(--shadow-card); font: inherit;
 }
-.dashboard-grid button > span { grid-row: 1 / 3; font-size: 1.35rem; text-align: center; }
-.dashboard-grid button strong { align-self: end; color: #f2d685; font-size: .78rem; }
-.dashboard-grid button small { align-self: start; overflow: hidden; color: var(--dim); font-size: .62rem; text-overflow: ellipsis; white-space: nowrap; }
-.dashboard-grid button:active { transform: scale(.98); }
+.home-prep-menu button > span, .home-record-menu button > span { grid-row: 1 / 3; font-size: 1.35rem; text-align: center; }
+.home-prep-menu button strong, .home-record-menu button strong { align-self: end; color: #f2d685; font-size: .78rem; }
+.home-prep-menu button small, .home-record-menu button small { align-self: start; overflow: hidden; color: var(--dim); font-size: .62rem; text-overflow: ellipsis; white-space: nowrap; }
+.home-record-menu button { min-height: 48px; grid-template-columns: auto minmax(0, auto); justify-content: center; padding: 6px 8px; }
+.home-record-menu button > span { font-size: 1rem; }
+.home-record-menu button strong { font-size: .7rem; }
+.home-record-menu button small { font-size: .58rem; }
+.home-prep-menu button:active, .home-record-menu button:active { transform: scale(.98); }
+.home-utility-menu { margin: 8px auto 0; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0 2px; }
+.home-utility-menu button { appearance: none; min-height: var(--tap-min); padding: 7px 10px; cursor: pointer; color: var(--dim); border: 0; border-radius: var(--radius-sm); background: none; font: inherit; font-size: .68rem; }
+.home-utility-menu button:active { color: var(--text); background: rgba(74, 63, 122, .28); }
+.home-utility-menu > span { color: var(--line); }
 
 /* 現実時間テーマ(M3-B) */
 .time-morning { --sky-top: #2b2347; --sky-bottom: #775044; --sky-glow: rgba(244, 181, 105, .27); --time-line: #d99b70; }
@@ -866,11 +878,16 @@ body.pwa-standalone #app { min-height: 100svh; }
 @media (max-width: 520px) {
   .screen-header { align-items: flex-start; padding: 11px 12px; }
   .screen-meta { max-width: 38%; }
-  .home-summary { grid-template-columns: repeat(2, 1fr); }
+  .home-summary { border-radius: var(--radius-md); }
   .home-hero { align-items: flex-start; flex-direction: column; gap: 2px; }
   .home-hero > span { text-align: left; }
-  .dashboard-grid { grid-template-columns: repeat(2, 1fr); }
-  .dashboard-grid button { min-height: 70px; }
+  .home-prep-menu button { min-height: 72px; grid-template-columns: 1fr; grid-template-rows: auto auto auto; justify-items: center; text-align: center; }
+  .home-prep-menu button > span { grid-row: auto; font-size: 1.2rem; }
+  .home-prep-menu button strong { align-self: auto; }
+  .home-prep-menu button small { align-self: auto; }
+  .home-record-menu { gap: 6px; }
+  .home-record-menu button { grid-template-columns: 1fr; grid-template-rows: auto auto; }
+  .home-record-menu button > span { display: none; }
   .screen-actions { width: 100%; }
   .screen-actions .btn { flex: 1 1 150px; min-width: 0; }
   .danger-zone { align-items: stretch; flex-direction: column; }

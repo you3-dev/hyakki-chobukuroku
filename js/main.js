@@ -839,25 +839,27 @@ function renderHome() {
     <header class="home-hero"><h1>調伏師の拠点</h1><span>${ending ? '大調伏師として、明けた夜をさらに歩め' : '妖怪を調伏し、百鬼の図鑑を埋めよ'}</span></header>
     ${ending ? '<div class="ending-home-banner">🌅 百鬼の試練 踏破済み — 称号「大調伏師」</div>' : ''}
     ${timeContextHtml(time)}
-    <div class="home-summary" aria-label="進行状況"><span><small>位階</small><strong>${rank.name}</strong><b>${rank.value}/${rank.max}</b></span><span><small>図鑑</small><strong>${dexOwnedCount()}/${Object.keys(SPECIES).length}</strong><b>使役</b></span><span><small>夜行</small><strong>${st.clears}</strong><b>踏破</b></span><span><small>調伏</small><strong>${st.captures}</strong><b>体</b></span></div>
     <section class="home-primary-panel">
+      <button class="btn btn-primary btn-big home-run-action ${firstNight ? 'first-night-action' : ''}" data-action="start-run"><span>🌙 ${firstNight ? '最初の夜行へ' : '夜行に出る'}</span><small>${firstNight ? '宵の小径 / 全10歩' : '行き先を選ぶ'}</small></button>
       ${progressionGoalHtml()}
-      ${firstNight ? '<aside class="first-night-callout"><span>一</span><div><strong>まずは最初の夜行へ</strong><p>準備は整っている。「宵の小径」で調伏を一度試してみよう。</p></div></aside>' : ''}
-      <div class="btn-row">
-      <button class="btn btn-primary btn-big ${firstNight ? 'first-night-action' : ''}" data-action="start-run">🌙 ${firstNight ? '最初の夜行へ' : '夜行に出る'}</button>
-      </div>
     </section>
-    ${sectionHeader('支度と記録', '', '夜行前の準備や集めた記録を確認')}
-    <nav class="dashboard-grid" aria-label="拠点メニュー">
+    <div class="home-summary" aria-label="進行状況"><span><small>位階</small><strong>${rank.name}</strong></span><span><small>図鑑</small><strong>${dexOwnedCount()}/${Object.keys(SPECIES).length}</strong></span><span><small>踏破</small><strong>${st.clears}</strong></span><span><small>調伏</small><strong>${st.captures}</strong></span></div>
+    ${sectionHeader('支度', '', '夜行前の準備。毎回使うものだけ')}
+    <nav class="home-prep-menu" aria-label="夜行の支度">
       <button data-action="nav-deck"><span>🎴</span><strong>編成</strong><small>${G.deck.length}/${DECK_MAX}枚</small></button>
       <button data-action="nav-fusion"><span>🔮</span><strong>憑合</strong><small>新種・重ね</small></button>
       <button data-action="nav-items"><span>🧿</span><strong>呪具</strong><small>所持${itemTotal()}</small></button>
+    </nav>
+    ${sectionHeader('記録', '', '集めた成果を確認')}
+    <nav class="home-record-menu" aria-label="成果の記録">
       <button data-action="nav-dex"><span>📖</span><strong>図鑑</strong><small>${dexOwnedCount()}/${Object.keys(SPECIES).length}</small></button>
       <button class="achievement-home-btn" data-action="nav-achievements"><span>🏆</span><strong>実績</strong><small>${achievementCount}/${ACHIEVEMENTS.length}${unseenCount ? `・NEW ${unseenCount}` : ''}${unclaimedCount ? `・受取 ${unclaimedCount}` : ''}</small></button>
       <button data-action="nav-ranks"><span>🎖️</span><strong>位階</strong><small>${rank.value}/${rank.max}</small></button>
-      <button data-action="nav-guide"><span>📜</span><strong>遊び方</strong><small>手引き</small></button>
-      <button data-action="nav-settings"><span>⚙️</span><strong>設定</strong><small>演出</small></button>
-      <button data-action="nav-save"><span>💾</span><strong>記録</strong><small>引継ぎ</small></button>
+    </nav>
+    <nav class="home-utility-menu" aria-label="補助メニュー">
+      <button data-action="nav-guide">📜 遊び方</button><span aria-hidden="true">·</span>
+      <button data-action="nav-settings">⚙️ 設定</button><span aria-hidden="true">·</span>
+      <button data-action="nav-save">💾 引継ぎ</button>
     </nav>
     ${sectionHeader('手持ち妖怪', `${G.roster.length}体`, 'イラストをタップすると詳細を表示')}
     <div class="grid">${rosterHtml}</div>
