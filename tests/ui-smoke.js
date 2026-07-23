@@ -80,7 +80,9 @@ check('RC5: 出撃ファースト改良ハブ', () => {
 check('home(イラスト差し替え)', () => {
   if (!ART.includes('onibi')) throw new Error('サンプルアートが未登録');
   render();
-  if (!appStub.innerHTML.includes('assets/art/onibi.svg')) throw new Error('imgタグに切り替わっていない');
+  if (!appStub.innerHTML.includes('assets/art/onibi.webp')) throw new Error('WebPのimgタグに切り替わっていない');
+  if (!artHtml('orochi-revenant', '🐍').includes('assets/art/orochi-revenant.webp')) throw new Error('再臨ボスWebPへ切り替わっていない');
+  if (!styleCss.includes('.enemy.boss .enemy-emoji .sprite')) throw new Error('ボス用の拡大表示がない');
 });
 check('home(イラスト拡大ボタン)', () => {
   screen = 'home'; render();

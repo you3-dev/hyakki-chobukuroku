@@ -1157,6 +1157,7 @@ function enemyHtml(e, idx) {
   const ratio = e.maxHp ? e.hp / e.maxHp : 0;
   const capturable = canCapture(e);
   const cls = ['enemy'];
+  if (e.boss) cls.push('boss');
   if (dead) cls.push(e.state === 'captured' ? 'captured' : 'dead');
   if (capturable) cls.push('capturable');
   if (captureMode && capturable) cls.push('capture-target');

@@ -563,6 +563,16 @@ body.pwa-standalone #app { min-height: 100svh; }
 .enemy.mercy-spared { border-color: #b9a6ff; box-shadow: 0 0 0 2px rgba(185, 166, 255, .18), 0 8px 18px rgba(0, 0, 0, .22); }
 .enemy.capture-target { box-shadow: 0 0 12px rgba(224, 182, 78, .8); }
 .enemy-emoji { font-size: 2.2rem; }
+.enemy.boss {
+  width: min(100%, 224px); padding: 10px;
+  border-color: rgba(224, 182, 78, .52);
+  background: linear-gradient(180deg, rgba(45, 36, 69, .96), rgba(20, 17, 35, .96));
+}
+.enemy.boss .enemy-emoji { font-size: 1rem; }
+.enemy.boss .enemy-emoji .sprite {
+  display: block; width: min(46vw, 180px); height: min(46vw, 180px); margin: 0 auto 7px;
+  border-radius: 10px; object-fit: cover; box-shadow: 0 8px 22px rgba(0, 0, 0, .36);
+}
 .enemy-name { font-size: .78rem; margin: 2px 0; }
 .enemy-state { color: var(--gold); font-weight: bold; margin-top: 4px; }
 .hpbar { height: 8px; background: #1c1733; border-radius: 4px; overflow: hidden; margin: 4px 4px 2px; }
@@ -612,7 +622,8 @@ body.pwa-standalone #app { min-height: 100svh; }
 .battle-beginner-hint.ready strong { color: var(--gold); }
 
 /* イラスト(絵文字と同じ大きさ感で置き換わる) */
-.sprite { width: 1.2em; height: 1.2em; vertical-align: -0.2em; }
+.sprite { width: 1.2em; height: 1.2em; vertical-align: -0.2em; object-fit: contain; }
+.sprite-webp { border-radius: 12%; }
 
 /* 手持ち妖怪のイラスト拡大 */
 .unit-detail-overlay {

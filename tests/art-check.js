@@ -1,4 +1,4 @@
-// アセット整合チェック: ARTに登録されたidのSVGが存在し、仕様を満たすか
+// アセット整合チェック: ARTに登録されたWebP/SVGが存在し、仕様を満たすか
 // 実行: node tests/art-check.js
 const fs = require('fs');
 const path = require('path');
@@ -15,10 +15,19 @@ function ok(cond, msg) { if (!cond) { fails++; console.log('FAIL:', msg); } else
 const validIds = new Set([
   ...Object.keys(SPECIES),
   ...Object.keys(ITEMS),
-  ...Object.values(DUNGEONS).flatMap(d => (d.bosses || [d.boss]).map(b => b.id)),
+  ...Object.values(DUNGEONS).flatMap(d => (d.bosses || [d.boss]).flatMap(b => [b.id, b.art].filter(Boolean))),
 ]);
 
-for (const id of ART) {
+for (const id of RASTER_ART) {
+  ok(validIds.has(id), `${id}: 実在するid`);
+  const p = path.join(ROOT, 'assets', 'art', `${id}.webp`);
+  if (!fs.existsSync(p)) { fails++; console.log(`FAIL: ${id}.webp が存在しない`); continue; }
+  const webp = fs.readFileSync(p);
+  ok(webp.length >= 12 && webp.subarray(0, 4).toString() === 'RIFF' && webp.subarray(8, 12).toString() === 'WEBP', `${id}.webp: WebP形式`);
+  ok(webp.length <= 128 * 1024, `${id}.webp: 128KB以下`);
+}
+
+for (const id of VECTOR_ART) {
   ok(validIds.has(id), `${id}: 実在するid`);
   const p = path.join(ROOT, 'assets', 'art', `${id}.svg`);
   if (!fs.existsSync(p)) { fails++; console.log(`FAIL: ${id}.svg が存在しない`); continue; }
@@ -28,13 +37,13 @@ for (const id of ART) {
   ok(!/<script|<image|xlink:href|href\s*=\s*["']https?:/i.test(svg), `${id}.svg: 外部参照・scriptなし`);
   ok(fs.statSync(p).size <= 20 * 1024, `${id}.svg: 20KB以下`);
 }
-// 置き忘れ(SVGはあるのにART未登録)の検出
+// 置き忘れ(WebPはあるのにRASTER_ART未登録)の検出
 const artDir = path.join(ROOT, 'assets', 'art');
-const orphans = fs.readdirSync(artDir)
-  .filter(f => f.endsWith('.svg'))
-  .map(f => f.replace(/\.svg$/, ''))
-  .filter(id => !ART.includes(id));
-ok(orphans.length === 0, `ART未登録のSVGなし${orphans.length ? ' → ' + orphans.join(',') : ''}`);
+const rasterOrphans = fs.readdirSync(artDir)
+  .filter(f => f.endsWith('.webp'))
+  .map(f => f.replace(/\.webp$/, ''))
+  .filter(id => !RASTER_ART.includes(id));
+ok(rasterOrphans.length === 0, `RASTER_ART未登録のWebPなし${rasterOrphans.length ? ' → ' + rasterOrphans.join(',') : ''}`);
 
 // PWAアプリアイコン: PNG実寸・manifest/index参照の整合
 function pngInfo(relativePath) {

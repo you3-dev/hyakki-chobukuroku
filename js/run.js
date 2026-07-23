@@ -149,7 +149,7 @@ function makeGroup(kind) {
   if (kind === 'boss') {
     const bosses = dg.bosses || [dg.boss];
     return bosses.map(b => ({
-      sp: null, art: b.id, boss: true, name: b.name, emoji: b.emoji, element: null, tier: 0,
+      sp: null, art: b.art || b.id, boss: true, name: b.name, emoji: b.emoji, element: null, tier: 0,
       maxHp: b.hp, hp: b.hp, atk: b.atk, bigAtk: b.bigAtk, expValue: b.expValue,
       rage: 0, poison: 0, weak: 0, advTag: false, snareTag: false, state: 'alive',
     }));

@@ -613,6 +613,7 @@ ok(dungeonUnlocked('d2'), 'd2解放');
   R.depth = DUNGEONS.trial.length;
   const finalBosses = makeGroup('boss');
   ok(finalBosses.length === 3 && finalBosses.every(enemy => enemy.boss), 'M4.5: 最終戦は既存3ボスの再臨');
+  ok(finalBosses.every(enemy => enemy.art.endsWith('-revenant')), 'M6-B.3: 最終戦は再臨ボスアート');
   const fudaBeforeChoice = R.fuda;
   const itemBeforeChoice = itemTotal();
   const choiceResults = treasureChoiceOptions();

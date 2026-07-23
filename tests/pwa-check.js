@@ -24,8 +24,14 @@ for (const asset of assets.filter(value => value !== './')) {
   ok(fs.existsSync(path.join(ROOT, asset.replace(/^\.\//, ''))), `キャッシュ資産が存在: ${asset}`);
 }
 
-const artFiles = fs.readdirSync(path.join(ROOT, 'assets/art')).filter(name => name.endsWith('.svg'));
-ok(artFiles.every(name => assets.includes(`./assets/art/${name}`)), `妖怪・呪具SVG ${artFiles.length}枚を全てキャッシュ`);
+const artContext = {};
+require('vm').runInNewContext(`${fs.readFileSync(path.join(ROOT, 'js/art.js'), 'utf8')}
+this.raster = RASTER_ART; this.vector = VECTOR_ART;`, artContext);
+const runtimeArtFiles = [
+  ...artContext.raster.map(id => `${id}.webp`),
+  ...artContext.vector.map(id => `${id}.svg`),
+];
+ok(runtimeArtFiles.every(name => assets.includes(`./assets/art/${name}`)), `実装用妖怪・ボス・呪具アート ${runtimeArtFiles.length}枚を全てキャッシュ`);
 for (const icon of manifest.icons || []) ok(assets.includes(`./${icon.src}`), `manifestアイコンをキャッシュ: ${icon.src}`);
 ok(assets.includes('./assets/title/title-keyart.webp'), '採用したタイトル看板アートをキャッシュ');
 

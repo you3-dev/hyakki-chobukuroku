@@ -135,9 +135,9 @@ const DUNGEONS = {
       t2: ['kodama', 'kappa', 'yamawaro', 'tsuchigumo', 'yukionna', 'karasutengu', 'ogama', 'nue', 'zashiki', 'gaikotsu', 'kasha', 'hyakume', 'yamanba', 'onyudo', 'shiranui', 'itsumade', 'nureonna', 'satori', 'umibozu', 'oboroguruma'],
     },
     bosses: [
-      { id: 'gashadokuro', name: 'がしゃどくろ・再臨', emoji: '💀', hp: 45, atk: 6, bigAtk: 9, expValue: 15 },
-      { id: 'shutendoji', name: '酒呑童子・再臨', emoji: '👹', hp: 65, atk: 7, bigAtk: 11, expValue: 25 },
-      { id: 'orochi', name: '八岐大蛇・再臨', emoji: '🐍', hp: 90, atk: 8, bigAtk: 13, expValue: 40 },
+      { id: 'gashadokuro', art: 'gashadokuro-revenant', name: 'がしゃどくろ・再臨', emoji: '💀', hp: 45, atk: 6, bigAtk: 9, expValue: 15 },
+      { id: 'shutendoji', art: 'shutendoji-revenant', name: '酒呑童子・再臨', emoji: '👹', hp: 65, atk: 7, bigAtk: 11, expValue: 25 },
+      { id: 'orochi', art: 'orochi-revenant', name: '八岐大蛇・再臨', emoji: '🐍', hp: 90, atk: 8, bigAtk: 13, expValue: 40 },
     ],
   },
 };
