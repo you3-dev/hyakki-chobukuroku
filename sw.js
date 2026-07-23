@@ -2,7 +2,7 @@
 
 // M5-E: この値を変更すると新しいキャッシュへ原子的に切り替わる。
 const CACHE_PREFIX = 'hyakki-chobukuroku-';
-const CACHE_VERSION = '1.0.0-rc.9';
+const CACHE_VERSION = '1.0.0-rc.10';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 
 const APP_ASSETS = [
