@@ -30,9 +30,11 @@ function check(name, fn) {
 check('boot: title', () => {
   if (screen !== 'title') throw new Error('起動時にタイトルではない: ' + screen);
   render();
-  if (!appStub.innerHTML.includes('百鬼調伏録')) throw new Error('タイトル名がない');
-  if (!appStub.innerHTML.includes('title-keyart.webp') || !appStub.innerHTML.includes('class="title-keyart"')) throw new Error('採用した切り絵タイトルアートがない');
-  if (!styleCss.includes('font-feature-settings: "palt" 1') || !styleCss.includes('"Yu Mincho"')) throw new Error('採用した怪異明朝ロゴがない');
+  if (!appStub.innerHTML.includes('<small>百鬼</small><strong>調伏録</strong>')) throw new Error('タイトル名がない');
+  if (!appStub.innerHTML.includes('title-keyart-journey.webp') || !appStub.innerHTML.includes('class="title-keyart"')) throw new Error('採用した夜行タイトルアートがない');
+  if (!appStub.innerHTML.includes('title-logo-journey') || !appStub.innerHTML.includes('<small>百鬼</small><strong>調伏録</strong>')) throw new Error('案Bの二段ロゴがない');
+  if (!appStub.innerHTML.includes('aria-label="百鬼調伏録"')) throw new Error('二段ロゴの読み上げ名がない');
+  if (!styleCss.includes('font-feature-settings: "palt" 1') || !styleCss.includes('"Yu Mincho"') || !styleCss.includes('.title-logo-crest')) throw new Error('採用した夜行印・怪異明朝ロゴがない');
   if (!(appStub.innerHTML.indexOf('class="title-keyart"') < appStub.innerHTML.indexOf('class="title-copy"') && appStub.innerHTML.indexOf('class="title-copy"') < appStub.innerHTML.indexOf('class="time-context"') && appStub.innerHTML.indexOf('class="time-context"') < appStub.innerHTML.indexOf('class="title-actions"'))) throw new Error('タイトルのアート・ロゴ・時間・操作が通常フロー順でない');
   const keyartRuleStart = styleCss.indexOf('.title-keyart {');
   const keyartRule = styleCss.slice(keyartRuleStart, styleCss.indexOf('}', keyartRuleStart));

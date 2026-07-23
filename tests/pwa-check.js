@@ -33,7 +33,7 @@ const runtimeArtFiles = [
 ];
 ok(runtimeArtFiles.every(name => assets.includes(`./assets/art/${name}`)), `実装用妖怪・ボス・呪具アート ${runtimeArtFiles.length}枚を全てキャッシュ`);
 for (const icon of manifest.icons || []) ok(assets.includes(`./${icon.src}`), `manifestアイコンをキャッシュ: ${icon.src}`);
-ok(assets.includes('./assets/title/title-keyart.webp'), '採用したタイトル看板アートをキャッシュ');
+ok(assets.includes('./assets/title/title-keyart-journey.webp'), '採用した夜行タイトルアートをキャッシュ');
 
 ok(/CACHE_PREFIX/.test(sw) && /CACHE_VERSION/.test(sw), 'キャッシュ名を版管理');
 ok(/addEventListener\('install'/.test(sw) && /cache\.addAll\(APP_ASSETS\)/.test(sw) && /skipWaiting/.test(sw), 'installで全資産を保存');
