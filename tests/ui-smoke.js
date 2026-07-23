@@ -158,7 +158,10 @@ check('M5-D: 専用演出・読み上げ・動きの抑制', () => {
   screen = 'fusion'; fusionSel = []; render();
   if (!appStub.innerHTML.includes('class="unit-select-hit"') || !appStub.innerHTML.includes('aria-label="鬼火を選択"')) throw new Error('選択カードの独立したキーボード操作が不足');
 });
-check('deck', () => { screen = 'deck'; render(); });
+check('deck', () => {
+  screen = 'deck'; render();
+  if (!styleCss.includes('minmax(140px, 1fr)') || !styleCss.includes('.unit-art-btn .sprite')) throw new Error('一覧カードの大型イラストレイアウトがない');
+});
 check('dungeon(d2ロック中)', () => {
   screen = 'dungeon'; render();
   if (!appStub.innerHTML.includes('踏破ごとに+15')) throw new Error('最大HP成長の表示が仕様と違う');
