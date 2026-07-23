@@ -724,13 +724,10 @@ function renderTitle() {
   const stateLabel = pendingRun ? '夜行の途中' : (isNew ? '新しい記録' : `位階「${currentProgressionRank(G).name}」`);
   app.innerHTML = `<main class="title-screen time-${time.timeBand.id}" data-screen="title" data-time-band="${time.timeBand.id}">
     <div class="title-stars" aria-hidden="true"></div>
-    <div class="title-keyart" aria-hidden="true"><img src="./assets/title/title-keyart-journey.webp" width="720" height="531" alt="" decoding="async" fetchpriority="high"></div>
-    <section class="title-copy" aria-labelledby="game-title">
-      <div class="title-logo title-logo-journey">
-        <span class="title-logo-crest" aria-hidden="true"><i></i></span>
-        <h1 id="game-title" aria-label="百鬼調伏録"><small>百鬼</small><strong>調伏録</strong></h1>
-      </div>
-      <p class="title-tagline">倒すか、従えるか。百鬼を率いて夜を征け。</p>
+    <div class="title-poster" aria-hidden="true"><img src="./assets/title/title-poster-journey.webp" width="824" height="870" alt="" decoding="async" fetchpriority="high"></div>
+    <section class="title-copy visually-hidden" aria-labelledby="game-title">
+      <h1 id="game-title">百鬼調伏録</h1>
+      <p>倒すか、従えるか。百鬼を率いて夜を征け。</p>
     </section>
     ${timeContextHtml(time)}
     ${isNew ? `<div class="title-guide" aria-label="遊び方の要点">

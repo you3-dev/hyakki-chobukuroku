@@ -30,15 +30,12 @@ function check(name, fn) {
 check('boot: title', () => {
   if (screen !== 'title') throw new Error('起動時にタイトルではない: ' + screen);
   render();
-  if (!appStub.innerHTML.includes('<small>百鬼</small><strong>調伏録</strong>')) throw new Error('タイトル名がない');
-  if (!appStub.innerHTML.includes('title-keyart-journey.webp') || !appStub.innerHTML.includes('class="title-keyart"')) throw new Error('採用した夜行タイトルアートがない');
-  if (!appStub.innerHTML.includes('title-logo-journey') || !appStub.innerHTML.includes('<small>百鬼</small><strong>調伏録</strong>')) throw new Error('案Bの二段ロゴがない');
-  if (!appStub.innerHTML.includes('aria-label="百鬼調伏録"')) throw new Error('二段ロゴの読み上げ名がない');
-  if (!styleCss.includes('font-feature-settings: "palt" 1') || !styleCss.includes('"Yu Mincho"') || !styleCss.includes('.title-logo-crest')) throw new Error('採用した夜行印・怪異明朝ロゴがない');
-  if (!(appStub.innerHTML.indexOf('class="title-keyart"') < appStub.innerHTML.indexOf('class="title-copy"') && appStub.innerHTML.indexOf('class="title-copy"') < appStub.innerHTML.indexOf('class="time-context"') && appStub.innerHTML.indexOf('class="time-context"') < appStub.innerHTML.indexOf('class="title-actions"'))) throw new Error('タイトルのアート・ロゴ・時間・操作が通常フロー順でない');
-  const keyartRuleStart = styleCss.indexOf('.title-keyart {');
-  const keyartRule = styleCss.slice(keyartRuleStart, styleCss.indexOf('}', keyartRuleStart));
-  if (!keyartRule.includes('position: relative') || keyartRule.includes('position: absolute')) throw new Error('タイトル看板アートが重なり配置になっている');
+  if (!appStub.innerHTML.includes('<h1 id="game-title">百鬼調伏録</h1>')) throw new Error('読み上げ用のタイトル名がない');
+  if (!appStub.innerHTML.includes('title-poster-journey.webp') || !appStub.innerHTML.includes('class="title-poster"')) throw new Error('採用した夜行タイトルポスターがない');
+  if (!(appStub.innerHTML.indexOf('class="title-poster"') < appStub.innerHTML.indexOf('class="title-copy') && appStub.innerHTML.indexOf('class="title-copy') < appStub.innerHTML.indexOf('class="time-context"') && appStub.innerHTML.indexOf('class="time-context"') < appStub.innerHTML.indexOf('class="title-actions"'))) throw new Error('タイトルポスター・時間・操作が通常フロー順でない');
+  const posterRuleStart = styleCss.indexOf('.title-poster {');
+  const posterRule = styleCss.slice(posterRuleStart, styleCss.indexOf('}', posterRuleStart));
+  if (!posterRule.includes('position: relative') || posterRule.includes('position: absolute')) throw new Error('タイトルポスターが重なり配置になっている');
   if (!appStub.innerHTML.includes('>はじめる<')) throw new Error('新規開始ボタンがない');
   if (!['title-guide', 'title-record', 'title-settings'].every(action => appStub.innerHTML.includes('data-action="' + action + '"'))) throw new Error('タイトルの補助導線が不足');
 });

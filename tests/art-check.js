@@ -80,10 +80,10 @@ ok(manifestIcons.some(icon => icon.src === 'assets/icons/icon-maskable-512.png' 
 ok(manifest.id === './' && manifest.scope === './' && manifest.start_url === './', 'manifest: GitHub Pages相対パス設定');
 ok(!manifest.name.includes('検証版'), 'manifest: ホーム画面名から検証版表記を除去');
 
-const titleKeyartPath = path.join(ROOT, 'assets', 'title', 'title-keyart-journey.webp');
-const titleKeyart = fs.existsSync(titleKeyartPath) ? fs.readFileSync(titleKeyartPath) : null;
-ok(titleKeyart && titleKeyart.length >= 12 && titleKeyart.subarray(0, 4).toString() === 'RIFF' && titleKeyart.subarray(8, 12).toString() === 'WEBP', '夜行タイトルアート: WebP形式');
-ok(titleKeyart && titleKeyart.length <= 96 * 1024, '夜行タイトルアート: 96KB以下');
+const titlePosterPath = path.join(ROOT, 'assets', 'title', 'title-poster-journey.webp');
+const titlePoster = fs.existsSync(titlePosterPath) ? fs.readFileSync(titlePosterPath) : null;
+ok(titlePoster && titlePoster.length >= 12 && titlePoster.subarray(0, 4).toString() === 'RIFF' && titlePoster.subarray(8, 12).toString() === 'WEBP', '夜行タイトルポスター: WebP形式');
+ok(titlePoster && titlePoster.length <= 144 * 1024, '夜行タイトルポスター: 144KB以下');
 
 const indexHtml = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 ok(indexHtml.includes('rel="apple-touch-icon" sizes="180x180" href="assets/icons/apple-touch-icon.png"'), 'index: apple-touch-icon指定');

@@ -2,7 +2,7 @@
 
 // M5-E: この値を変更すると新しいキャッシュへ原子的に切り替わる。
 const CACHE_PREFIX = 'hyakki-chobukuroku-';
-const CACHE_VERSION = '1.0.0-rc.8';
+const CACHE_VERSION = '1.0.0-rc.9';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 
 const APP_ASSETS = [
@@ -26,7 +26,7 @@ const APP_ASSETS = [
   './assets/icons/icon-192.png',
   './assets/icons/icon-512.png',
   './assets/icons/icon-maskable-512.png',
-  './assets/title/title-keyart-journey.webp',
+  './assets/title/title-poster-journey.webp',
   './assets/art/amanojaku.webp',
   './assets/art/amefuri.webp',
   './assets/art/byakko.webp',
